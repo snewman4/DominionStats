@@ -1,0 +1,71 @@
+version: 2.1
+
+executors:
+  node:
+    working_directory: ~/dominion
+    docker:
+      - image: circleci/node:14
+
+commands:
+  restore_yarn_cache:
+    description: Restore Yarn cache from previous build
+    steps:
+      - restore_cache:
+          keys:
+            - yarn-v2-{{ checksum "yarn.lock" }}
+
+  save_yarn_cache:
+    description: Save Yarn cache for future builds
+    steps:
+      - save_cache:
+          key: yarn-v2-{{ checksum "yarn.lock" }}
+          paths:
+          - ~/.cache/yarn
+
+  save_workspace:
+    description: Save current workspace
+    steps:
+      - persist_to_workspace:
+          root: .
+          paths: .
+
+  load_workspace:
+    description: Load workspace
+    steps:
+      - attach_workspace:
+          at: ~/dominion
+
+jobs:
+  build:
+    executor: node
+    steps:
+      - checkout
+      - restore_yarn_cache
+      - run:
+          name: Install and Build
+          command: |
+            yarn install --frozen-lockfile
+            yarn build
+      - run:
+          name: Check Formatting
+          command: yarn prettier
+      - run:
+          name: Check Linting
+          command: yarn lint
+      - save_yarn_cache
+      - save_workspace
+  test_unit:
+    executor: node
+    steps:
+      - load_workspace
+      - run:
+          name: Run Unit Tests
+          command: yarn test:unit
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test_unit:
+          requires:
+            - build
