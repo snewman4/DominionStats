@@ -17,6 +17,16 @@ app.get('/api/v1/endpoint', (req: any, res: any) => {
     res.json({ success: true });
 });
 
+app.use(helmet({
+    contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+            "upgrade-insecure-requests": null
+    
+        }
+   }
+}));
+
 // Serve LWC content
 app.use(express.static(DIST_DIR));
 
