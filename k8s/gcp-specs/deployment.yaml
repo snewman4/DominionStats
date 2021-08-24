@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: domgame-deployment
+  name: dominionstats-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: domgame-deployment
+      app: dominionstats-deployment
   template:
     metadata:
       labels:
-        app: domgame-deployment
+        app: dominionstats-deployment
     spec:
       containers:
       - name: app
