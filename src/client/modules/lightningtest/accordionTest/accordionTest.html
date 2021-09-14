@@ -1,0 +1,61 @@
+<!--
+  Copyright (c) 2019, salesforce.com, inc.
+  All rights reserved.
+  SPDX-License-Identifier: MIT
+  For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
+ -->
+
+<template>
+    <template if:false={isAccordionHidden}>
+        <lightning-accordion
+            title="accordion title"
+            active-section-name={activeSection}
+            allow-multiple-sections-open={allowMultipleSectionsOpen}
+            onsectiontoggle={sectiontoggleHandler}
+        >
+            <lightning-accordion-section
+                class="section-a"
+                title="section A"
+                name="A"
+                label="section A"
+            >
+                <lightning-button-menu
+                    slot="actions"
+                    alternative-text="Show menu"
+                    menu-alignment="right"
+                    icon-size="x-small"
+                >
+                    <lightning-menu-item
+                        value="New"
+                        label="Menu Item One"
+                    ></lightning-menu-item>
+                    <lightning-menu-item
+                        value="Edit"
+                        label="Menu Item Two"
+                    ></lightning-menu-item>
+                </lightning-button-menu>
+                <p>This is the content area for section A.</p>
+            </lightning-accordion-section>
+
+            <template if:true={isBVisible}>
+                <lightning-accordion-section
+                    class="section-b"
+                    title="section B"
+                    name="B"
+                    label="section B"
+                >
+                    <p>This is the content area for section B.</p>
+                </lightning-accordion-section>
+            </template>
+
+            <lightning-accordion-section
+                class="section-c"
+                title="section C"
+                name="C"
+                label="section C"
+            >
+                <p>This is the content area for section C.</p>
+            </lightning-accordion-section>
+        </lightning-accordion>
+    </template>
+</template>

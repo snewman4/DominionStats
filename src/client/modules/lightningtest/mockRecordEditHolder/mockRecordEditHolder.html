@@ -1,0 +1,58 @@
+<!--
+  Copyright (c) 2019, salesforce.com, inc.
+  All rights reserved.
+  SPDX-License-Identifier: MIT
+  For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
+ -->
+
+<template>
+    {_recordId}
+    <lightning-record-edit-form
+        record-id={_recordId}
+        object-api-name={_objectApiName}
+        record-type-id={_recordTypeId}
+        density={density}
+        layout-type={_layoutType}
+        onload={handleLoad}
+    >
+        <lightning-messages></lightning-messages>
+        <lightning-input-field field-name="Name"></lightning-input-field>
+        <lightning-output-field field-name="Name"></lightning-output-field>
+        <lightning-input-field
+            if:true={_showChild}
+            class="newChild"
+            field-name="Has_Website__c"
+        ></lightning-input-field>
+        <lightning-input-field
+            if:true={_showPicklist}
+            class="picklist"
+            field-name="Weakness__c"
+        ></lightning-input-field>
+        <lightning-input-field
+            if:true={_showPicklist}
+            class="picklist"
+            field-name="Country__c"
+        ></lightning-input-field>
+        <lightning-input-field
+            field-name="Description__c"
+        ></lightning-input-field>
+        <div class="nestedChild">
+            <template if:true={_showNestedChild}>
+                <lightning-input-field
+                    field-name="Description__c"
+                    class="description"
+                ></lightning-input-field>
+                <lightning-output-field
+                    field-name="CreatedDate"
+                    class="createdDate"
+                ></lightning-output-field>
+            </template>
+        </div>
+        <lightning-button
+            type="submit"
+            name="submit"
+            label="submit"
+            class="submitme"
+        ></lightning-button>
+    </lightning-record-edit-form>
+</template>

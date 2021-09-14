@@ -8,7 +8,32 @@
     </div>
 
     <div class="center">
-        <img src="./resources/lwc.png" />
+        <img src="./assets/lwc.png" />
+    </div>
+
+    <!-- Testing lightning components -->
+    <div class="center">
+
+        <lightning-button variant="brand" label="Brand Button">
+        </lightning-button>
+
+        <lightning-tab-set>
+            <lightning-tab label="A">
+                <lightning-card title="Tab A > Card A">
+                    Contents A
+                </lightning-card>
+            </lightning-tab>
+            <lightning-tab label="B">
+                <lightning-card title="Tab B > Card B">
+                    Contents B
+                </lightning-card>
+            </lightning-tab>
+            <lightning-tab label="C">
+                <lightning-card title="Tab C > Card C">
+                    Contents C
+                </lightning-card>
+            </lightning-tab>
+        </lightning-tab-set>
     </div>
 
     <!-- Page code -->
@@ -21,7 +46,7 @@
             </p>
         </div>
         <div>
-            <a href="https://lwc.dev" class="link" target="_blank">Learn LWC</a>
+            <lightning-formatted-url value="https://lwc.dev" class="link" target="_blank">Learn LWC</lightning-formatted-url>
         </div>
     </div>
 </template>

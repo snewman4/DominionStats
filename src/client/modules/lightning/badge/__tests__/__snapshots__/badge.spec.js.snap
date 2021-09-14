@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`lightning-badge default 1`] = `
+<lightning-badge
+  class="slds-badge"
+>
+  #shadow-root(open)
+     
+    Alpha
+     
+</lightning-badge>
+`;

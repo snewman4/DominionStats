@@ -1,0 +1,77 @@
+<!--
+  Copyright (c) 2019, salesforce.com, inc.
+  All rights reserved.
+  SPDX-License-Identifier: MIT
+  For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
+ -->
+
+<template>
+    <lightning-vertical-navigation
+        compact={compact}
+        shaded={shaded}
+        selected-item={selectedItem}
+        aria-label={ariaLabel}
+        onbeforeselect={handleBeforeSelect}
+        onselect={handleSelect}
+    >
+        <lightning-vertical-navigation-section label="First" class="asection">
+            <lightning-vertical-navigation-item
+                label="Item 1"
+                name="item1"
+            ></lightning-vertical-navigation-item>
+            <lightning-vertical-navigation-item
+                label="Item 2"
+                name="item2"
+            ></lightning-vertical-navigation-item>
+            <lightning-vertical-navigation-item
+                label="Item 3"
+                name="item3"
+            ></lightning-vertical-navigation-item>
+        </lightning-vertical-navigation-section>
+
+        <lightning-vertical-navigation-section label="Second" class="asection">
+            <lightning-vertical-navigation-item
+                label="Item 4"
+                name="item4"
+            ></lightning-vertical-navigation-item>
+            <lightning-vertical-navigation-item
+                label="Item 5"
+                name="item5"
+            ></lightning-vertical-navigation-item>
+            <lightning-vertical-navigation-item
+                label="Item 6"
+                name="item6"
+            ></lightning-vertical-navigation-item>
+            <lightning-vertical-navigation-overflow class="anoverflow">
+                <lightning-vertical-navigation-item
+                    label="Item 7"
+                    name="item7"
+                ></lightning-vertical-navigation-item>
+                <lightning-vertical-navigation-item
+                    label="Item 8"
+                    name="item8"
+                ></lightning-vertical-navigation-item>
+                <lightning-vertical-navigation-item
+                    label="Item 9"
+                    name="item9"
+                ></lightning-vertical-navigation-item>
+            </lightning-vertical-navigation-overflow>
+        </lightning-vertical-navigation-section>
+
+        <lightning-vertical-navigation-section label="Third">
+            <lightning-vertical-navigation-item-icon
+                label="Item 10"
+                name="item10"
+                icon-name="utility:open_folder"
+            >
+            </lightning-vertical-navigation-item-icon>
+
+            <lightning-vertical-navigation-item-icon
+                label="Item 11"
+                name="item11"
+                icon-name="utility:open_folder"
+            >
+            </lightning-vertical-navigation-item-icon>
+        </lightning-vertical-navigation-section>
+    </lightning-vertical-navigation>
+</template>
