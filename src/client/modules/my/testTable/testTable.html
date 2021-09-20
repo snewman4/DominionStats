@@ -1,0 +1,20 @@
+<template>
+
+  <tr>
+    <th>Date</th>
+    <th>Name</th>
+    <th>Ranking</th>
+    <th>Victory Points</th>
+  </tr>
+
+  <template for:each={tableData} for:item="entry">
+
+    <tr key={entry.name}>
+        <td>{entry.date}</td>
+        <td>{entry.name}</td>
+        <td>{entry.ranking}</td>
+        <td>{entry.victoryPoints}</td>
+    </tr>
+
+  </template>
+</template>
