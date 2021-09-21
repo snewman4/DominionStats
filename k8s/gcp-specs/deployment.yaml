@@ -23,7 +23,7 @@ spec:
             secretKeyRef:
               name: dominionstats-secrets
               key: postgres_user
-        - name: PGPASS
+        - name: PGPASSWORD
           valueFrom:
             secretKeyRef:
               name: dominionstats-secrets
