@@ -12,7 +12,38 @@ spec:
       labels:
         app: dominionstats-deployment
     spec:
+      serviceAccountName: dominionstats-ksa
       containers:
       - name: app
-        image: gcr.io/PROJECT_ID/IMAGE:TAG
+        image: gcr.io/august-cascade-323015/dominionstats-image:31b56d1d19304febb41799ddb938e2e1062ad8bd
         imagePullPolicy: Always
+        env:
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              name: dominionstats-secrets
+              key: postgres_user
+        - name: PGPASS
+          valueFrom:
+            secretKeyRef:
+              name: dominionstats-secrets
+              key: postgres_password
+        - name: PGDATABASE
+          valueFrom:
+            secretKeyRef:
+              name: dominionstats-secrets
+              key: postgres_database
+      - name: cloud-sql-proxy
+        # It is recommended to use the latest version of the Cloud SQL proxy
+        # Make sure to update on a regular schedule!
+        image: gcr.io/cloudsql-docker/gce-proxy:1.17
+        command:
+          - "/cloud_sql_proxy"
+
+          # Replace DB_PORT with the port the proxy should listen on
+          # Defaults: MySQL: 3306, Postgres: 5432, SQLServer: 1433
+          - "-instances=august-cascade-323015:us-central1:dominionstats-pg=tcp:5432"
+        securityContext:
+          # The default Cloud SQL proxy image runs as the
+          # "nonroot" user and group (uid: 65532) by default.
+          runAsNonRoot: true
