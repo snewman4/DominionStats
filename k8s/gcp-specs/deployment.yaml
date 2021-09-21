@@ -15,7 +15,7 @@ spec:
       serviceAccountName: dominionstats-ksa
       containers:
       - name: app
-        image: gcr.io/august-cascade-323015/dominionstats-image:31b56d1d19304febb41799ddb938e2e1062ad8bd
+        image: gcr.io/PROJECT_ID/IMAGE:TAG
         imagePullPolicy: Always
         env:
         - name: PGUSER
