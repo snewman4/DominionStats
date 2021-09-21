@@ -13,6 +13,9 @@ import { migrate } from 'postgres-migrations';
 const pool = new Pool();
 
 async function init(): Promise<void> {
+    // startup delay to ensure cloudsql-proxy comes up
+    await new Promise((res) => setTimeout(res, 5000));
+
     // Validate connection
     try {
         await pool.query('SELECT NOW()');
@@ -33,7 +36,10 @@ async function init(): Promise<void> {
 }
 
 // Verify connection and run migrations on startup
-init();
+init().catch((e) => {
+    console.error("Failed to init db_setup: ", e);
+    process.exit(1);
+});
 
 interface TestObject {
     id: number;
