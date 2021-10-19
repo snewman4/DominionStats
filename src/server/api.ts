@@ -4,8 +4,8 @@ import helmet from 'helmet';
 import express from 'express';
 import path from 'path';
 
-// TODO: import queries from DB service
-import { testQueryAll } from './db_setup';
+//to import queries from DB service
+import { testQueryAll, testQueryAll2} from './db_setup';
 
 const app = express();
 app.use(compression());
@@ -34,6 +34,10 @@ app.get('/api/v1/endpoint', (req: any, res: any) => {
 
 app.get('/api/v1/testObjects', async (req: any, res: any) => {
     res.json(await testQueryAll());
+});
+
+app.get('/api/v1/gameLogs', async (req: any, res: any) => {
+    res.json(await testQueryAll2());
 });
 
 // Serve LWC content
