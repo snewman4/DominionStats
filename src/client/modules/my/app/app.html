@@ -1,61 +1,27 @@
 <template>
-    <h1>Tanner's Component</h1>
-    <!-- LWC sample component <my-greeting> -->
-    <div class="center greeting">
-        <!-- <my-greeting speed="slow"></my-greeting> -->
-        <my-greeting speed="medium"></my-greeting>
-        <!-- <my-greeting speed="fast"></my-greeting> -->
-    </div>
 
     <div class="center">
-        <img src="./assets/lwc.png" />
-    </div>
-
-    <!-- Testing lightning components -->
-    <div class="center">
-
-        <lightning-button variant="brand" label="Brand Button">
-        </lightning-button>
 
         <lightning-tabset>
-            <lightning-tab label="A">
-                <lightning-card title="Tab A > Card A">
+            <lightning-tab label="Raw Results">
+                <lightning-card title="Raw Results">
                     
                     <div class="center">
-                        <my-test-table></my-test-table>
+                        <my-raw-results-table></my-raw-results-table>
                     </div>
 
                 </lightning-card>
             </lightning-tab>
-            <lightning-tab label="B">
-                <lightning-card title="Tab B > Card B">
-                    Contents B
-                </lightning-card>
-            </lightning-tab>
-            <lightning-tab label="C">
-                <lightning-card title="Tab C > Card C">
-                    Contents C
+            <lightning-tab label="Games">
+                <lightning-card title="Game Results">
+                    <div class="center">
+
+                        <my-player-ranking-table></my-player-ranking-table>
+
+                    </div>
                 </lightning-card>
             </lightning-tab>
         </lightning-tabset>
-    </div>
-
-    <!-- Page code -->
-    <div class="center">
-        <div class="container">
-            <!-- prettier-ignore -->
-            <p class="info">
-                Edit <strong class="code">src/client/modules/my/app/app.html</strong>
-                <br />and save for live reload.
-            </p>
-        </div>
-        <div>
-            <lightning-formatted-url value="https://lwc.dev" class="link" target="_blank">Learn LWC</lightning-formatted-url>
-        </div>
-    </div>
-
-    <div class="slds-p-top_large">
-        <my-hello-world></my-hello-world>
     </div>
 
 </template>

@@ -1,0 +1,33 @@
+<template>
+
+  <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+
+    <thead>
+      <tr class="slds-line-height_reset">
+        <th>Player</th>
+        <th>Games Played</th>
+        <th>Percentage of Games Played</th>
+        <th>Average Points per Game</th>
+        <th>Total Points</th>
+        <th>Number of First Place Finishes</th>
+        <th>First Place Percentage</th>
+      </tr>
+    </thead>
+  
+    <tbody>
+      <template for:each={tableData} for:item="entry">
+        <tr key={entry.name} class="slds-hint-parent">
+            <td>{entry.name}</td>
+            <td>{entry.gamesPlayed}</td>
+            <td>{entry.gamePercent}</td>
+            <td>{entry.averagePoints}</td>
+            <td>{entry.totalPoints}</td>
+            <td>{entry.totalFirst}</td>
+            <td>{entry.percentFirst}</td>
+        </tr>
+      </template>
+    </tbody>
+
+  </table>
+
+</template>
