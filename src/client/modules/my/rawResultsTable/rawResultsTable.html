@@ -4,26 +4,20 @@
 
     <thead>
       <tr class="slds-line-height_reset">
-        <th>Player</th>
-        <th>Games Played</th>
-        <th>Percentage of Games Played</th>
-        <th>Average Points per Game</th>
-        <th>Total Points</th>
-        <th>Number of First Place Finishes</th>
-        <th>First Place Percentage</th>
+        <th>Date</th>
+        <th>Ranking</th>
+        <th>Name</th>
+        <th>Victory Points</th>
       </tr>
     </thead>
-  
+
     <tbody>
       <template for:each={tableData} for:item="entry">
-        <tr key={entry.name} class="slds-hint-parent">
-            <td>{entry.name}</td>
-            <td>{entry.gamesPlayed}</td>
-            <td>{entry.gamePercent}</td>
-            <td>{entry.averagePoints}</td>
-            <td>{entry.totalPoints}</td>
-            <td>{entry.totalFirst}</td>
-            <td>{entry.percentFirst}</td>
+        <tr key={entry.id} class="slds-hint-parent">
+            <td>{entry.game_label}</td>
+            <td>{entry.player_num}</td>
+            <td>{entry.player_name}</td>
+            <td>{entry.victory_points}</td>
         </tr>
       </template>
     </tbody>
