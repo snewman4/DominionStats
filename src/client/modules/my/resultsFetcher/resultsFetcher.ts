@@ -1,4 +1,4 @@
-interface GameResultsData {
+export interface GameResultsData {
     id: number;
     game_label: string;
     player_num: number;
@@ -6,7 +6,7 @@ interface GameResultsData {
     victory_points: number;
 }
 
-interface PlayerStatsAllGames {
+export interface PlayerStatsAllGames {
     player_name: string;
     num_games: number;
     percent_played: number;

@@ -1,0 +1,29 @@
+<template>
+    <div class="slds-clearfix">
+        <!-- Sized assuming 6cols = 1920px window-->
+        <!-- TODO: dynamic columning to overflow downward -->
+        <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
+            <my-donut-chart
+                data={firstPlaceFreqDonutData}
+                title="First Place Wins"
+                width=300
+                height=300
+                >
+            </my-donut-chart>
+        </div>
+        <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
+            <my-connected-scatter-graph
+                data={gameParticipationTrendData}
+                title="Game Participation"
+                xkey="game_label"
+                xlabel="Game"
+                xtype={scalePoint}
+                ylabel="Players"
+                ykey="player_num"
+                width=600
+                height=300
+                >
+            </my-connected-scatter-graph>
+        </div>
+    </div>
+</template>
