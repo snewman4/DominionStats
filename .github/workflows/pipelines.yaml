@@ -60,7 +60,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@main
         with:
           service: dominionstats-image
-          image: "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
+          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE }}:${{ github.sha }}
 
       - name: CloudRun Deploy Results
         run: curl "${{ steps.deploy.outputs.url }}"
