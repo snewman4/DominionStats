@@ -56,8 +56,6 @@ async function init(): Promise<void> {
             csvData.push(data);
         })
         .on("end", function() {
-            // remove the first line: header
-            csvData.shift();
 
             const query = "INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)";
 
