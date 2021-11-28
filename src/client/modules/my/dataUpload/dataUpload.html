@@ -1,7 +1,11 @@
 <template>
 
+    <h5>Enter game results</h5>
+    
+    <br>
+
     <label for="gameId">Game ID:</label>
-    <input class="slds-input" type="text" name="gameId">
+    <input class="slds-input" type="text" name="gameId" placeholder="Eg. YYYYMMDDa">
 
     <br>
 
@@ -54,5 +58,9 @@
     <br>
 
     <lightning-button label="Submit" variant="brand-outline" onclick={gatherDataAndSend}></lightning-button>
+
+    <br>
+
+    <p name="errorMessage" hidden>Error text</p>
 
 </template>
