@@ -12,6 +12,29 @@
             </my-donut-chart>
         </div>
         <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
+            <my-donut-chart
+                data={gamesPlayedDonuntData}
+                title="Games Played"
+                width=300
+                height=300
+                >
+            </my-donut-chart>
+        </div>
+        <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
+            <my-bar-graph
+                data={avgPointsWonBarData}
+                title="Average Points Won"
+                xkey="player_name"
+                xlabel="Player"
+                xtype={scalePoint}
+                ylabel="Points"
+                ykey="avg_points"
+                width=800
+                height=300
+                >
+            </my-bar-graph>
+        </div>
+        <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
             <my-connected-scatter-graph
                 data={gameParticipationTrendData}
                 title="Game Participation"
