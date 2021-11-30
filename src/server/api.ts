@@ -5,10 +5,14 @@ import express from 'express';
 import path from 'path';
 
 //to import queries from DB service
-import { testQueryAll, testQueryAll2} from './db_setup';
+import { testQueryAll, getGameResultsFromDb, testQueryDataUpload} from './db_setup';
 
 const app = express();
 app.use(compression());
+
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const HOST = process.env.HOST || 'localhost';
 if (HOST !== 'localhost') {
@@ -24,6 +28,7 @@ if (HOST !== 'localhost') {
         noSniff: undefined,
     }));
 }
+
 const PORT = process.env.PORT || 3001;
 const DIST_DIR = './dist';
 
@@ -36,8 +41,12 @@ app.get('/api/v1/testObjects', async (req: any, res: any) => {
     res.json(await testQueryAll());
 });
 
-app.get('/api/v1/gameLogs', async (req: any, res: any) => {
-    res.json(await testQueryAll2());
+app.post('/api/v1/gameResultsTest', (req: any, res: any) => {
+    res.json(testQueryDataUpload(req.body, res));
+});
+
+app.get('/api/v1/gameResults', async (req: any, res: any) => {
+    res.json(await getGameResultsFromDb());
 });
 
 // Serve LWC content

@@ -31,7 +31,7 @@ type PlayersPerGame = Pick<GameResultsData, "game_label" | "player_num">;
 
 export function getRawResults(): Promise<GameResultsData[]> {
     if (cachedData && !cachedData.length) {
-        return fetch('/api/v1/gameLogs')
+        return fetch('/api/v1/gameResults')
             .then(response => response.json())
             .then(data => {
                 cachedData = data as GameResultsData[];

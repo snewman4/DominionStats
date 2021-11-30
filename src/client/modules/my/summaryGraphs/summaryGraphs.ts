@@ -19,6 +19,11 @@ interface AvgPointsData {
     avg_points: number;
 }
 
+interface PointsData {
+    player_name: string;
+    total_victory_points: number;
+}
+
 export default class SummaryGraphs extends LightningElement {
     gameParticipationTrendData: PlayersPerGame[] = [];
     firstPlaceFreqDonutData: DonutData[] = [];
@@ -38,11 +43,12 @@ export default class SummaryGraphs extends LightningElement {
             this.firstPlaceFreqDonutData = playerOverviewStats
                 .filter(ps => ps.first_place > 0)
                 .map((ps) => { return {name: ps.player_name, value: ps.first_place}; })
+                // sort descending
                 .sort((a, b) => {
                     if (a.value < b.value) {
-                        return -1;
-                    } else if (a.value > b.value) {
                         return 1;
+                    } else if (a.value > b.value) {
+                        return -1;
                     }
                     return 0;
                 });
@@ -79,6 +85,19 @@ export default class SummaryGraphs extends LightningElement {
                 return accum;
             }, {});
             this.gameParticipationTrendData = Object.entries(playersPerGame).map(([key, value]) => { return {game_label: key, player_num: value}});
+
+            // Total Points
+            this.totalPointsWonBarData = playerOverviewStats
+                // sort descending
+                .sort((a,b) => {
+                    if (a.total_victory_points < b.total_victory_points) {
+                        return 1;
+                    } else if (a.total_victory_points > b.total_victory_points) {
+                        return -1;
+                    }
+                    return 0;
+                });
+
         } else {
             console.log("Blocked a re-render propagation");
         }

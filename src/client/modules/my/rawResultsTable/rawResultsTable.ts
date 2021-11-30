@@ -8,7 +8,6 @@ export default class RawResultsTable extends LightningElement {
     async connectedCallback() {
         this.tableData = await getRawResults();
     }
-
 }
 
 

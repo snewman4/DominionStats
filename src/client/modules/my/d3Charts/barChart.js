@@ -29,10 +29,10 @@ export function BarChart(data, {
     if (xDomain === undefined) xDomain = X;
     if (yDomain === undefined) yDomain = [0, d3.max(Y)];
     xDomain = new d3.InternSet(xDomain);
-
+  
     // Omit any data not present in the x-domain.
     const I = d3.range(X.length).filter(i => xDomain.has(X[i]));
-
+  
     // Construct scales, axes, and formats.
     const xScale = d3.scaleBand(xDomain, xRange).padding(xPadding);
     const yScale = yType(yDomain, yRange);
@@ -78,13 +78,13 @@ export function BarChart(data, {
         .attr("y", i => yScale(Y[i]))
         .attr("height", i => yScale(0) - yScale(Y[i]))
         .attr("width", xScale.bandwidth());
-
+  
     if (title) bar.append("title")
         .text(title);
-
+  
     svg.append("g")
         .attr("transform", `translate(0,${height - marginBottom})`)
         .call(xAxis);
-
+  
     return svg.node();
-  } 
+  }

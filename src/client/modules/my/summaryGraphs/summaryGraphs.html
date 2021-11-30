@@ -48,5 +48,21 @@
                 >
             </my-connected-scatter-graph>
         </div>
+
+        <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
+            <my-bar-graph
+                data={totalPointsWonBarData}
+                title="Total Points Won"
+                xkey="player_name"
+                xlabel="Player"
+                xtype={scalePoint}
+                ylabel="Points"
+                ykey="total_victory_points"
+                width=800
+                height=300
+                >
+            </my-bar-graph>
+        </div>
+
     </div>
 </template>
