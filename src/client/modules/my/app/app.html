@@ -6,83 +6,84 @@
         </h1>
     </div>
 
-    <div class="center">
+    <div class="slds-clearfix">
+        <div class="slds-float_left">
+            <my-menu></my-menu>
+        </div>
+    </div>
 
+    <my-route route="/">
         <lightning-tabset>
+
             <lightning-tab label="Raw Results">
-
-                <my-data-upload></my-data-upload>
-
                 <lightning-card title="Raw Results">
-                    
                     <div class="center">
                         <my-raw-results-table></my-raw-results-table>
                     </div>
-
                 </lightning-card>
             </lightning-tab>
+
             <lightning-tab label="All Games">
                 <lightning-card title="Game Results">
                     <div class="center">
-
                         <my-summary-graphs></my-summary-graphs>
                         <my-player-ranking-table></my-player-ranking-table>
-
                     </div>
                 </lightning-card>
             </lightning-tab>
+
             <lightning-tab label="2 Player Games">
                 <lightning-card title="2 Player Games">
                     <div class="center">
-
                         <my-two-player-summary-graphs></my-two-player-summary-graphs>
                         <my-two-player-ranking-table></my-two-player-ranking-table>
-
                     </div>
                 </lightning-card>
             </lightning-tab>
+
             <lightning-tab label="3 Player Games">
                 <lightning-card title="3 Player Games">
                     <div class="center">
-
                         <my-three-player-summary-graphs></my-three-player-summary-graphs>
                         <my-three-player-ranking-table></my-three-player-ranking-table>
-
                     </div>
                 </lightning-card>
             </lightning-tab>      
+
             <lightning-tab label="4 Player Games">
                 <lightning-card title="4 Player Games">
                     <div class="center">
-
                         <my-four-player-summary-graphs></my-four-player-summary-graphs>
                         <my-four-player-ranking-table></my-four-player-ranking-table>
-
                     </div>
                 </lightning-card>
             </lightning-tab>
+
             <lightning-tab label="5 Player Games">
                 <lightning-card title="5 Player Games">
                     <div class="center">
-
                         <my-five-player-summary-graphs></my-five-player-summary-graphs>
                         <my-five-player-ranking-table></my-five-player-ranking-table>
-
                     </div>
                 </lightning-card>
             </lightning-tab>
-                <lightning-tab label="6 Player Games">
-                    <lightning-card title="6 Player Games">
-                        <div class="center">
 
-                            <my-six-player-summary-graphs></my-six-player-summary-graphs>
-                            <my-six-player-ranking-table></my-six-player-ranking-table>
-
-                        </div>
-                    </lightning-card>
-                </lightning-tab>
+            <lightning-tab label="6 Player Games">
+                <lightning-card title="6 Player Games">
+                    <div class="center">
+                        <my-six-player-summary-graphs></my-six-player-summary-graphs>
+                        <my-six-player-ranking-table></my-six-player-ranking-table>
+                    </div>
+                </lightning-card>
+            </lightning-tab>
         </lightning-tabset>
+    </my-route>
 
-    </div>
+    <my-route route="/upload">
+        <my-data-upload></my-data-upload>
+    </my-route>
 
+    <my-route route="/user/[^/?#]+">
+        <my-user-landing></my-user-landing>
+    </my-route>
 </template>

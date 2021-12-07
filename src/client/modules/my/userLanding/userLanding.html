@@ -1,0 +1,24 @@
+<template>
+    <div class="slds-clearfix">
+        <lightning-card class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
+            <div style="width:300px">
+                <my-user-card
+                    username={userName}
+                    games={summaryStats.games}
+                    wins={summaryStats.firstPlace}
+                    points={summaryStats.points}
+                ></my-user-card>
+            </div>
+        </lightning-card>
+
+        <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
+            <my-donut-chart
+                data={placeDistribution}
+                title="Place Distribution"
+                width=300
+                height=300
+                >
+            </my-donut-chart>
+        </div>
+    </div>
+</template>

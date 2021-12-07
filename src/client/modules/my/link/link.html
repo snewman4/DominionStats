@@ -1,0 +1,12 @@
+<template>
+    <a onclick={onclick} href={href}>
+        <template if:true={iconName}>
+            <lightning-icon icon-name={iconName}></lightning-icon>
+        </template>
+        <template if:true={label}>
+            <!-- TODO: vertical center -->
+            <span>{label}</span>
+        </template>
+        <slot></slot>
+    </a>
+</template>

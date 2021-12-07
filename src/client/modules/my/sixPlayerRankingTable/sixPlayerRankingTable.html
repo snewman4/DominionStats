@@ -27,7 +27,7 @@
       <tbody>
         <template for:each={tableData} for:item="entry">
           <tr key={entry.player_name} class="slds-hint-parent">
-              <td>{entry.player_name}</td>
+              <td><my-user-link user={entry.player_name}></my-user-link></td>
               <td>{entry.num_games}</td>
               <td>{entry.percent_played}%</td>
               <td>{entry.avg_points}</td>

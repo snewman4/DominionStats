@@ -16,7 +16,7 @@
         <tr key={entry.id} class="slds-hint-parent">
             <td>{entry.game_label}</td>
             <td>{entry.player_num}</td>
-            <td>{entry.player_name}</td>
+            <td><my-user-link user={entry.player_name}></my-user-link></td>
             <td>{entry.victory_points}</td>
         </tr>
       </template>

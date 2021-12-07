@@ -14,8 +14,8 @@ export default class DataUploader extends LightningElement {
         //get entered player data
         for(let x = 0; x < 6; x++) {
             playerData.push({
-                "playerName": this.getValueFromInput("playerName" + (x+1).toString()),
-                "victoryPoints": parseInt(this.getValueFromInput("victoryPoints" + (x+1).toString()), 10)
+                "playerName": this.getValueFromInput("playerName" + (x+1).toString()).trim(),
+                "victoryPoints": parseInt(this.getValueFromInput("victoryPoints" + (x+1).toString().trim()), 10)
             });
         }
 
@@ -46,7 +46,7 @@ export default class DataUploader extends LightningElement {
             console.log("Sending data: ", data);
 
             //send POST request to api
-            fetch("api/v1/gameResultsTest", {
+            fetch("api/v1/gameResults", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -64,6 +64,7 @@ export default class DataUploader extends LightningElement {
                     this.template.querySelector("p[name=\"errorMessage\"]").textContent = 
                             "Something went wrong with the data upload. Please try again.";
                     this.template.querySelector("p[name=\"errorMessage\"]").hidden = false;
+                    console.error("Error inserting game results: ", response);
 
                 }
 

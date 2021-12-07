@@ -2,7 +2,7 @@
     "name": "DominionStats",
     "description": "My amazing LWC app",
     "version": "0.0.1",
-    "author": "Matt",
+    "author": "gik0geck0",
     "bugs": "https://github.com/Matt/DominionStats/issues",
     "dependencies": {
         "compression": "^1.7.4",
@@ -25,15 +25,15 @@
         "husky": "^7.0.1",
         "lwc-services": "^3.1.2",
         "npm-run-all": "^4.1.5",
-        "prettier": "^2.3.2",
-        "rimraf": "^3.0.2"
+        "rimraf": "^3.0.2",
+        "prettier": "^2.3.2"
     },
     "engines": {
         "node": ">=10.13.0",
         "npm": ">=6.4.1",
         "yarn": ">=1.9.4"
     },
-    "homepage": "https://github.com/Matt/DominionStats",
+    "homepage": "https://github.com/gik0geck0/DominionStats",
     "keywords": [
         "lwc"
     ],
@@ -49,7 +49,7 @@
         ],
         "exec": "ts-node ./src/server/api.ts"
     },
-    "repository": "Matt/DominionStats",
+    "repository": "https://github.com/gik0geck0/DominionStats",
     "scripts": {
         "build": "lwc-services build -m production -b rollup && tsc -b ./src/server",
         "build:development": "lwc-services build -b rollup",

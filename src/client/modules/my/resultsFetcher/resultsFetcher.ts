@@ -82,14 +82,14 @@ function getGameSizes(resultsData: GameResultsData[]) : PlayersPerGame[] {
 function calculatePlayerStats(PlayerStats : PlayerStatsAllGames[],resultsData : GameResultsData[]) : PlayerStatsAllGames[] {
     let total = 0;
     resultsData.forEach((entry, i) => {
-       if(!PlayerStats.find(o => o.player_name == entry.player_name)){
+       if(!PlayerStats.find(o => o.player_name === entry.player_name)){
         PlayerStats.push({player_name: entry.player_name,first_place: 0,percent_first: 0,percent_second: 0,percent_third:0,percent_fourth:0,percent_fifth:0,percent_sixth:0,avg_points: 0,percent_played: 0, total_victory_points: 0, num_games: 0,second_place: 0,third_place: 0,fourth_place: 0, fifth_place: 0,sixth_place: 0})
        }
-       if(entry.player_num == 1){
+       if(entry.player_num === 1){
            total++;
        }
        for (var j in PlayerStats){
-            if(PlayerStats[j].player_name == entry.player_name){
+            if(PlayerStats[j].player_name === entry.player_name){
                 PlayerStats[j].num_games++;
                 PlayerStats[j].total_victory_points += entry.victory_points;
                 switch (entry.player_num) {

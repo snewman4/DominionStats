@@ -1,0 +1,78 @@
+<template>
+    <!--
+    <div class="slds-page-header slds-page-header_vertical">
+        <div class="slds-page-header__row">
+            <div class="slds-page-header__col-title">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="standard:user"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <div class="slds-page-header__name">
+                            <div class="slds-page-header__name-title">
+                                <h1>
+                                    <span>Users</span>
+                                    <span class="slds-page-header__title slds-truncate"
+                                        title={userName}>{username}</span>
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-page-header__row">
+            <div class="slds-page-header__col-meta">
+                <p class="slds-page-header__meta-text">{games} Games</p>
+            </div>
+        </div>
+        <div class="slds-page-header__row">
+            <div class="slds-page-header__col-meta">
+                <p class="slds-page-header__meta-text">{wins} Wins</p>
+            </div>
+        </div>
+        <div class="slds-page-header__row">
+            <div class="slds-page-header__col-meta">
+                <p class="slds-page-header__meta-text">{points} Points</p>
+            </div>
+        </div>
+    </div>
+    -->
+
+    <div class="slds-page-header slds-page-header_vertical">
+        <div class="slds-media">
+            <div class="slds-media__figure">
+                <lightning-icon icon-name="standard:user"></lightning-icon>
+            </div>
+            <div class="slds-media__body">
+                <div class="slds-page-header__name">
+                    <div class="slds-page-header__name-title">
+                        <h1>
+                            <span class="slds-page-header__title slds-truncate" title={userName}>{username}</span>
+                        </h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ul class="slds-page-header__detail-list">
+            <li class="slds-page-header__detail-item">
+                <u class="slds-text-title slds-truncate" title="Games">Games</u>
+                <div class="slds-text-heading_medium">
+                    {games}
+                </div>
+            </li>
+            <li class="slds-page-header__detail-item">
+                <u class="slds-text-title slds-truncate" title="Wins">Wins</u>
+                <div class="slds-text-heading_medium">
+                    {wins}
+                </div>
+            </li>
+            <li class="slds-page-header__detail-item">
+                <u class="slds-text-title slds-truncate" title="Points">Points</u>
+                <div class="slds-text-heading_medium">
+                    {points}
+                </div>
+            </li>
+        </ul>
+    </div>
+</template>
