@@ -18,7 +18,11 @@ const pool = new Pool();
 const fs = require("fs");
 const fastcsv = require("fast-csv");
 
-async function init(): Promise<void> {
+export function getPool() {
+    return pool;
+}
+
+export async function init(): Promise<void> {
     // startup delay to ensure cloudsql-proxy comes up
     await new Promise((res) => setTimeout(res, 5000));
 
@@ -34,7 +38,8 @@ async function init(): Promise<void> {
     // Referenc: https://www.npmjs.com/package/postgres-migrations
     const client = await pool.connect();
     try {
-        await migrate({client}, "db-migrations");
+        const results = await migrate({client}, "db-migrations");
+        console.log("DB Migration: ", results);
     } finally {
         // release the client back to the pool when we're done
         await client.release();
@@ -76,14 +81,6 @@ async function init(): Promise<void> {
         });
         stream.pipe(csvStream);
     }
-}
-
-if (!process.env.NODB) {
-    // Verify connection and run migrations on startup
-    init().catch((e) => {
-        console.error("Failed to init db_setup: ", e);
-        process.exit(1);
-    });
 }
 
 export async function testQueryAll(): Promise<TestObject[]> {

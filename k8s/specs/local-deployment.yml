@@ -60,6 +60,11 @@ spec:
               configMapKeyRef:
                 name: oauthapp
                 key: sessionsecret
+          - name: PUBLIC_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: oauthapp
+                key: publicport
 ---
 apiVersion: v1
 kind: Service

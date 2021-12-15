@@ -30,7 +30,7 @@ kubectl create configmap postgres-config --namespace dominion --from-literal=pos
 kubectl create -f ../specs/postgres.yml
 kubectl wait --for=condition=ready pod -n dominion -l app=postgres
 kubectl create configmap hostname-config --namespace dominion --from-literal=postgres_host=$(kubectl get svc postgres --namespace dominion -o jsonpath="{.spec.clusterIP}")
-kubectl create configmap oauthapp --namespace dominion --from-literal=clientid=$(head -n 1 ../../creds.txt) --from-literal=clientsecret=$(tail -n 2 ../../creds.txt | head -n 1) --from-literal=allowlist=$(tail -n 1 ../../creds.txt) --from-literal=sessionsecret=localonly
+kubectl create configmap oauthapp --namespace dominion --from-literal=clientid=$(head -n 1 ../../creds.txt) --from-literal=clientsecret=$(tail -n 2 ../../creds.txt | head -n 1) --from-literal=allowlist=$(tail -n 1 ../../creds.txt) --from-literal=sessionsecret=localonly --from-literal=publicport=30001
 kubectl create -f ../specs/local-deployment.yml
 kubectl wait --for=condition=ready pod -n dominion -l app=dominion
 
