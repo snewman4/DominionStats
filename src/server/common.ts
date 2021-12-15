@@ -48,3 +48,8 @@ export interface SuccessResult {
     results: GameResults[];
 }
 export type GameResultsFormResult = UserErrorResult | DevErrorResult | SuccessResult;
+
+export interface DominionUser {
+    email: string;
+    name: string;
+}

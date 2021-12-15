@@ -33,6 +33,26 @@ spec:
             secretKeyRef:
               name: dominionstats-secrets
               key: postgres_database
+        - name: GOOGLE_CLIENT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: dominionstats-secrets
+              key: clientid
+        - name: GOOGLE_CLIENT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: dominionstats-secrets
+              key: clientsecret
+        - name: ALLOWLIST
+          valueFrom:
+            configMapKeyRef:
+              name: dominionstats-secrets
+              key: allowlist
+        - name: SESSION_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: dominionstats-secrets
+              key: sessionsecret
       - name: cloud-sql-proxy
         # It is recommended to use the latest version of the Cloud SQL proxy
         # Make sure to update on a regular schedule!

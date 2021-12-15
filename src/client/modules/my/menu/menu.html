@@ -5,10 +5,24 @@
             icon-name="utility:home"
             href="/">
         </lightning-menu-item>
-        <lightning-menu-item onclick={menuItemClicked}
-            label="Upload Results"
-            icon-name="utility:new"
-            href="/upload">
-        </lightning-menu-item>
+        <template if:true={loggedIn}>
+            <lightning-menu-item onclick={menuItemClicked}
+                label="Upload Results"
+                icon-name="utility:new"
+                href="/upload">
+            </lightning-menu-item>
+            <lightning-menu-item
+                label="Logout"
+                icon-name="utility:logout"
+                href="/logout">
+            </lightning-menu-item>
+        </template>
+        <template if:false={loggedIn}>
+            <lightning-menu-item
+                label="Login"
+                icon-name="utility:user"
+                href="/login/google">
+            </lightning-menu-item>
+        </template>
     </lightning-button-menu>
 </template>

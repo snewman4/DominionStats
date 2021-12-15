@@ -40,6 +40,26 @@ spec:
               configMapKeyRef:
                 name: postgres-config
                 key: postgres_db
+          - name: GOOGLE_CLIENT_ID
+            valueFrom:
+              configMapKeyRef:
+                name: oauthapp
+                key: clientid
+          - name: GOOGLE_CLIENT_SECRET
+            valueFrom:
+              configMapKeyRef:
+                name: oauthapp
+                key: clientsecret
+          - name: ALLOWLIST
+            valueFrom:
+              configMapKeyRef:
+                name: oauthapp
+                key: allowlist
+          - name: SESSION_SECRET
+            valueFrom:
+              configMapKeyRef:
+                name: oauthapp
+                key: sessionsecret
 ---
 apiVersion: v1
 kind: Service

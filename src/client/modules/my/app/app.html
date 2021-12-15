@@ -6,6 +6,10 @@
         </h1>
     </div>
 
+    <template if:true={loggedIn}>
+        <h1>Hello {username}!</h1>
+    </template>
+
     <div class="slds-clearfix">
         <div class="slds-float_left">
             <my-menu></my-menu>
