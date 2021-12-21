@@ -1,9 +1,6 @@
 <template>
-
-    <div class = "pretty_header">
-        <h1>
-            Dominion Statistics Tracker
-        </h1>
+    <div class="pretty_header">
+        <h1>Dominion Statistics Tracker</h1>
     </div>
 
     <template if:true={loggedIn}>
@@ -18,7 +15,6 @@
 
     <my-route route="/">
         <lightning-tabset>
-
             <lightning-tab label="Raw Results">
                 <lightning-card title="Raw Results">
                     <div class="center">
@@ -52,7 +48,7 @@
                         <my-three-player-ranking-table></my-three-player-ranking-table>
                     </div>
                 </lightning-card>
-            </lightning-tab>      
+            </lightning-tab>
 
             <lightning-tab label="4 Player Games">
                 <lightning-card title="4 Player Games">

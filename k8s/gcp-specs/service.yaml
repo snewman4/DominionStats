@@ -1,44 +1,44 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: dominionstats-service
-  annotations:
-    networking.gke.io/load-balancer-type: "Internal"
-  labels:
-    app: dominionstats-service
+    name: dominionstats-service
+    annotations:
+        networking.gke.io/load-balancer-type: 'Internal'
+    labels:
+        app: dominionstats-service
 spec:
-  type: LoadBalancer
-  selector:
-    app: dominionstats-deployment
-  ports:
-  - port: 80
-    targetPort: 3001
+    type: LoadBalancer
+    selector:
+        app: dominionstats-deployment
+    ports:
+        - port: 80
+          targetPort: 3001
 ---
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
-  name: "dominionstats-https"
+    name: 'dominionstats-https'
 spec:
-  domains:
-    - dominionstats.geekygamegroup.com
+    domains:
+        - dominionstats.geekygamegroup.com
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: dominionstats-ingress
-  annotations:
-    kubernetes.io/ingress.class: "gce"
-    networking.gke.io/managed-certificates: "dominionstats-https"
-    kubernetes.io/ingress.global-static-ip-name: "dominionstats-eip"
+    name: dominionstats-ingress
+    annotations:
+        kubernetes.io/ingress.class: 'gce'
+        networking.gke.io/managed-certificates: 'dominionstats-https'
+        kubernetes.io/ingress.global-static-ip-name: 'dominionstats-eip'
 spec:
-  rules:
-  - host: "dominionstats.geekygamegroup.com"
-    http:
-      paths:
-      - path: /*
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: dominionstats-service
-            port:
-              number: 80
+    rules:
+        - host: 'dominionstats.geekygamegroup.com'
+          http:
+              paths:
+                  - path: /*
+                    pathType: ImplementationSpecific
+                    backend:
+                        service:
+                            name: dominionstats-service
+                            port:
+                                number: 80

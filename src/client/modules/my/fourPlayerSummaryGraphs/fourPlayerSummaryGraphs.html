@@ -2,25 +2,31 @@
     <div class="slds-clearfix">
         <!-- Sized assuming 6cols = 1920px window-->
         <!-- TODO: dynamic columning to overflow downward -->
-        <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
+        <div
+            class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small"
+        >
             <my-donut-chart
                 data={firstPlaceFreqDonutData}
                 title="First Place Wins"
-                width=300
-                height=300
-                >
+                width="300"
+                height="300"
+            >
             </my-donut-chart>
         </div>
-         <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
+        <div
+            class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small"
+        >
             <my-donut-chart
                 data={gamesPlayedDonuntData}
                 title="Games Played"
-                width=300
-                height=300
-                >
+                width="300"
+                height="300"
+            >
             </my-donut-chart>
         </div>
-        <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
+        <div
+            class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small"
+        >
             <my-bar-graph
                 data={avgPointsWonBarData}
                 title="Average Points Won"
@@ -29,9 +35,9 @@
                 xtype={scalePoint}
                 ylabel="Points"
                 ykey="avg_points"
-                width=800
-                height=300
-                >
+                width="800"
+                height="300"
+            >
             </my-bar-graph>
         </div>
     </div>

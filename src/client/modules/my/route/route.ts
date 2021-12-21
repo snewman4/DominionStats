@@ -4,7 +4,7 @@ import { subscribe } from 'my/router';
 export default class Route extends LightningElement {
     active = false;
 
-    @api route = "";
+    @api route = '';
 
     connectedCallback() {
         subscribe(this.onUpdate.bind(this));

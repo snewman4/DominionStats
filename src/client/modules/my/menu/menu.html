@@ -1,27 +1,37 @@
 <template>
-    <lightning-button-menu icon-name="utility:rows" icon-size="medium" alternative-text="Show menu">
-        <lightning-menu-item onclick={menuItemClicked}
+    <lightning-button-menu
+        icon-name="utility:rows"
+        icon-size="medium"
+        alternative-text="Show menu"
+    >
+        <lightning-menu-item
+            onclick={menuItemClicked}
             label="Home"
             icon-name="utility:home"
-            href="/">
+            href="/"
+        >
         </lightning-menu-item>
         <template if:true={loggedIn}>
-            <lightning-menu-item onclick={menuItemClicked}
+            <lightning-menu-item
+                onclick={menuItemClicked}
                 label="Upload Results"
                 icon-name="utility:new"
-                href="/upload">
+                href="/upload"
+            >
             </lightning-menu-item>
             <lightning-menu-item
                 label="Logout"
                 icon-name="utility:logout"
-                href="/logout">
+                href="/logout"
+            >
             </lightning-menu-item>
         </template>
         <template if:false={loggedIn}>
             <lightning-menu-item
                 label="Login"
                 icon-name="utility:user"
-                href="/login/google">
+                href="/login/google"
+            >
             </lightning-menu-item>
         </template>
     </lightning-button-menu>

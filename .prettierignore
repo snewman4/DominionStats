@@ -1,11 +1,14 @@
 # Jest coverage
 coverage/
 
-# Default lib folder
-lib/
-
-# Default dist folder
-dist/
+build/
+__lwr_cache__
+node_modules/
+pageObjects/*
+src/client/assets/
+src/client/modules/lightning/
+src/client/modules/lightningtest/
+.github
 
 # Default resources folder
 src/client/resources

@@ -48,7 +48,11 @@
                 <div class="slds-page-header__name">
                     <div class="slds-page-header__name-title">
                         <h1>
-                            <span class="slds-page-header__title slds-truncate" title={userName}>{username}</span>
+                            <span
+                                class="slds-page-header__title slds-truncate"
+                                title={userName}
+                                >{username}</span
+                            >
                         </h1>
                     </div>
                 </div>
@@ -57,21 +61,17 @@
         <ul class="slds-page-header__detail-list">
             <li class="slds-page-header__detail-item">
                 <u class="slds-text-title slds-truncate" title="Games">Games</u>
-                <div class="slds-text-heading_medium">
-                    {games}
-                </div>
+                <div class="slds-text-heading_medium">{games}</div>
             </li>
             <li class="slds-page-header__detail-item">
                 <u class="slds-text-title slds-truncate" title="Wins">Wins</u>
-                <div class="slds-text-heading_medium">
-                    {wins}
-                </div>
+                <div class="slds-text-heading_medium">{wins}</div>
             </li>
             <li class="slds-page-header__detail-item">
-                <u class="slds-text-title slds-truncate" title="Points">Points</u>
-                <div class="slds-text-heading_medium">
-                    {points}
-                </div>
+                <u class="slds-text-title slds-truncate" title="Points"
+                    >Points</u
+                >
+                <div class="slds-text-heading_medium">{points}</div>
             </li>
         </ul>
     </div>

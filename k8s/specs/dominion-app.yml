@@ -1,32 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dominion-app
-  namespace: uisf
+    name: dominion-app
+    namespace: uisf
 spec:
-  selector:
-    matchLabels:
-      app: dominion-app
-  replicas: 1
-  template:
-    metadata:
-      name: dominion-app
-      labels:
-        app: dominion-app
-    spec:
-      containers:
-      - name: dominion-app
-        resources:
-            limits:
-              memory: 2Gi
-              cpu: "1"
-            requests:
-              memory: 256Mi
-              cpu: "0.2"
-        env:
-          - name: DATABASE_URL
-            valueFrom:
-              configMapKeyRef:
-                name: postgres-config
-                key: database_url
-        image: https://github.com/gik0geck0/DominionStats.git#local
+    selector:
+        matchLabels:
+            app: dominion-app
+    replicas: 1
+    template:
+        metadata:
+            name: dominion-app
+            labels:
+                app: dominion-app
+        spec:
+            containers:
+                - name: dominion-app
+                  resources:
+                      limits:
+                          memory: 2Gi
+                          cpu: '1'
+                      requests:
+                          memory: 256Mi
+                          cpu: '0.2'
+                  env:
+                      - name: DATABASE_URL
+                        valueFrom:
+                            configMapKeyRef:
+                                name: postgres-config
+                                key: database_url
+                  image: https://github.com/gik0geck0/DominionStats.git#local

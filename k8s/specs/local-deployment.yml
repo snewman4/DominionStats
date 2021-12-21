@@ -1,82 +1,81 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dominion-deployment
-  namespace: dominion
-  labels:
-    app: dominion
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: dominion
-  template:
-    metadata:
-      labels:
+    name: dominion-deployment
+    namespace: dominion
+    labels:
         app: dominion
-    spec:
-      containers:
-      - name: dominion
-        image: dominionstats:latest
-        imagePullPolicy: Never
-        env:
-          - name: PGUSER
-            valueFrom:
-              configMapKeyRef:
-                name: postgres-config
-                key: postgres_user
-          - name: PGPASSWORD
-            valueFrom:
-              configMapKeyRef:
-                name: postgres-config
-                key: postgres_password
-          - name: PGHOST
-            valueFrom:
-              configMapKeyRef:
-                name: hostname-config
-                key: postgres_host
-          - name: PGDATABASE
-            valueFrom:
-              configMapKeyRef:
-                name: postgres-config
-                key: postgres_db
-          - name: GOOGLE_CLIENT_ID
-            valueFrom:
-              configMapKeyRef:
-                name: oauthapp
-                key: clientid
-          - name: GOOGLE_CLIENT_SECRET
-            valueFrom:
-              configMapKeyRef:
-                name: oauthapp
-                key: clientsecret
-          - name: ALLOWLIST
-            valueFrom:
-              configMapKeyRef:
-                name: oauthapp
-                key: allowlist
-          - name: SESSION_SECRET
-            valueFrom:
-              configMapKeyRef:
-                name: oauthapp
-                key: sessionsecret
-          - name: PUBLIC_PORT
-            valueFrom:
-              configMapKeyRef:
-                name: oauthapp
-                key: publicport
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: dominion
+    template:
+        metadata:
+            labels:
+                app: dominion
+        spec:
+            containers:
+                - name: dominion
+                  image: dominionstats:latest
+                  imagePullPolicy: Never
+                  env:
+                      - name: PGUSER
+                        valueFrom:
+                            configMapKeyRef:
+                                name: postgres-config
+                                key: postgres_user
+                      - name: PGPASSWORD
+                        valueFrom:
+                            configMapKeyRef:
+                                name: postgres-config
+                                key: postgres_password
+                      - name: PGHOST
+                        valueFrom:
+                            configMapKeyRef:
+                                name: hostname-config
+                                key: postgres_host
+                      - name: PGDATABASE
+                        valueFrom:
+                            configMapKeyRef:
+                                name: postgres-config
+                                key: postgres_db
+                      - name: GOOGLE_CLIENT_ID
+                        valueFrom:
+                            configMapKeyRef:
+                                name: oauthapp
+                                key: clientid
+                      - name: GOOGLE_CLIENT_SECRET
+                        valueFrom:
+                            configMapKeyRef:
+                                name: oauthapp
+                                key: clientsecret
+                      - name: ALLOWLIST
+                        valueFrom:
+                            configMapKeyRef:
+                                name: oauthapp
+                                key: allowlist
+                      - name: SESSION_SECRET
+                        valueFrom:
+                            configMapKeyRef:
+                                name: oauthapp
+                                key: sessionsecret
+                      - name: PUBLIC_PORT
+                        valueFrom:
+                            configMapKeyRef:
+                                name: oauthapp
+                                key: publicport
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: dominion-service
-  namespace: dominion
+    name: dominion-service
+    namespace: dominion
 spec:
-  type: NodePort
-  selector:
-    app: dominion
-  ports:
-  - port: 3001
-    targetPort: 3001
-    nodePort: 30001
-
+    type: NodePort
+    selector:
+        app: dominion
+    ports:
+        - port: 3001
+          targetPort: 3001
+          nodePort: 30001

@@ -1,7 +1,7 @@
 export interface RouteAttributes {
     url: string;
     [key: string]: string;
-};
+}
 
 interface UrlBasics {
     segments: string[];
@@ -38,24 +38,24 @@ function urlSplit(url: string): UrlBasics {
 function singleSplit(str: string, needle: string): string[] {
     const idx = str.indexOf(needle);
     if (idx >= 0) {
-        return [
-            str.substring(0, idx),
-            str.substring(needle.length + idx)
-        ];
+        return [str.substring(0, idx), str.substring(needle.length + idx)];
     } else {
         return [str];
     }
 }
 
-export function parseUrl(spec: string, url: string): RouteAttributes {
-    const attributes = {url};
+export function parseUrl(
+    spec: string,
+    url: string
+): RouteAttributes | undefined {
+    const attributes = { url };
     const urlObj = urlSplit(url);
     const specObj = urlSplit(spec);
 
     if (urlObj.segments.length === specObj.segments.length) {
         urlObj.segments.forEach((seg, i) => {
             const specSeg = specObj.segments[i];
-            if (specSeg.startsWith(":")) {
+            if (specSeg.startsWith(':')) {
                 attributes[specSeg.substring(1)] = seg;
             } else if (seg !== specSeg) {
                 return undefined;

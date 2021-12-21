@@ -8,4 +8,4 @@ export HOST=localhost
 export NODB=true
 export INMEM_SESSION=true
 
-npm run start
+yarn start

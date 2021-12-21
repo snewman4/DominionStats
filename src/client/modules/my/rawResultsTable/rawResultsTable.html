@@ -1,27 +1,27 @@
 <template>
+    <table
+        class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
+    >
+        <thead>
+            <tr class="slds-line-height_reset">
+                <th>Date</th>
+                <th>Ranking</th>
+                <th>Name</th>
+                <th>Victory Points</th>
+            </tr>
+        </thead>
 
-  <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
-
-    <thead>
-      <tr class="slds-line-height_reset">
-        <th>Date</th>
-        <th>Ranking</th>
-        <th>Name</th>
-        <th>Victory Points</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <template for:each={tableData} for:item="entry">
-        <tr key={entry.id} class="slds-hint-parent">
-            <td>{entry.game_label}</td>
-            <td>{entry.player_num}</td>
-            <td><my-user-link user={entry.player_name}></my-user-link></td>
-            <td>{entry.victory_points}</td>
-        </tr>
-      </template>
-    </tbody>
-
-  </table>
-
+        <tbody>
+            <template for:each={tableData} for:item="entry">
+                <tr key={entry.id} class="slds-hint-parent">
+                    <td>{entry.game_label}</td>
+                    <td>{entry.player_num}</td>
+                    <td>
+                        <my-user-link user={entry.player_name}></my-user-link>
+                    </td>
+                    <td>{entry.victory_points}</td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
 </template>

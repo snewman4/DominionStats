@@ -1,0 +1,98 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "strict": true,
+        "resolveJsonModule": true,
+        "noUnusedLocals": false, // TODO: cleanup
+        "noImplicitAny": false, // TODO: cleanup
+        "allowSyntheticDefaultImports": true,
+        "declaration": true,
+        "sourceMap": true,
+        "declarationMap": true,
+        "esModuleInterop": true,
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "composite": true,
+        "target": "ES2020",
+        "skipLibCheck": true,
+        "baseUrl": ".",
+        "rootDir": "src",
+        "outDir": "build",
+        // TODO: use node style module resolution and the dominionstats namespace/package name
+        "paths": {
+            "my/app": ["src/client/modules/my/app/app.ts"],
+            "my/barGraph": ["src/client/modules/my/barGraph/barGraph.ts"],
+            "my/connectedScatterGraph": [
+                "src/client/modules/my/connectedScatterGraph/connectedScatterGraph.ts"
+            ],
+            "my/d3Charts": ["src/client/modules/my/d3Charts/d3Charts.ts"],
+            "my/dataUpload": ["src/client/modules/my/dataUpload/dataUpload.ts"],
+            "my/donutChart": ["src/client/modules/my/donutChart/donutChart.ts"],
+            "my/fivePlayerRankingTable": [
+                "src/client/modules/my/fivePlayerRankingTable/fivePlayerRankingTable.ts"
+            ],
+            "my/fivePlayerSummaryGraphs": [
+                "src/client/modules/my/fivePlayerSummaryGraphs/fivePlayerSummaryGraphs.ts"
+            ],
+            "my/formattedField": [
+                "src/client/modules/my/formattedField/formattedField.ts"
+            ],
+            "my/fourPlayerRankingTable": [
+                "src/client/modules/my/fourPlayerRankingTable/fourPlayerRankingTable.ts"
+            ],
+            "my/fourPlayerSummaryGraphs": [
+                "src/client/modules/my/fourPlayerSummaryGraphs/fourPlayerSummaryGraphs.ts"
+            ],
+            "my/link": ["src/client/modules/my/link/link.ts"],
+            "my/loginLink": ["src/client/modules/my/loginLink/loginLink.ts"],
+            "my/logoutLink": ["src/client/modules/my/logoutLink/logoutLink.ts"],
+            "my/menu": ["src/client/modules/my/menu/menu.ts"],
+            "my/playerRankingTable": [
+                "src/client/modules/my/playerRankingTable/playerRankingTable.ts"
+            ],
+            "my/rawResultsTable": [
+                "src/client/modules/my/rawResultsTable/rawResultsTable.ts"
+            ],
+            "my/resultsFetcher": [
+                "src/client/modules/my/resultsFetcher/resultsFetcher.ts"
+            ],
+            "my/route": ["src/client/modules/my/route/route.ts"],
+            "my/router": ["src/client/modules/my/router/router.ts"],
+            "my/sessionlib": ["src/client/modules/my/sessionlib/sessionlib.ts"],
+            "my/sixPlayerRankingTable": [
+                "src/client/modules/my/sixPlayerRankingTable/sixPlayerRankingTable.ts"
+            ],
+            "my/sixPlayerSummaryGraphs": [
+                "src/client/modules/my/sixPlayerSummaryGraphs/sixPlayerSummaryGraphs.ts"
+            ],
+            "my/summaryGraphs": [
+                "src/client/modules/my/summaryGraphs/summaryGraphs.ts"
+            ],
+            "my/threePlayerRankingTable": [
+                "src/client/modules/my/threePlayerRankingTable/threePlayerRankingTable.ts"
+            ],
+            "my/threePlayerSummaryGraphs": [
+                "src/client/modules/my/threePlayerSummaryGraphs/threePlayerSummaryGraphs.ts"
+            ],
+            "my/twoPlayerRankingTable": [
+                "src/client/modules/my/twoPlayerRankingTable/twoPlayerRankingTable.ts"
+            ],
+            "my/twoPlayerSummaryGraphs": [
+                "src/client/modules/my/twoPlayerSummaryGraphs/twoPlayerSummaryGraphs.ts"
+            ],
+            "my/userCard": ["src/client/modules/my/userCard/userCard.ts"],
+            "my/userLanding": [
+                "src/client/modules/my/userLanding/userLanding.ts"
+            ],
+            "my/userLink": ["src/client/modules/my/userLink/userLink.ts"]
+        }
+    },
+    "exclude": [
+        "build",
+        "node_modules/**",
+        "**/__tests__/**",
+        "**/__benchmarks__/**",
+        "**/build/**",
+        "**/cjs/**"
+    ]
+}

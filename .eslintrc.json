@@ -1,24 +1,45 @@
 {
     "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint,inclusive-language"],
-    "plugins": ["inclusive-language"],
-    "extends": ["@salesforce/eslint-config-lwc/recommended"],
-    "rules": {
-        "@lwc/lwc/no-async-operation": "off",
-        "@lwc/lwc/no-inner-html": "warn",
-        "@lwc/lwc/no-document-query": "warn",
-        "inclusive-language/use-inclusive-words": "error"
+    "plugins": ["prettier", "@typescript-eslint"],
+    "parserOptions": {
+        "ecmaVersion": 2020,
+        "sourceType": "module"
     },
     "overrides": [
         {
-            "files": [
-                "src/server/**",
-                "scripts/server.js",
-                "jest.config.js",
-                "lwc-services.config.js"
-            ],
+            "files": ["src/server/**", "jest.config.js"],
             "env": {
                 "node": true
+            },
+            "extends": ["eslint:recommended"]
+        },
+        {
+            "files": ["src/client/**"],
+            "env": {
+                "browser": true,
+                "node": false,
+                "es6": true
+            },
+            "extends": ["eslint:recommended"]
+        },
+        {
+            "files": ["*.ts"],
+            "extends": [
+                "eslint:recommended",
+                "plugin:@typescript-eslint/eslint-recommended",
+                "plugin:@typescript-eslint/recommended",
+                "prettier"
+            ],
+            "rules": {
+                "prettier/prettier": 0,
+                "@typescript-eslint/explicit-function-return-type": 1,
+                "@typescript-eslint/camelcase": 0,
+                "@typescript-eslint/class-name-casing": 0,
+                "@typescript-eslint/ban-types": 0,
+                "@typescript-eslint/no-namespace": 0, // d3 namespace stuff
+                "@typescript-eslint/ban-ts-comment": 1,
+                // TODO: cleanup
+                "prefer-const": 0
             }
         }
     ]

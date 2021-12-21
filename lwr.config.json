@@ -1,0 +1,35 @@
+{
+    "lwc": {
+        "modules": [
+            {
+                "dir": "$rootDir/src/client/modules"
+            }
+        ]
+    },
+    "bundleConfig": {
+        "exclude": ["lwc", "@lwc/synthetic-shadow"]
+    },
+    "assets": [
+        {
+            "alias": "assetsDir",
+            "dir": "$rootDir/src/client/assets",
+            "urlPath": "/assets"
+        },
+        {
+            "alias": "layoutsDir",
+            "dir": "$rootDir/src/client/layouts",
+            "urlPath": "/layouts"
+        }
+    ],
+    "routes": [
+        {
+            "id": "root",
+            "path": "/*",
+            "rootComponent": "my/app",
+            "layoutTemplate": "$layoutsDir/main.html",
+            "bootstrap": {
+                "syntheticShadow": true
+            }
+        }
+    ]
+}

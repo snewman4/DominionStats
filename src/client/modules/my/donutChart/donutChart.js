@@ -2,8 +2,7 @@ import { api, LightningElement } from 'lwc';
 import { DonutChart } from 'my/d3Charts';
 
 export default class ConnectedScatterGraph extends LightningElement {
-
-    @api title = "Place Frequency Graph";
+    @api title = 'Place Frequency Graph';
 
     // Must be in the form [{name: string, value: number}]
     // Using a setter gives us a reactive hook to re-render the graph if the data changes
@@ -27,19 +26,18 @@ export default class ConnectedScatterGraph extends LightningElement {
     }
 
     async renderGraph() {
-      // The querySelector at the bottom of this function requires that the component has rendered at least once (and is attached to the DOM)
-      // If we haven't rendered yet, wait for renderedCallback to be invoked, and draw the graph then
-      if (!this.hasRendered)
-        return;
+        // The querySelector at the bottom of this function requires that the component has rendered at least once (and is attached to the DOM)
+        // If we haven't rendered yet, wait for renderedCallback to be invoked, and draw the graph then
+        if (!this.hasRendered) return;
 
-      const csElement = DonutChart(this._data, {
-          name: d => d.name,
-          value: d => d.value,
-          width: this.width,
-          height: this.height
-      });
+        const csElement = DonutChart(this._data, {
+            name: (d) => d.name,
+            value: (d) => d.value,
+            width: this.width,
+            height: this.height
+        });
 
-      // Attach it to the element
-      this.template.querySelector(".chart").replaceChildren(csElement);
+        // Attach it to the element
+        this.template.querySelector('.chart').replaceChildren(csElement);
     }
 }

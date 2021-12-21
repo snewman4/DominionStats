@@ -47,7 +47,10 @@ export interface SuccessResult {
     status: 200;
     results: GameResults[];
 }
-export type GameResultsFormResult = UserErrorResult | DevErrorResult | SuccessResult;
+export type GameResultsFormResult =
+    | UserErrorResult
+    | DevErrorResult
+    | SuccessResult;
 
 export interface DominionUser {
     email: string;

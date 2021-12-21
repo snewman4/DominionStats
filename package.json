@@ -1,9 +1,35 @@
 {
-    "name": "DominionStats",
-    "description": "My amazing LWC app",
+    "name": "dominionstats",
+    "description": "LWC Web App for tracking dominion game stats",
     "version": "0.0.1",
     "author": "gik0geck0",
-    "bugs": "https://github.com/Matt/DominionStats/issues",
+    "license": "MIT",
+    "repository": "https://github.com/gik0geck0/DominionStats",
+    "homepage": "https://github.com/gik0geck0/DominionStats",
+    "bugs": "https://github.com/gik0geck0/DominionStats/issues",
+    "keywords": [
+        "lwc"
+    ],
+    "files": [
+        "build/*"
+    ],
+    "type": "module",
+    "types": "build/index.d.ts",
+    "main": "build/server/api.js",
+    "scripts": {
+        "build": "tsc -b",
+        "clean": "rimraf -rf build dist lib coverage tsconfig.tsbuildinfo",
+        "lint": "eslint ./src/**/*.ts",
+        "postinstall": "husky install",
+        "precommit": "npm run prettier:verify && [ $? -eq 0 ] && npm run lint",
+        "prettier": "prettier --write \"**/*.{css,html,js,json,md,ts,yaml,yml}\"",
+        "prettier:verify": "prettier --list-different \"**/*.{css,html,js,json,md,ts,yaml,yml}\"",
+        "start": "cross-env MODE=prod node --es-module-specifier-resolution=node build/server/api.js",
+        "dev": "node --es-module-specifier-resolution=node build/server/api.js",
+        "test": "yarn test:unit && yarn test:unit:coverage",
+        "test:unit": "jest",
+        "test:unit:coverage": "jest --coverage"
+    },
     "dependencies": {
         "compression": "^1.7.4",
         "connect-pg-simple": "^7.0.0",
@@ -12,6 +38,8 @@
         "express-session": "^1.17.2",
         "fast-csv": "^4.3.6",
         "helmet": "^4.6.0",
+        "lwc": "2.5.8",
+        "lwr": "^0.6.0-alpha.9",
         "node-postgres": "^0.6.2",
         "passport": "^0.5.0",
         "passport-google-oauth20": "^2.0.0",
@@ -20,6 +48,9 @@
         "sequelize": "^6.6.2"
     },
     "devDependencies": {
+        "@lwc/jest-preset": "^11.2.2",
+        "@typescript-eslint/eslint-plugin": "^5.8.0",
+        "@typescript-eslint/parser": "^5.8.0",
         "@types/compression": "^1.7.1",
         "@types/cookie-parser": "^1.4.2",
         "@types/connect-pg-simple": "7.0.0",
@@ -30,52 +61,29 @@
         "@types/passport": "^1.0.7",
         "@types/passport-google-oauth20": "^2.0.11",
         "@types/pg": "^8.6.1",
+        "cross-env": "^7.0.3",
         "eslint": "^7.32.0",
-        "eslint-plugin-inclusive-language": "^2.1.1",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-prettier": "^4.0.0",
         "husky": "^7.0.1",
-        "lwc-services": "^3.1.2",
-        "npm-run-all": "^4.1.5",
+        "jest": "^27.4.5",
+        "lint-staged": "^12.1.3",
         "rimraf": "^3.0.2",
-        "prettier": "^2.3.2"
+        "prettier": "^2.3.2",
+        "typescript": "^4.5.4"
     },
     "engines": {
-        "node": ">=10.13.0",
+        "node": ">=14.15.4",
         "npm": ">=6.4.1",
         "yarn": ">=1.9.4"
     },
-    "homepage": "https://github.com/gik0geck0/DominionStats",
-    "keywords": [
-        "lwc"
-    ],
-    "license": "MIT",
-    "nodemonConfig": {
-        "watch": [
-            "src/server/**/*.ts"
-        ],
-        "ext": "ts",
-        "ignore": [
-            "src/**/*.spec.ts",
-            "src/**/*.test.ts"
-        ],
-        "exec": "ts-node ./src/server/api.ts"
+    "volta": {
+        "node": "14.17.5",
+        "yarn": "1.22.17"
     },
-    "repository": "https://github.com/gik0geck0/DominionStats",
-    "scripts": {
-        "build": "lwc-services build -m production -b rollup && tsc -b ./src/server",
-        "build:development": "lwc-services build -b rollup",
-        "clean": "rimraf -rf dist lib",
-        "lint": "eslint ./src/**/*.ts",
-        "postinstall": "husky install",
-        "precommit": "npm run prettier:verify && [ $? -eq 0 ] && npm run lint",
-        "prettier": "prettier --write \"**/*.{css,html,js,json,md,ts,yaml,yml}\"",
-        "prettier:verify": "prettier --list-different \"**/*.{css,html,js,json,md,ts,yaml,yml}\"",
-        "start": "node lib/server/api.js",
-        "test:unit": "lwc-services test:unit",
-        "test:unit:coverage": "lwc-services test:unit --coverage",
-        "test:unit:debug": "lwc-services test:unit --debug",
-        "test:unit:watch": "lwc-services test:unit --watch",
-        "watch": "run-p watch:client watch:server",
-        "watch:client": "lwc-services watch -b rollup",
-        "watch:server": "nodemon"
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged --config ./lint-staged.config.js"
+        }
     }
 }

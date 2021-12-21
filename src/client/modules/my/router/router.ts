@@ -4,7 +4,9 @@ import type { RouteAttributes } from './parser';
 type RouteCallback = (url: string) => void;
 
 function getCurrentLocation(): string {
-    return window.location.pathname + window.location.search + window.location.hash
+    return (
+        window.location.pathname + window.location.search + window.location.hash
+    );
 }
 
 function updateCurrentLocation(): void {
@@ -24,14 +26,13 @@ window.addEventListener('popstate', () => {
     notifySubscribers();
 });
 
-
 export function subscribe(callback: RouteCallback): void {
     subscribers.push(callback);
     callback(currentLocation);
 }
 
 export function navigate(url: string): void {
-    window.history.pushState({}, "", url);
+    window.history.pushState({}, '', url);
     updateCurrentLocation();
     notifySubscribers();
 }
@@ -41,6 +42,6 @@ export function navigate(url: string): void {
  * @param spec express-like route
  * @returns Object of attributes such that `url` is always included, and named attributes from the spec have their single-segment value set
  */
-export function parse(spec: string): RouteAttributes {
+export function parse(spec: string): RouteAttributes | undefined {
     return parseUrl(spec, getCurrentLocation());
 }

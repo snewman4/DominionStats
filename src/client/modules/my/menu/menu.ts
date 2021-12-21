@@ -11,7 +11,7 @@ export default class Menu extends LightningElement {
         evt.preventDefault();
         evt.stopPropagation();
 
-        console.log("Menu Item clicked: ", evt.target);
+        console.log('Menu Item clicked: ', evt.target);
         const href = (evt.target as any).href;
         navigate(href);
     }

@@ -3,12 +3,15 @@ logs
 *.log
 *-debug.log
 *-error.log
+logfile
 
-# Standard lib folder
-/lib
+# build artifacts
+**/build
+**/__lwr_cache__/
+**/pageObjects
+.eslintcache
+tsconfig.tsbuildinfo
 
-# Standard dist folder
-/dist
 
 # Tooling files
 node_modules

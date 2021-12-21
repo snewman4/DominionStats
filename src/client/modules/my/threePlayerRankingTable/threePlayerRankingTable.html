@@ -1,41 +1,41 @@
 <template>
+    <table
+        class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
+    >
+        <thead>
+            <tr class="slds-line-height_reset">
+                <th>Player</th>
+                <th>Games Played</th>
+                <th>Percentage of Games Played</th>
+                <th>Average Points per Game</th>
+                <th>Total Points</th>
+                <th>First Place Finishes</th>
+                <th>First Place Percentage</th>
+                <th>Second Place Finishes</th>
+                <th>Second Place Percentage</th>
+                <th>Third Place Finishes</th>
+                <th>Third Place Percentage</th>
+            </tr>
+        </thead>
 
-    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
-  
-      <thead>
-        <tr class="slds-line-height_reset">
-          <th>Player</th>
-          <th>Games Played</th>
-          <th>Percentage of Games Played</th>
-          <th>Average Points per Game</th>
-          <th>Total Points</th>
-          <th>First Place Finishes</th>
-          <th>First Place Percentage</th>
-          <th>Second Place Finishes</th>
-          <th>Second Place Percentage</th>
-          <th>Third Place Finishes</th>
-          <th>Third Place Percentage</th>
-        </tr>
-      </thead>
-      
-      <tbody>
-        <template for:each={tableData} for:item="entry">
-          <tr key={entry.player_name} class="slds-hint-parent">
-              <td><my-user-link user={entry.player_name}></my-user-link></td>
-              <td>{entry.num_games}</td>
-              <td>{entry.percent_played}%</td>
-              <td>{entry.avg_points}</td>
-              <td>{entry.total_victory_points}</td>
-              <td>{entry.first_place}</td>
-              <td>{entry.percent_first}%</td>
-              <td>{entry.second_place}</td>
-              <td>{entry.percent_second}%</td>
-              <td>{entry.third_place}</td>
-              <td>{entry.percent_third}%</td>
-          </tr>
-        </template>
-      </tbody>
-  
+        <tbody>
+            <template for:each={tableData} for:item="entry">
+                <tr key={entry.player_name} class="slds-hint-parent">
+                    <td>
+                        <my-user-link user={entry.player_name}></my-user-link>
+                    </td>
+                    <td>{entry.num_games}</td>
+                    <td>{entry.percent_played}%</td>
+                    <td>{entry.avg_points}</td>
+                    <td>{entry.total_victory_points}</td>
+                    <td>{entry.first_place}</td>
+                    <td>{entry.percent_first}%</td>
+                    <td>{entry.second_place}</td>
+                    <td>{entry.percent_second}%</td>
+                    <td>{entry.third_place}</td>
+                    <td>{entry.percent_third}%</td>
+                </tr>
+            </template>
+        </tbody>
     </table>
-  
-  </template>
+</template>
