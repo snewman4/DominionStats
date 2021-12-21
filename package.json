@@ -37,7 +37,6 @@
         "express": "^4.17.1",
         "express-session": "^1.17.2",
         "fast-csv": "^4.3.6",
-        "helmet": "^4.6.0",
         "lwc": "2.5.8",
         "lwr": "^0.6.0-alpha.9",
         "node-postgres": "^0.6.2",
