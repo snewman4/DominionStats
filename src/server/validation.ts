@@ -3,6 +3,7 @@ import type { ErrorObject, PlayerResultForm } from './common';
 const invalidChars = /[!@#$%^&*()+=[\]{};':"\\|,.<>/?]+/; //used to make sure none of these chars are used in players' names
 const invalidPrefix = /^[ \t/]+.*/;
 const invalidSuffix = /.*[ \t]+$/;
+const gameIdStructure = /^[0-9]{8}[a-z]$/;
 
 export function validateGameData(
     gameId: string,
@@ -34,15 +35,15 @@ export function validateGameData(
         });
     }
 
-    //verify that a game_id of less than 10 characters is passed in because usually 8 or 9 characters (e.g. 20200911 - YYYYMMDD or 20200911a - YYYYMMDDa)
-    if (gameId.length > 10 || gameId.length < 2) {
+    //verify that a game_id matches the YYYYMMDDa structure
+    if (gameId.length !== 9 || !gameIdStructure.test(gameId)) {
         errors.push({
             status: 'error',
             error: `Game ID must be 2-10 characters; got: "${gameId}"`
         });
     }
 
-    gameResults.forEach(({ playerName, victoryPoints }) => {
+    gameResults.forEach(({ playerName, playerPlace, victoryPoints }) => {
         //server validation
         if (playerName === null || playerName === '') {
             errors.push({
@@ -54,6 +55,12 @@ export function validateGameData(
             errors.push({
                 status: 'error',
                 error: `Invalid Victory Points for player ${playerName}: ${victoryPoints}`
+            });
+        }
+        if (playerPlace === null || !Number.isInteger(playerPlace)) {
+            errors.push({
+                status: 'error',
+                error: `Invalid Place for player ${playerName}: ${playerPlace}`
             });
         }
 

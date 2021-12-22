@@ -1,3 +1,75 @@
+import type { GameData, PlayerData } from './types';
+
+export function isEmptyName(s: string): boolean {
+    return !s;
+}
+export function isEmptyNumber(n: number): boolean {
+    return (
+        n === null ||
+        n === undefined ||
+        Object.is(n, NaN) ||
+        typeof n !== 'number'
+    );
+}
+
+export function allEmpty(p: PlayerData): boolean {
+    return (
+        isEmptyName(p.playerName) &&
+        isEmptyNumber(p.playerPlace) &&
+        isEmptyNumber(p.victoryPoints)
+    );
+}
+export function anyEmpty(p: PlayerData): boolean {
+    return (
+        isEmptyName(p.playerName) ||
+        isEmptyNumber(p.playerPlace) ||
+        isEmptyNumber(p.victoryPoints)
+    );
+}
+export function validPlace(p: PlayerData): boolean {
+    return p.playerPlace >= 1 && p.playerPlace <= 6;
+}
+
+export const ERRORS = {
+    NO_EMPTY_VALUES:
+        'Non-blank entries must have a player name, place, and victory points',
+    PLACE_RANGE: 'Player place must be between (including) 1 and 6',
+    NO_BLANKS: 'Please leave no blank rows before entries.',
+    NO_GAMEID: 'Game ID cannot be blank.',
+    MINIMUM_ENTRIES: 'Input must have at least two entries.',
+    DECREASING_VP: 'Please order entries in decreasing victory point order.',
+    INCREASING_PLACE: 'Please order entries in increasing place order',
+    TIE_VP: 'Players that tie place must have equal victory points'
+};
+
+export function validateFilledData(pd: PlayerData[]): string[] {
+    const errors: string[] = [];
+    let remainingEmpty = false;
+    pd.forEach((p, i) => {
+        if (!remainingEmpty) {
+            // transition to expecting all empty only if all the values are empty
+            if (allEmpty(p) && i > 0) {
+                remainingEmpty = true;
+                return; // continue
+            }
+
+            // expected all values filled in
+            if (anyEmpty(p)) {
+                errors.push(ERRORS.NO_EMPTY_VALUES);
+            }
+            if (!validPlace(p)) {
+                errors.push(ERRORS.PLACE_RANGE);
+            }
+        } else {
+            // expected to be empty
+            if (!allEmpty(p)) {
+                errors.push(ERRORS.NO_BLANKS);
+            }
+        }
+    });
+    return errors;
+}
+
 /**
  * Validates the input from the form.
  * Parameters:
@@ -5,83 +77,52 @@
  * Returns:
  *  A list of error messages that were found during validation. If the data is valid, the list will be empty.
  */
-export function validateInput(input: any): string[] {
-    let isDataValid = true; //whether the data is valid
+export function validateInput(input: GameData): string[] {
     let errors: string[] = []; //list of error messages
 
     //check game id
     if (!input['gameId']) {
-        errors.push('Game ID cannot be blank.');
-        isDataValid = false;
+        errors.push(ERRORS.NO_GAMEID);
     }
 
-    //check each player/victory point pair
-    for (let x = 0; x < input['playerData'].length; x++) {
-        //check entries are full
-        if (
-            (input['playerData'][x]['playerName'] &&
-                Object.is(input['playerData'][x]['victoryPoints'], NaN)) ||
-            (!input['playerData'][x]['playerName'] &&
-                !Object.is(input['playerData'][x]['victoryPoints'], NaN))
-        ) {
-            errors.push(
-                'Non-blank entries must have a player name and a victory point count.'
-            );
-            isDataValid = false;
-        }
-
-        //check first entry is not empty
-        if (
-            x == 0 &&
-            !input['playerData'][x]['playerName'] &&
-            Object.is(input['playerData'][x]['victoryPoints'], NaN)
-        ) {
-            errors.push('First entry cannot be blank.');
-            isDataValid = false;
-        }
-
-        //check no entries out of order
-        if (
-            x > 0 &&
-            input['playerData'][x]['playerName'] &&
-            !Object.is(input['playerData'][x]['victoryPoints'], NaN) &&
-            !input['playerData'][x - 1]['playerName'] &&
-            Object.is(input['playerData'][x - 1]['victoryPoints'], NaN)
-        ) {
-            errors.push('Please leave no blank rows before entries.');
-            isDataValid = false;
-        }
+    const filledDataErrors = validateFilledData(input.playerData);
+    if (filledDataErrors.length > 0) {
+        errors.push(...filledDataErrors);
     }
-
-    //check >1 entry
 
     let numNonBlankEntries = 0; //total non blank entries
-
     //find all valid entries
     for (let row of input['playerData'])
-        if (row['playerName'] !== '' && !Object.is(row['victoryPoints'], NaN))
-            numNonBlankEntries++;
+        if (!allEmpty(row)) numNonBlankEntries++;
 
-    if (numNonBlankEntries <= 1)
-        errors.push('Input must have at least two entries.');
+    if (numNonBlankEntries <= 1) errors.push(ERRORS.MINIMUM_ENTRIES);
 
-    //check descending victory points
+    //check descending victory points and place
 
     let lastScore = Number.POSITIVE_INFINITY; //last visited score
+    let lastPlace = 0;
 
     //validate points
     for (let x = 0; x < input['playerData'].length; x++) {
+        let player: PlayerData = input['playerData'][x];
         //only check non blank entries
-        if (!Object.is(input['playerData'][x]['victoryPoints'], NaN)) {
+        if (!anyEmpty(player)) {
             //make sure score is less than previous score
-            if (input['playerData'][x]['victoryPoints'] > lastScore) {
-                errors.push(
-                    'Please order entries in decreasing victory point order.'
-                );
-                break;
+            if (player.victoryPoints > lastScore) {
+                errors.push(ERRORS.DECREASING_VP);
+            }
+            if (player.playerPlace < lastPlace) {
+                errors.push(ERRORS.INCREASING_PLACE);
+            }
+            if (
+                player.playerPlace === lastPlace &&
+                player.victoryPoints !== lastScore
+            ) {
+                errors.push(ERRORS.TIE_VP);
             }
 
-            lastScore = input['playerData'][x]['victoryPoints'];
+            lastScore = player.victoryPoints;
+            lastPlace = player.playerPlace;
         }
     }
 

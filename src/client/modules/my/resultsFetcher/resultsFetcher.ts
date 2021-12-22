@@ -148,19 +148,25 @@ function calculatePlayerStats(
             let avg =
                 PlayerStats[j].total_victory_points / PlayerStats[j].num_games;
             PlayerStats[j].avg_points = +avg.toFixed(2);
-            let games_played = (PlayerStats[j].num_games / total) * 100;
-            PlayerStats[j].percent_played = +games_played.toFixed(2);
-            let first = (PlayerStats[j].first_place / total) * 100;
+            let games_played_percent = (PlayerStats[j].num_games / total) * 100;
+            PlayerStats[j].percent_played = +games_played_percent.toFixed(2);
+            let first =
+                (PlayerStats[j].first_place / PlayerStats[j].num_games) * 100;
             PlayerStats[j].percent_first = +first.toFixed(2);
-            let second = (PlayerStats[j].second_place / total) * 100;
+            let second =
+                (PlayerStats[j].second_place / PlayerStats[j].num_games) * 100;
             PlayerStats[j].percent_second = +second.toFixed(2);
-            let third = (PlayerStats[j].third_place / total) * 100;
+            let third =
+                (PlayerStats[j].third_place / PlayerStats[j].num_games) * 100;
             PlayerStats[j].percent_third = +third.toFixed(2);
-            let fourth = (PlayerStats[j].fourth_place / total) * 100;
+            let fourth =
+                (PlayerStats[j].fourth_place / PlayerStats[j].num_games) * 100;
             PlayerStats[j].percent_fourth = +fourth.toFixed(2);
-            let fifth = (PlayerStats[j].fifth_place / total) * 100;
+            let fifth =
+                (PlayerStats[j].fifth_place / PlayerStats[j].num_games) * 100;
             PlayerStats[j].percent_fifth = +fifth.toFixed(2);
-            let sixth = (PlayerStats[j].sixth_place / total) * 100;
+            let sixth =
+                (PlayerStats[j].sixth_place / PlayerStats[j].num_games) * 100;
             PlayerStats[j].percent_sixth = +sixth.toFixed(2);
         }
     }, PlayerStats);

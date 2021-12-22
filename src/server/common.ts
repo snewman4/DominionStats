@@ -22,6 +22,7 @@ export interface GameResults {
 
 export interface PlayerResultForm {
     playerName: string;
+    playerPlace: number;
     victoryPoints: number;
 }
 

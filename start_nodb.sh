@@ -5,9 +5,7 @@ export ALLOWLIST=$(tail -n 1 creds.txt)
 export SESSION_SECRET=localonly
 export PORT=3001
 export HOST=localhost
+export NODB=true
 export INMEM_SESSION=true
-export PGUSER=admin
-export PGDATABASE=dominion
-export PGPASSWORD=$(cat dbpwd.txt)
 
 yarn start
