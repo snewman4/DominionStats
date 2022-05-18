@@ -1,2 +1,2 @@
 head -c 32 /dev/random | base64 > ../../dbpwd.txt
-docker run -d --name local-postgres -e POSTGRES_PASSWORD=$(cat ../../dbpwd.txt) -e POSTGRES_USER=admin -e POSTGRES_DB=dominion -v postgres-data:/var/lib/postgresql/data -p 5432:5432 postgres
+docker run --name local-postgres -e POSTGRES_DB=dominion -e POSTGRES_USER=dominionUser -e POSTGRES_PASSWORD=$(head -n1 ../../dbpwd.txt) -p 5432:5432 -d postgres
