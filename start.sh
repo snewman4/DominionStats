@@ -10,4 +10,4 @@ export PGUSER=admin
 export PGDATABASE=dominion
 export PGPASSWORD=$(cat dbpwd.txt)
 
-yarn start
+yarn dev
