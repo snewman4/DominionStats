@@ -128,11 +128,6 @@ export async function insertGameResults(
 
         const gameId = req.gameId.trim();
 
-        // DEBUGGING
-        console.log(gameId);
-        console.log(gameId);
-        console.log('Validation');
-
         // Clean up the input a bit
         let gameResults: PlayerResultForm[] = req.playerData;
 
@@ -145,9 +140,6 @@ export async function insertGameResults(
             // Instead of stopping all inserts, stop only this one
             //return Promise.resolve({ status: 400, results: validationErrors });
         }
-
-        // DEBUGGING
-        console.log('Successful validation');
 
         gameResults = gameResults
             // Clean up the input a bit (trim spaces)
@@ -200,9 +192,6 @@ export async function insertGameResults(
             // Instead of stopping all inserts, stop this one
             // return { status: 500, results: insertErrors };
         }
-
-        // DEBUGGING
-        console.log('Successful insertion');
     }
 
     if (allErrors.length > 0) {
