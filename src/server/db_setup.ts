@@ -208,93 +208,12 @@ export async function insertGameResults(
       }
   }
 
-  if(allErors.length != 0){
+  if(allErrors.length != 0){
+    //If there was an eror return a status of 500 and all errors
     return { status: 500, results: allErrors};
   }else{
-    return result;
+    //Other wise return success
+    return {status: 200, results: []};
   }
-/*
-    let allErrors: ErrorObject[] = [];
-
-    const query =
-        'INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)';
-
-    for (let req of allReq) {
-
-        const gameId = req.gameId.trim();
-
-        // Clean up the input a bit
-        let gameResults: PlayerResultForm[] = req.playerData;
-
-        const validationErrors = validateGameData(gameId, gameResults);
-
-        if (validationErrors.length > 0) {
-            console.log('Validation errors: ', validationErrors);
-            allErrors.concat(validationErrors);
-            continue;
-            // Instead of stopping all inserts, stop only this one
-            //return Promise.resolve({ status: 400, results: validationErrors });
-        }
-
-        gameResults = gameResults
-            // Clean up the input a bit (trim spaces)
-            .map(({ playerName, victoryPoints, playerPlace }) => {
-                return {
-                    playerName: playerName.trim(),
-                    victoryPoints,
-                    playerPlace
-                };
-            });
-
-        const insertErrors: ErrorObject[] = flatArray(
-            await Promise.all(
-                gameResults.map(
-                    ({
-                        playerName,
-                        victoryPoints,
-                        playerPlace
-                    }): Promise<ErrorObject[]> => {
-                        //build list
-                        const values = [
-                            gameId,
-                            playerPlace,
-                            playerName,
-                            victoryPoints
-                        ];
-
-                        return pool
-                            .query(query, values)
-                            .then(() => [])
-                            .catch((error) => {
-                                console.log('DB Error:', error);
-                                return [
-                                    {
-                                        status: 'error',
-                                        error: 'Failed to insert data'
-                                    }
-                                ];
-                            });
-                    }
-                )
-            )
-        );
-
-        if (insertErrors.length > 0) {
-            // Failures to insert are considered developer errors (or infra) aka 500
-            console.log('Insert errors: ', insertErrors);
-            allErrors.concat(insertErrors);
-            continue;
-            // Instead of stopping all inserts, stop this one
-            // return { status: 500, results: insertErrors };
-        }
-    }
-
-    if (allErrors.length > 0) {
-        // Something failed along the way, report that
-        return { status: 500, results: allErrors }
-    }
-
-    // TODO: Could return latest DB results here
-    return { status: 200, results: [] };
-    */
+  
 }
