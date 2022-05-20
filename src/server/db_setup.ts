@@ -119,6 +119,8 @@ export async function insertGameResults(
 
     // TODO : Check for duplicate ids in both input list and database
 
+    let allErrors: ErrorObject[] = [];
+
     const query =
         'INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)';
 
@@ -128,6 +130,8 @@ export async function insertGameResults(
 
         // DEBUGGING
         console.log(gameId);
+        console.log(gameId);
+        console.log('Validation');
 
         // Clean up the input a bit
         let gameResults: PlayerResultForm[] = req.playerData;
@@ -136,8 +140,14 @@ export async function insertGameResults(
 
         if (validationErrors.length > 0) {
             console.log('Validation errors: ', validationErrors);
-            return Promise.resolve({ status: 400, results: validationErrors });
+            allErrors.concat(validationErrors);
+            continue;
+            // Instead of stopping all inserts, stop only this one
+            //return Promise.resolve({ status: 400, results: validationErrors });
         }
+
+        // DEBUGGING
+        console.log('Successful validation');
 
         gameResults = gameResults
             // Clean up the input a bit (trim spaces)
@@ -185,8 +195,19 @@ export async function insertGameResults(
         if (insertErrors.length > 0) {
             // Failures to insert are considered developer errors (or infra) aka 500
             console.log('Insert errors: ', insertErrors);
-            return { status: 500, results: insertErrors };
+            allErrors.concat(insertErrors);
+            continue;
+            // Instead of stopping all inserts, stop this one
+            // return { status: 500, results: insertErrors };
         }
+
+        // DEBUGGING
+        console.log('Successful insertion');
+    }
+
+    if (allErrors.length > 0) {
+        // Something failed along the way, report that
+        return { status: 500, results: allErrors }
     }
 
     // TODO: Could return latest DB results here

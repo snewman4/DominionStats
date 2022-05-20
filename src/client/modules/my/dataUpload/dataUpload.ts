@@ -71,7 +71,7 @@ export default class DataUploader extends LightningElement {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify([data])
             }).then((response) => {
                 //check response from server
                 if (response.status == 200) location.reload();
