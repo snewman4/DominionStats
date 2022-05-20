@@ -8,9 +8,25 @@ const month = (todaysDate.getMonth() + 1).toString().padStart(2, '0');
 const day = todaysDate.getDate().toString().padStart(2, '0');
 
 export default class DataUploader extends LightningElement {
-    defaultGameId = `${year}${month}${day}a`;
-    errorMessages: string[] = [];
-    showErrors = false;
+    defaultGameId;
+    errorMessages: string[];
+    showErrors;
+
+    constructor(){
+      super();
+      this.errorMessages = [];
+      this.showErrors = false;
+      this.defaultGameId = `${year}${month}${day}a`;
+
+      /*
+      Uncomment to use, doesn't seem to run the code
+      fetch('/api/v1/generateId').then((response) => {
+        this.defaultGameId = "" + response.status;
+        console.log("test2");
+      });
+      */
+
+    }
 
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
