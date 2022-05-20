@@ -172,30 +172,19 @@
         <br/>
         <br>
 
-        <div class="slds-text-heading_small"><b>Enter game results in the order below:</b></div>
+        <div class="slds-text-heading_small"><b>Enter game results below:</b></div>
 
         <div class="slds-form-element">
-        <label class="slds-form-element__label" for="textarea-id-01">Game ID</label>
+        <label class="slds-form-element__label" for="textarea-id-01">Input each game on its own line and separate game data with spaces.</label>
         <br>
-        <label class="slds-form-element__label" for="textarea-id-02">Number of Players</label>
-        <br>
-        <label class="slds-form-element__label" for="textarea-id-03">Player Name</label>
-        <br>
-        <label class="slds-form-element__label" for="textarea-id-04">Player Place</label>
-        <br>
-        <label class="slds-form-element__label" for="textarea-id-05">Player Victory Points</label>
+        <label class="slds-form-element__label" for="textarea-id-02">GameID #ofPlayers Player1Name Player1Placement Player1VictoryScore etc.</label>
         <br>
         <div class="slds-form-element__control">
-        <textarea id="textarea-id-01" rows=20 class="slds-textarea" placeholder=
+        <textarea id="textarea-id-01" rows=5 class="slds-textarea" placeholder=
         'Ex.
-20220520a
-2
-Matt
-1
-53
-Joe
-2
-47'></textarea>
+20220520a 2 Matt 1 53 Joe 2 47
+20200928a 2 Joe 1 46 Matt 2 43
+'></textarea>
         </div>
         </div>
 
@@ -207,6 +196,7 @@ Joe
           onclick={gatherDataAndSend}
         ></lightning-button>
 
+        <br>
 
         <template if:true={showErrors}>
             <template for:each={errorMessages} for:item="entry">
