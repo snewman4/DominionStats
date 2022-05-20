@@ -65,13 +65,15 @@ export default class DataUploader extends LightningElement {
 
             console.log('Sending data: ', data);
 
+            //console.log('Sending data: ', JSON.stringify(data));
+
             //send POST request to api
             fetch('api/v1/gameResults', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify([data])
             }).then((response) => {
                 //check response from server
                 if (response.status == 200) location.reload();

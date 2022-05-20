@@ -111,84 +111,98 @@ function flatArray<T>(arrarr: T[][]): T[] {
     return arrarr.reduce((acc, val) => acc.concat(val), []);
 }
 
+//Submitting an individual game
+async function insertGameResult(
+  req: GameResultsForm
+): Promise<GameResultsFormResult>{
+  // TODO : Check for duplicate ids in both input list and database
+
+  const query = 'INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)';
+
+  const gameId = req.gameId.trim();
+
+  // DEBUGGING
+  //console.log(gameId);
+
+  // Clean up the input a bit
+  let gameResults: PlayerResultForm[] = req.playerData;
+
+  const validationErrors = validateGameData(gameId, gameResults);
+
+  if (validationErrors.length > 0) {
+      console.log('Validation errors: ', validationErrors);
+      return Promise.resolve({ status: 400, results: validationErrors });
+  }
+
+  gameResults = gameResults
+      // Clean up the input a bit (trim spaces)
+      .map(({ playerName, victoryPoints, playerPlace }) => {
+          return {
+              playerName: playerName.trim(),
+              victoryPoints,
+              playerPlace
+          };
+      });
+
+  const insertErrors: ErrorObject[] = flatArray(
+      await Promise.all(
+          gameResults.map(
+              ({
+                  playerName,
+                  victoryPoints,
+                  playerPlace
+              }): Promise<ErrorObject[]> => {
+                  //build list
+                  const values = [
+                      gameId,
+                      playerPlace,
+                      playerName,
+                      victoryPoints
+                  ];
+
+                  return pool
+                      .query(query, values)
+                      .then(() => [])
+                      .catch((error) => {
+                          console.log('DB Error:', error);
+                          return [
+                              {
+                                  status: 'error',
+                                  error: 'Failed to insert data'
+                              }
+                          ];
+                      });
+              }
+          )
+      )
+  );
+
+  if (insertErrors.length > 0) {
+      // Failures to insert are considered developer errors (or infra) aka 500
+      console.log('Insert errors: ', insertErrors);
+      return { status: 500, results: insertErrors };
+  }
+
+
+  // TODO: Could return latest DB results here
+  return { status: 200, results: [] };
+
+}
+
 //to test data upload
 //when page is refreshed, submitted data shows up in raw results table
 export async function insertGameResults(
     allReq: GameResultsForm[]
 ): Promise<GameResultsFormResult> {
+  var result;
 
-    // TODO : Check for duplicate ids in both input list and database
+  //Loops for additional game data
+  for (let req of allReq) {
+    //TODO: implemenmt a system for combining results
+    result = insertGameResult(req);
+  }
 
-    const query =
-        'INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)';
+  //Returns the results from attempting to add the data
+  return result;
 
-    for (let req of allReq) {
-
-        const gameId = req.gameId.trim();
-
-        // DEBUGGING
-        console.log(gameId);
-
-        // Clean up the input a bit
-        let gameResults: PlayerResultForm[] = req.playerData;
-
-        const validationErrors = validateGameData(gameId, gameResults);
-
-        if (validationErrors.length > 0) {
-            console.log('Validation errors: ', validationErrors);
-            return Promise.resolve({ status: 400, results: validationErrors });
-        }
-
-        gameResults = gameResults
-            // Clean up the input a bit (trim spaces)
-            .map(({ playerName, victoryPoints, playerPlace }) => {
-                return {
-                    playerName: playerName.trim(),
-                    victoryPoints,
-                    playerPlace
-                };
-            });
-
-        const insertErrors: ErrorObject[] = flatArray(
-            await Promise.all(
-                gameResults.map(
-                    ({
-                        playerName,
-                        victoryPoints,
-                        playerPlace
-                    }): Promise<ErrorObject[]> => {
-                        //build list
-                        const values = [
-                            gameId,
-                            playerPlace,
-                            playerName,
-                            victoryPoints
-                        ];
-
-                        return pool
-                            .query(query, values)
-                            .then(() => [])
-                            .catch((error) => {
-                                console.log('DB Error:', error);
-                                return [
-                                    {
-                                        status: 'error',
-                                        error: 'Failed to insert data'
-                                    }
-                                ];
-                            });
-                    }
-                )
-            )
-        );
-
-        if (insertErrors.length > 0) {
-            // Failures to insert are considered developer errors (or infra) aka 500
-            console.log('Insert errors: ', insertErrors);
-            return { status: 500, results: insertErrors };
-        }
-    }
-
-    // TODO: Could return latest DB results here
-    return { status: 200, results: [] };
 }
