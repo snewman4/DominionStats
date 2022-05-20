@@ -12,7 +12,7 @@
             placeholder="Eg. YYYYMMDDa"
         />
         <br />
-
+        
         <table class="slds-size_small">
             <thead class="slds-text-align_center">
                 <tr>
@@ -169,7 +169,44 @@
             onclick={gatherDataAndSend}
         ></lightning-button>
 
-        <br />
+        <br/>
+        <br>
+
+        <div class="slds-text-heading_small"><b>Enter game results in the order below:</b></div>
+
+        <div class="slds-form-element">
+        <label class="slds-form-element__label" for="textarea-id-01">Game ID</label>
+        <br>
+        <label class="slds-form-element__label" for="textarea-id-02">Number of Players</label>
+        <br>
+        <label class="slds-form-element__label" for="textarea-id-03">Player Name</label>
+        <br>
+        <label class="slds-form-element__label" for="textarea-id-04">Player Place</label>
+        <br>
+        <label class="slds-form-element__label" for="textarea-id-05">Player Victory Points</label>
+        <br>
+        <div class="slds-form-element__control">
+        <textarea id="textarea-id-01" rows=20 class="slds-textarea" placeholder=
+        'Ex.
+20220520a
+2
+Matt
+1
+53
+Joe
+2
+47'></textarea>
+        </div>
+        </div>
+
+
+        
+          <lightning-button
+          label="Submit"
+          variant="brand-outline"
+          onclick={gatherDataAndSend}
+        ></lightning-button>
+
 
         <template if:true={showErrors}>
             <template for:each={errorMessages} for:item="entry">
