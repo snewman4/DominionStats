@@ -85,12 +85,13 @@ export default class DataUploader extends LightningElement {
             //console.log('Sending data: ', JSON.stringify(data));
 
             //send POST request to api
-            fetch('api/v1/gameResults', {
+            fetch('api/v1/bulkGameResults', {
+            //fetch('api/v1/gameResults', { // Old API communication, use for single data insertion
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify([data])
+                body: JSON.stringify([data]) // Remove brackets for single data insertion
             }).then((response) => {
                 //check response from server
                 if (response.status == 200) location.reload();

@@ -112,6 +112,7 @@ function flatArray<T>(arrarr: T[][]): T[] {
 }
 
 //Submitting an individual game
+// This is the original, tried and true function
 async function insertGameResult(
     req: GameResultsForm
 ): Promise<GameResultsFormResult> {
@@ -181,7 +182,7 @@ async function insertGameResult(
     return { status: 200, results: [] };
 }
 
-
+// Checks the existence of an ID in the database
 export async function checkGameIdExists(
     gameId: string
 ): Promise<boolean>{
@@ -204,6 +205,7 @@ export async function checkGameIdExists(
 
 //to test data upload
 //when page is refreshed, submitted data shows up in raw results table
+// This is the new function that can handle multiple insertions
 export async function insertGameResults(
     allReq: GameResultsForm[]
 ): Promise<GameResultsFormResult> {
