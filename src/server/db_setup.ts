@@ -177,10 +177,8 @@ async function insertGameResult(
         return { status: 500, results: insertErrors };
     }
 
-
     // TODO: Could return latest DB results here
     return { status: 200, results: [] };
-
 }
 
 //to test data upload
@@ -197,10 +195,12 @@ export async function insertGameResults(
 
         // Check if the game already exists in the table
         const res = await pool.query(
+            // TODO : Move database query out of the for loop
             "SELECT * FROM game_results WHERE game_label = $1",
             [gameId]
         );
         if(res.rows.length > 0) {
+            console.log("Duplicate Game, Skipping");
             continue;
         }
 
