@@ -222,6 +222,7 @@ function setupRoutes() {
         }
     );
 
+    /*
     app.get(
       '/api/v1/generateId',
       async (req, res) => {
@@ -229,6 +230,7 @@ function setupRoutes() {
         return res.status(3);
       }
     )
+    */
 
     app.post(
         '/api/v1/gameResults',

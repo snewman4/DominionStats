@@ -19,12 +19,13 @@ export default class DataUploader extends LightningElement {
       this.defaultGameId = `${year}${month}${day}a`;
 
       /*
-      Uncomment to use, doesn't seem to run the code
+      //Uncomment to use, doesn't seem to run the code
       fetch('/api/v1/generateId').then((response) => {
         this.defaultGameId = "" + response.status;
         console.log("test2");
       });
       */
+
 
     }
 

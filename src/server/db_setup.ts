@@ -183,6 +183,27 @@ async function insertGameResult(
 
 }
 
+
+export async function checkGameIdExists(
+    gameId: string
+): Promise<boolean>{
+  // Check if the game already exists in the table
+  const res = await pool.query(
+      "SELECT * FROM game_results WHERE game_label = $1",
+      [gameId]
+  );
+
+
+  if(res.rows.length > 0) {
+      //Game ID already exists, return true
+      return true;
+  }
+
+  return false;
+
+
+}
+
 //to test data upload
 //when page is refreshed, submitted data shows up in raw results table
 export async function insertGameResults(
@@ -195,13 +216,12 @@ export async function insertGameResults(
     for (let req of allReq) {
         const gameId = req.gameId.trim();
 
-        // Check if the game already exists in the table
-        const res = await pool.query(
-            "SELECT * FROM game_results WHERE game_label = $1",
-            [gameId]
-        );
-        if(res.rows.length > 0) {
-            continue;
+        let gameIdExists = await checkGameIdExists(gameId);
+
+        if(gameIdExists){
+          //If the game Id exists don't add it
+          //TODO: return some form of error to the user
+          continue;
         }
 
         // If not a duplicate, insert it
