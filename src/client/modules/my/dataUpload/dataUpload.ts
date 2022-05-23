@@ -8,26 +8,9 @@ const month = (todaysDate.getMonth() + 1).toString().padStart(2, '0');
 const day = todaysDate.getDate().toString().padStart(2, '0');
 
 export default class DataUploader extends LightningElement {
-    defaultGameId;
-    errorMessages: string[];
-    showErrors;
-
-    constructor(){
-      super();
-      this.errorMessages = [];
-      this.showErrors = false;
-      this.defaultGameId = `${year}${month}${day}a`;
-
-      /*
-      //Uncomment to use, doesn't seem to run the code
-      fetch('/api/v1/generateId').then((response) => {
-        this.defaultGameId = "" + response.status;
-        console.log("test2");
-      });
-      */
-
-
-    }
+    defaultGameId = `${year}${month}${day}a`;
+    errorMessages: string[] = [];
+    showErrors = false;
 
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
@@ -35,6 +18,7 @@ export default class DataUploader extends LightningElement {
     gatherDataAndSend(): void {
         let playerData: PlayerData[] = []; //data for each player input
 
+        /*
         //get entered player data
         for (let x = 0; x < 6; x++) {
             playerData.push({
@@ -55,57 +39,81 @@ export default class DataUploader extends LightningElement {
                 )
             });
         }
+        */
+       //data for post
+       let dataList: GameData[] = [];
 
-        //data for post
-        let data: GameData = {
-            gameId: this.getValueFromInput('gameId'),
-            playerData: playerData
-        };
-
-        let errorMessages = validateInput(data); //validate input data
-
-        //if no errors were found
-        if (errorMessages.length == 0) {
-            let newPlayerData: PlayerData[] = []; //player data without blank entries
-
-            //remove blank input entries
-            for (let playerEntry of data.playerData) {
-                if (
-                    playerEntry.playerName !== '' &&
-                    !Object.is(playerEntry.victoryPoints, NaN)
-                ) {
-                    newPlayerData.push(playerEntry);
-                }
+        let textBlob: string = this.getValueFromInput('inputTextArea');
+        let currentData: GameData;
+        let currentGameId;
+        textBlob.split("\r\n").forEach((line: string) => {
+            let columns: string[] = line.split("\t");
+            let gameId = columns.shift();
+            if(gameId !== currentGameId){
+                dataList.push(currentData);
+                currentData = {
+                    gameId: "",
+                    playerData: []
+                };
+                currentGameId = gameId;
+                playerData = [];
             }
+            let newPlayer: PlayerData = {
+                playerPlace: parseInt(columns[0]),
+                playerName: columns[1],
+                victoryPoints: parseInt(columns[2])
+            }
+            playerData.push(newPlayer);
 
-            data.playerData = newPlayerData; //reassign data
+            currentData = {
+                gameId: currentGameId,
+                playerData: playerData
+            }
+        });
+        dataList.push(currentData);
+        
+        let errorMessagesList = [];
+        for(let data of dataList){
+            errorMessagesList.push(validateInput(data)); //validate input data
+            //if no errors were found
+            if (errorMessagesList.length == 0) {
+                let newPlayerData: PlayerData[] = []; //player data without blank entries
 
-            console.log('Sending data: ', data);
-
-            //console.log('Sending data: ', JSON.stringify(data));
-
-            //send POST request to api
-            fetch('api/v1/bulkGameResults', {
-            //fetch('api/v1/gameResults', { // Old API communication, use for single data insertion
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify([data]) // Remove brackets for single data insertion
-            }).then((response) => {
-                //check response from server
-                if (response.status == 200) location.reload();
-                //refresh page
-                else if (response.status >= 400) {
-                    this.setErrorMessages([
-                        'Something went wrong with the data upload. Please try again.'
-                    ]);
-                    console.error('Error inserting game results: ', response);
-                }
-            });
-        } else {
-            this.setErrorMessages(errorMessages);
+                //remove blank input entries
+                for (let playerEntry of data.playerData) {
+                    if (
+                        playerEntry.playerName !== '' &&
+                        !Object.is(playerEntry.victoryPoints, NaN)
+                    ) {
+                        newPlayerData.push(playerEntry);
+                    }
+                } 
+                data.playerData = newPlayerData; //reassign data
+            }   else {
+                    this.setErrorMessages(errorMessagesList);
+            }
         }
+
+        console.log('Sending data: ', dataList);
+
+        //send POST request to api
+        fetch('api/v1/bulkGameResults', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dataList)
+        }).then((response) => {
+            //check response from server
+            if (response.status == 200) location.reload();
+            //refresh page
+            else if (response.status >= 400) {
+                this.setErrorMessages([
+                    'Something went wrong with the data upload. Please try again.'
+                ]);
+                console.error('Error inserting game results: ', response);
+            }
+        });
     }
 
     setErrorMessages(errorMessages: string[]): void {
