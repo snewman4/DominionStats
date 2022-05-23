@@ -113,7 +113,7 @@ function flatArray<T>(arrarr: T[][]): T[] {
 
 //Submitting an individual game
 // This is the original, tried and true function
-async function insertGameResult(
+export async function insertGameResult(
     req: GameResultsForm
 ): Promise<GameResultsFormResult> {
     const query = 'INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)';
@@ -183,6 +183,7 @@ async function insertGameResult(
 }
 
 // Checks the existence of an ID in the database
+// TODO : Fix this to allow for a list of game IDs, and check with just one query
 export async function checkGameIdExists(
     gameId: string
 ): Promise<boolean>{
@@ -212,18 +213,20 @@ export async function insertGameResults(
     var result;
     let allErrors: ErrorObject[] = [];
 
+    // If the final game id exists in the DB, then we don't need to add anything
+    const finalGameId = allReq[allReq.length - 1].gameId;
+    let gameIdExists = await checkGameIdExists(finalGameId);
+
+    if(gameIdExists) {
+        const dupError : ErrorObject = {
+            status: 'error',
+            error: "Duplicate ID entered, no data uploaded"
+        }
+        return { status: 500, results: [dupError] };
+    }
+
     //Loops for additional game data
     for (let req of allReq) {
-        const gameId = req.gameId.trim();
-
-        let gameIdExists = await checkGameIdExists(gameId);
-
-        if(gameIdExists){
-          //If the game Id exists don't add it
-          //TODO: return some form of error to the user
-          continue;
-        }
-
         // If not a duplicate, insert it
         result = insertGameResult(req);
 
