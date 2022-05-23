@@ -222,6 +222,16 @@ function setupRoutes() {
         }
     );
 
+    /*
+    app.get(
+      '/api/v1/generateId',
+      async (req, res) => {
+        //Temporary here for testing
+        return res.status(3);
+      }
+    )
+    */
+
     app.post(
         '/api/v1/gameResults',
         ensureLoggedIn({ throw: true }),
