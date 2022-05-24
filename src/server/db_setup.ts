@@ -188,17 +188,20 @@ export async function insertGameResult(
 export async function checkGameIdExists(
     gameId: string[]
 ): Promise<ErrorObject[]> {
-    // Check if the game already exists in the table
+    //Create an array of $#'s
     let params: string[] = [];
     for (let i = 1; i <= gameId.length; i++) {
         params.push('$' + i);
     }
 
+    //query the data
     let queryText: string =
         'SELECT * FROM game_results WHERE game_label IN (' +
         params.join(',') +
         ')';
     const res = await pool.query(queryText, gameId);
+
+    //Create the reutrn value
     let allErrors: ErrorObject[] = [];
 
     for (let row of res.rows) {

@@ -80,12 +80,16 @@ export default class DataUploader extends LightningElement {
                 if (response.status == 200) location.reload();
                 //refresh page
                 else if (response.status >= 400) {
+                    //If there has been an error
+
                     if(response.status == 409){
+                        //If the error was a duplicate ID
                         this.setErrorMessages([
                             "Error: there is a duplicate game id present"
                         ])
                         console.error('Duplicate game id error: ', response);
                     }else{
+                        //If the error was something else
                         this.setErrorMessages([
                             'Something went wrong with the data upload. Please try again.'
                         ]);
