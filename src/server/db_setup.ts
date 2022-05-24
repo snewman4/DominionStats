@@ -116,7 +116,8 @@ function flatArray<T>(arrarr: T[][]): T[] {
 export async function insertGameResult(
     req: GameResultsForm
 ): Promise<GameResultsFormResult> {
-    const query = 'INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)';
+    const query =
+        'INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)';
     const gameId = req.gameId.trim();
 
     // Clean up the input a bit
@@ -183,25 +184,34 @@ export async function insertGameResult(
 }
 
 // Checks the existence of an ID in the database
-// TODO : Fix this to allow for a list of game IDs, and check with just one query
+// Returns list of errors, one for each duplicate ID
 export async function checkGameIdExists(
-    gameId: string
-): Promise<boolean>{
-  // Check if the game already exists in the table
-  const res = await pool.query(
-      "SELECT * FROM game_results WHERE game_label = $1",
-      [gameId]
-  );
+    gameId: string[]
+): Promise<ErrorObject[]> {
+    // Check if the game already exists in the table
+    let params: string[] = [];
+    for (let i = 1; i <= gameId.length; i++) {
+        params.push('$' + i);
+    }
 
+    let queryText: string =
+        'SELECT * FROM game_results WHERE game_label IN (' +
+        params.join(',') +
+        ')';
+    const res = await pool.query(queryText, gameId);
+    let allErrors: ErrorObject[] = [];
 
-  if(res.rows.length > 0) {
-      //Game ID already exists, return true
-      return true;
-  }
+    for (let row of res.rows) {
+        const dupError: ErrorObject = {
+            status: 'error',
+            error: 'Duplicate ID entered, no data uploaded: '.concat(
+                row.game_label
+            )
+        };
+        allErrors.push(dupError);
+    }
 
-  return false;
-
-
+    return allErrors;
 }
 
 //to test data upload
@@ -210,19 +220,19 @@ export async function checkGameIdExists(
 export async function insertGameResults(
     allReq: GameResultsForm[]
 ): Promise<GameResultsFormResult> {
-    var result;
+    let result;
     let allErrors: ErrorObject[] = [];
 
-    // If the final game id exists in the DB, then we don't need to add anything
-    const finalGameId = allReq[allReq.length - 1].gameId;
-    let gameIdExists = await checkGameIdExists(finalGameId);
+    // Check all game IDs being inserted
+    const allIds: string[] = [];
+    for (let req of allReq) {
+        allIds.push(req.gameId);
+    }
 
-    if(gameIdExists) {
-        const dupError : ErrorObject = {
-            status: 'error',
-            error: "Duplicate ID entered, no data uploaded"
-        }
-        return { status: 500, results: [dupError] };
+    let gameIdExists = await checkGameIdExists(allIds);
+
+    if (gameIdExists.length > 0) {
+        return { status: 500, results: gameIdExists };
     }
 
     //Loops for additional game data
