@@ -41,15 +41,33 @@ export default class DataUploader extends LightningElement {
         }
         */
        //data for post
-       let dataList: GameData[] = [];
-
-        let textBlob: string = this.getValueFromInput('inputTextArea');
-        let currentData: GameData;
+        let dataList: GameData[] = [];
+        let textBlob: string = this.getValueFromInput("textArea")
+        console.log('textblob:', textBlob);
+        let currentData: GameData= {
+            gameId: "",
+            playerData: []
+        };
         let currentGameId;
-        textBlob.split("\r\n").forEach((line: string) => {
-            let columns: string[] = line.split("\t");
-            let gameId = columns.shift();
-            if(gameId !== currentGameId){
+        let gameId;
+        let count:number = 0;
+        textBlob.split(/[\r\n]+/).forEach((line: string) => {
+            console.log('processing line:', line)
+            let columns: string[] = line.split(/\s+/);
+            gameId = columns.shift();
+            if(gameId === null || gameId === undefined || gameId === "" || columns.length !== 3){
+                return;
+            }
+            if(count == 0){
+                currentGameId = gameId;
+                count += 1;
+            }
+            else if(gameId !== currentGameId){
+                currentData = {
+                    gameId: currentGameId,
+                    playerData: playerData
+                }
+                console.log('Pushing current data:', currentData)
                 dataList.push(currentData);
                 currentData = {
                     gameId: "",
@@ -64,17 +82,19 @@ export default class DataUploader extends LightningElement {
                 victoryPoints: parseInt(columns[2])
             }
             playerData.push(newPlayer);
-
-            currentData = {
-                gameId: currentGameId,
-                playerData: playerData
-            }
+            
         });
+        currentData = {
+            gameId: currentGameId,
+            playerData: playerData
+        }
+        console.log('Pushing current data:', currentData)
         dataList.push(currentData);
-        
-        let errorMessagesList = [];
+        debugger
+
+        let errorMessagesList:string[] = [];
         for(let data of dataList){
-            errorMessagesList.push(validateInput(data)); //validate input data
+          // errorMessagesList.push(validateInput(data)); //validate input data
             //if no errors were found
             if (errorMessagesList.length == 0) {
                 let newPlayerData: PlayerData[] = []; //player data without blank entries
@@ -93,7 +113,7 @@ export default class DataUploader extends LightningElement {
                     this.setErrorMessages(errorMessagesList);
             }
         }
-
+      
         console.log('Sending data: ', dataList);
 
         //send POST request to api
@@ -105,9 +125,9 @@ export default class DataUploader extends LightningElement {
             body: JSON.stringify(dataList)
         }).then((response) => {
             //check response from server
-            if (response.status == 200) location.reload();
+            if (response.status == 200){ //location.reload();
             //refresh page
-            else if (response.status >= 400) {
+            } else if (response.status >= 400) {
                 this.setErrorMessages([
                     'Something went wrong with the data upload. Please try again.'
                 ]);
@@ -130,7 +150,7 @@ export default class DataUploader extends LightningElement {
      */
     getValueFromInput(name: string): string {
         const e: HTMLInputElement | null = this.template.querySelector(
-            'input[name="' + name + '"]'
+            'textarea[name="' + name + '"]'
         );
         if (e) {
             return e.value.trim();
