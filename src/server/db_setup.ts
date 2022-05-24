@@ -194,6 +194,8 @@ export async function checkGameIdExists(
         params.push('$' + i);
     }
 
+    // TODO : Convert to simpler method : ... WHERE game_label = ANY($1::string[])
+    // https://stackoverflow.com/questions/10720420/node-postgres-how-to-execute-where-col-in-dynamic-value-list-query
     let queryText: string =
         'SELECT * FROM game_results WHERE game_label IN (' +
         params.join(',') +
