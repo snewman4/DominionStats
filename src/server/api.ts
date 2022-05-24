@@ -14,6 +14,7 @@ import {
     getPool,
     testQueryAll,
     getGameResultsFromDb,
+    insertGameResult,
     insertGameResults
 } from './db_setup';
 
@@ -222,8 +223,22 @@ function setupRoutes() {
         }
     );
 
+    // Old API access to endpoint, use for single data insertion
     app.post(
         '/api/v1/gameResults',
+        ensureLoggedIn({ throw: true }),
+        async (req, res) => {
+            if (process.env.NODB) {
+                return res.status(501).send();
+            }
+            const insertResult = await insertGameResult(req.body);
+            return res.status(insertResult.status).json(insertResult.results);
+        }
+    );
+
+    // New API access to endpoint, use for bulk data insertion
+    app.post(
+        '/api/v1/bulkGameResults',
         ensureLoggedIn({ throw: true }),
         async (req, res) => {
             if (process.env.NODB) {

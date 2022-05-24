@@ -111,9 +111,9 @@ function flatArray<T>(arrarr: T[][]): T[] {
     return arrarr.reduce((acc, val) => acc.concat(val), []);
 }
 
-//to test data upload
-//when page is refreshed, submitted data shows up in raw results table
-export async function insertGameResults(
+//Submitting an individual game
+// This is the original, tried and true function
+export async function insertGameResult(
     req: GameResultsForm
 ): Promise<GameResultsFormResult> {
     const query =
@@ -181,4 +181,76 @@ export async function insertGameResults(
 
     // TODO: Could return latest DB results here
     return { status: 200, results: [] };
+}
+
+// Checks the existence of an ID in the database
+// Returns list of errors, one for each duplicate ID
+export async function checkGameIdExists(
+    gameId: string[]
+): Promise<ErrorObject[]> {
+    // Check if the game already exists in the table
+    let params: string[] = [];
+    for (let i = 1; i <= gameId.length; i++) {
+        params.push('$' + i);
+    }
+
+    let queryText: string =
+        'SELECT * FROM game_results WHERE game_label IN (' +
+        params.join(',') +
+        ')';
+    const res = await pool.query(queryText, gameId);
+    let allErrors: ErrorObject[] = [];
+
+    for (let row of res.rows) {
+        const dupError: ErrorObject = {
+            status: 'error',
+            error: 'Duplicate ID entered, no data uploaded: '.concat(
+                row.game_label
+            )
+        };
+        allErrors.push(dupError);
+    }
+
+    return allErrors;
+}
+
+//to test data upload
+//when page is refreshed, submitted data shows up in raw results table
+// This is the new function that can handle multiple insertions
+export async function insertGameResults(
+    allReq: GameResultsForm[]
+): Promise<GameResultsFormResult> {
+    let result;
+    let allErrors: ErrorObject[] = [];
+
+    // Check all game IDs being inserted
+    const allIds: string[] = [];
+    for (let req of allReq) {
+        allIds.push(req.gameId);
+    }
+
+    let gameIdExists = await checkGameIdExists(allIds);
+
+    if (gameIdExists.length > 0) {
+        return { status: 500, results: gameIdExists };
+    }
+
+    //Loops for additional game data
+    for (let req of allReq) {
+        // If not a duplicate, insert it
+        result = insertGameResult(req);
+
+        //If the result is a user input error
+        if (result.status == 500 || result.status == 400) {
+            allErrors.concat(result.results);
+        }
+    }
+
+    if (allErrors.length != 0) {
+        //If there was an eror return a status of 500 and all errors
+        return { status: 500, results: allErrors };
+    } else {
+        //Other wise return success
+        return { status: 200, results: [] };
+    }
 }
