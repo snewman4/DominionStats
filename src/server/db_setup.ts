@@ -111,13 +111,12 @@ function flatArray<T>(arrarr: T[][]): T[] {
     return arrarr.reduce((acc, val) => acc.concat(val), []);
 }
 
-//to test data upload
-//when page is refreshed, submitted data shows up in raw results table
-export async function insertGameResults(
+//Submitting an individual game
+// This is the original, tried and true function
+async function insertGameResult(
     req: GameResultsForm
 ): Promise<GameResultsFormResult> {
-    const query =
-        'INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)';
+    const query = 'INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)';
     const gameId = req.gameId.trim();
 
     // Clean up the input a bit
@@ -181,4 +180,64 @@ export async function insertGameResults(
 
     // TODO: Could return latest DB results here
     return { status: 200, results: [] };
+}
+
+// Checks the existence of an ID in the database
+export async function checkGameIdExists(
+    gameId: string
+): Promise<boolean>{
+  // Check if the game already exists in the table
+  const res = await pool.query(
+      "SELECT * FROM game_results WHERE game_label = $1",
+      [gameId]
+  );
+
+
+  if(res.rows.length > 0) {
+      //Game ID already exists, return true
+      return true;
+  }
+
+  return false;
+
+
+}
+
+//to test data upload
+//when page is refreshed, submitted data shows up in raw results table
+// This is the new function that can handle multiple insertions
+export async function insertGameResults(
+    allReq: GameResultsForm[]
+): Promise<GameResultsFormResult> {
+    var result;
+    let allErrors: ErrorObject[] = [];
+
+    //Loops for additional game data
+    for (let req of allReq) {
+        const gameId = req.gameId.trim();
+
+        let gameIdExists = await checkGameIdExists(gameId);
+
+        if(gameIdExists){
+          //If the game Id exists don't add it
+          //TODO: return some form of error to the user
+          continue;
+        }
+
+        // If not a duplicate, insert it
+        result = insertGameResult(req);
+
+        //If the result is a user input error
+        if (result.status == 500 || result.status == 400) {
+            allErrors.concat(result.results);
+        }
+    }
+
+    if (allErrors.length != 0) {
+        //If there was an eror return a status of 500 and all errors
+        return { status: 500, results: allErrors };
+    } else {
+        //Other wise return success
+        return { status: 200, results: [] };
+    }
 }

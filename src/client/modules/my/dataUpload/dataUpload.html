@@ -1,195 +1,19 @@
 <template>
-    <div class="slds-size_x-large">
-        <h1>Enter game results</h1>
-        <br />
-
-        <label for="gameId">Game ID:</label>
-        <input
-            class="slds-input"
-            type="text"
-            name="gameId"
-            value={defaultGameId}
-            placeholder="Eg. YYYYMMDDa"
-        />
-        <br />
-        
-        <table class="slds-size_small">
-            <thead class="slds-text-align_center">
-                <tr>
-                    <th>Player Name</th>
-                    <th>Place</th>
-                    <th>Victory Points</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="text"
-                            name="playerName1"
-                        />
-                    </td>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="number"
-                            name="playerPlace1"
-                        />
-                    </td>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="number"
-                            name="victoryPoints1"
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="text"
-                            name="playerName2"
-                        />
-                    </td>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="number"
-                            name="playerPlace2"
-                        />
-                    </td>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="number"
-                            name="victoryPoints2"
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="text"
-                            name="playerName3"
-                        />
-                    </td>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="number"
-                            name="playerPlace3"
-                        />
-                    </td>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="number"
-                            name="victoryPoints3"
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="text"
-                            name="playerName4"
-                        />
-                    </td>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="number"
-                            name="playerPlace4"
-                        />
-                    </td>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="number"
-                            name="victoryPoints4"
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="text"
-                            name="playerName5"
-                        />
-                    </td>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="number"
-                            name="playerPlace5"
-                        />
-                    </td>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="number"
-                            name="victoryPoints5"
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="text"
-                            name="playerName6"
-                        />
-                    </td>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="number"
-                            name="playerPlace6"
-                        />
-                    </td>
-                    <td>
-                        <input
-                            class="slds-input"
-                            type="number"
-                            name="victoryPoints6"
-                        />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <lightning-button
-            label="Submit"
-            variant="brand-outline"
-            onclick={gatherDataAndSend}
-        ></lightning-button>
-
-        <br/>
-        <br>
-
+    
         <div class="slds-text-heading_small"><b>Enter game results below:</b></div>
 
         <div class="slds-form-element">
-        <label class="slds-form-element__label" for="textarea-id-01">Input each game on its own line and separate game data with spaces.</label>
+        <label class="slds-form-element__label" for="textarea-id-01">Copy and paste data from the google sheets.</label>
         <br>
         <label class="slds-form-element__label" for="textarea-id-02">GameID #ofPlayers Player1Name Player1Placement Player1VictoryScore etc.</label>
         <br>
         <div class="slds-form-element__control">
         <textarea id="textarea-id-01" rows=5 class="slds-textarea" placeholder=
         'Ex.
-20220520a 2 Matt 1 53 Joe 2 47
-20200928a 2 Joe 1 46 Matt 2 43
 '></textarea>
         </div>
         </div>
 
-
-        
           <lightning-button
           label="Submit"
           variant="brand-outline"
@@ -206,5 +30,4 @@
                 </div>
             </template>
         </template>
-    </div>
 </template>
