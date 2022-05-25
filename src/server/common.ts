@@ -45,7 +45,7 @@ export interface DevErrorResult {
     results: ErrorObject[];
 }
 export interface DuplicateErrorResult {
-    status: 409
+    status: 409;
     results: ErrorObject[];
 }
 export interface SuccessResult {

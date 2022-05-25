@@ -236,7 +236,7 @@ export async function insertGameResults(
     let gameIdExists = await checkGameIdExists(allIds);
 
     if (gameIdExists.length > 0) {
-        return { status: 409, results: gameIdExists};
+        return { status: 409, results: gameIdExists };
     }
 
     //Loops for additional game data

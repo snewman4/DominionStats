@@ -17,13 +17,13 @@ export default class DataUploader extends LightningElement {
      */
     gatherDataAndSend(): void {
         let playerData: PlayerData[] = []; //data for each player input
-        let dataList: GameData[] = []; //list of game data 
+        let dataList: GameData[] = []; //list of game data
         //gets value from textarea
-        let textBlob: string = this.getValueFromInput("textArea")
-        let currentData: GameData = {gameId: "", playerData: []};
+        let textBlob: string = this.getValueFromInput('textArea');
+        let currentData: GameData = { gameId: '', playerData: [] };
         let currentGameId;
         let gameId;
-        let count: number = 0;
+        let count = 0;
 
         //loops through each line
         textBlob.split(/[\r\n]+/).forEach((line: string) => {
@@ -33,7 +33,12 @@ export default class DataUploader extends LightningElement {
             //Set gameId equal to the first value in the line
             gameId = columns.shift();
             //validates gameid
-            if (gameId === null || gameId === undefined || gameId === "" || columns.length !== 3) {
+            if (
+                gameId === null ||
+                gameId === undefined ||
+                gameId === '' ||
+                columns.length !== 3
+            ) {
                 return;
             }
             //on first run, only set current to first gameid
@@ -46,9 +51,9 @@ export default class DataUploader extends LightningElement {
                 currentData = {
                     gameId: currentGameId,
                     playerData: playerData
-                }
+                };
                 dataList.push(currentData);
-                currentData = {gameId: "", playerData: []};
+                currentData = { gameId: '', playerData: [] };
                 currentGameId = gameId;
                 playerData = [];
             }
@@ -57,14 +62,14 @@ export default class DataUploader extends LightningElement {
                 playerPlace: parseInt(columns[0]),
                 playerName: columns[1],
                 victoryPoints: parseInt(columns[2])
-            }
+            };
             playerData.push(newPlayer);
         });
 
         currentData = {
             gameId: currentGameId,
             playerData: playerData
-        }
+        };
         dataList.push(currentData);
 
         let errorMessages = validateInput(dataList);
@@ -89,18 +94,21 @@ export default class DataUploader extends LightningElement {
                 else if (response.status >= 400) {
                     //If there has been an error
 
-                    if(response.status == 409){
+                    if (response.status == 409) {
                         //If the error was a duplicate ID
                         this.setErrorMessages([
-                            "Error: there is a duplicate game id present"
-                        ])
+                            'Error: there is a duplicate game id present'
+                        ]);
                         console.error('Duplicate game id error: ', response);
-                    }else{
+                    } else {
                         //If the error was something else
                         this.setErrorMessages([
                             'Something went wrong with the data upload. Please try again.'
                         ]);
-                        console.error('Error inserting game results: ', response);
+                        console.error(
+                            'Error inserting game results: ',
+                            response
+                        );
                     }
                 }
             });
