@@ -28,7 +28,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(0);
@@ -70,7 +70,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(0);
@@ -97,7 +97,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(0);
@@ -119,7 +119,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).not.toEqual(0);
@@ -130,7 +130,7 @@ describe('Input form field validation', () => {
             gameId: 'id',
             playerData: []
         };
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).not.toEqual(0);
@@ -147,7 +147,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);
@@ -170,7 +170,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);
@@ -193,7 +193,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);
@@ -221,7 +221,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);
@@ -250,7 +250,7 @@ describe('Input form field validation', () => {
             ]
         };
 
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(2);
@@ -279,7 +279,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);
@@ -307,7 +307,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(2);
@@ -331,7 +331,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
-        const testObject :GameData[] = [testGame];
+        const testObject: GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);

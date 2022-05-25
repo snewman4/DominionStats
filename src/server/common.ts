@@ -37,7 +37,7 @@ export interface ErrorObject {
 }
 
 export interface UserErrorResult {
-    status: 400|409;
+    status: 400 | 409;
     results: ErrorObject[];
 }
 export interface DevErrorResult {
