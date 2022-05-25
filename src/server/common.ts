@@ -44,6 +44,10 @@ export interface DevErrorResult {
     status: 500;
     results: ErrorObject[];
 }
+export interface DuplicateErrorResult {
+    status: 409
+    results: ErrorObject[];
+}
 export interface SuccessResult {
     status: 200;
     results: GameResults[];
@@ -51,6 +55,7 @@ export interface SuccessResult {
 export type GameResultsFormResult =
     | UserErrorResult
     | DevErrorResult
+    | DuplicateErrorResult
     | SuccessResult;
 
 export interface DominionUser {

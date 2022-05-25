@@ -113,10 +113,11 @@ function flatArray<T>(arrarr: T[][]): T[] {
 
 //Submitting an individual game
 // This is the original, tried and true function
-async function insertGameResult(
+export async function insertGameResult(
     req: GameResultsForm
 ): Promise<GameResultsFormResult> {
-    const query = 'INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)';
+    const query =
+        'INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)';
     const gameId = req.gameId.trim();
 
     // Clean up the input a bit
@@ -183,24 +184,38 @@ async function insertGameResult(
 }
 
 // Checks the existence of an ID in the database
+// Returns list of errors, one for each duplicate ID
 export async function checkGameIdExists(
-    gameId: string
-): Promise<boolean>{
-  // Check if the game already exists in the table
-  const res = await pool.query(
-      "SELECT * FROM game_results WHERE game_label = $1",
-      [gameId]
-  );
+    gameId: string[]
+): Promise<ErrorObject[]> {
+    //Create an array of $#'s
+    let params: string[] = [];
+    for (let i = 1; i <= gameId.length; i++) {
+        params.push('$' + i);
+    }
 
+    // TODO : Convert to simpler method : ... WHERE game_label = ANY($1::string[])
+    // https://stackoverflow.com/questions/10720420/node-postgres-how-to-execute-where-col-in-dynamic-value-list-query
+    let queryText: string =
+        'SELECT * FROM game_results WHERE game_label IN (' +
+        params.join(',') +
+        ')';
+    const res = await pool.query(queryText, gameId);
 
-  if(res.rows.length > 0) {
-      //Game ID already exists, return true
-      return true;
-  }
+    //Create the reutrn value
+    let allErrors: ErrorObject[] = [];
 
-  return false;
+    for (let row of res.rows) {
+        const dupError: ErrorObject = {
+            status: 'error',
+            error: 'Duplicate ID entered, no data uploaded: '.concat(
+                row.game_label
+            )
+        };
+        allErrors.push(dupError);
+    }
 
-
+    return allErrors;
 }
 
 //to test data upload
@@ -209,21 +224,23 @@ export async function checkGameIdExists(
 export async function insertGameResults(
     allReq: GameResultsForm[]
 ): Promise<GameResultsFormResult> {
-    var result;
+    let result;
     let allErrors: ErrorObject[] = [];
+
+    // Check all game IDs being inserted
+    const allIds: string[] = [];
+    for (let req of allReq) {
+        allIds.push(req.gameId);
+    }
+
+    let gameIdExists = await checkGameIdExists(allIds);
+
+    if (gameIdExists.length > 0) {
+        return { status: 409, results: gameIdExists};
+    }
 
     //Loops for additional game data
     for (let req of allReq) {
-        const gameId = req.gameId.trim();
-
-        let gameIdExists = await checkGameIdExists(gameId);
-
-        if(gameIdExists){
-          //If the game Id exists don't add it
-          //TODO: return some form of error to the user
-          continue;
-        }
-
         // If not a duplicate, insert it
         result = insertGameResult(req);
 

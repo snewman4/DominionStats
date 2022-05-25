@@ -76,6 +76,7 @@ export default class DataUploader extends LightningElement {
 
             //send POST request to api
             fetch('api/v1/bulkGameResults', {
+                //fetch('api/v1/gameResults', { // Old API communication, use for single data insertion
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -83,14 +84,24 @@ export default class DataUploader extends LightningElement {
                 body: JSON.stringify(dataList)
             }).then((response) => {
                 //check response from server
-                if (response.status == 200) {
-                    location.reload();
-                    //refresh page
-                } else if (response.status >= 400) {
-                    this.setErrorMessages([
-                        'Something went wrong with the data upload. Please try again.'
-                    ]);
-                    console.error('Error inserting game results: ', response);
+                if (response.status == 200) location.reload();
+                //refresh page
+                else if (response.status >= 400) {
+                    //If there has been an error
+
+                    if(response.status == 409){
+                        //If the error was a duplicate ID
+                        this.setErrorMessages([
+                            "Error: there is a duplicate game id present"
+                        ])
+                        console.error('Duplicate game id error: ', response);
+                    }else{
+                        //If the error was something else
+                        this.setErrorMessages([
+                            'Something went wrong with the data upload. Please try again.'
+                        ]);
+                        console.error('Error inserting game results: ', response);
+                    }
                 }
             });
         } else {
