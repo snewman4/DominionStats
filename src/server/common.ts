@@ -37,15 +37,11 @@ export interface ErrorObject {
 }
 
 export interface UserErrorResult {
-    status: 400;
+    status: 400|409;
     results: ErrorObject[];
 }
 export interface DevErrorResult {
     status: 500;
-    results: ErrorObject[];
-}
-export interface DuplicateErrorResult {
-    status: 409;
     results: ErrorObject[];
 }
 export interface SuccessResult {
@@ -55,7 +51,6 @@ export interface SuccessResult {
 export type GameResultsFormResult =
     | UserErrorResult
     | DevErrorResult
-    | DuplicateErrorResult
     | SuccessResult;
 
 export interface DominionUser {

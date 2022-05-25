@@ -16,10 +16,80 @@ export default class DataUploader extends LightningElement {
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
      */
     gatherDataAndSend(): void {
-        let playerData: PlayerData[] = []; //data for each player input
-        let dataList: GameData[] = []; //list of game data
         //gets value from textarea
         let textBlob: string = this.getValueFromInput('textArea');
+        let dataList: GameData[] = this.processLine(textBlob);
+        let errorMessages = validateInput(dataList);
+        //if no errors were found
+        if (errorMessages.length == 0) {
+            let newPlayerData: PlayerData[] = []; //player data without blank entries
+
+            console.log('Sending data: ', dataList);
+
+            //send POST request to api
+            fetch('api/v1/bulkGameResults', {
+                //fetch('api/v1/gameResults', { // Old API communication, use for single data insertion
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dataList)
+            }).then((response) => {
+                //check response from server
+                if (response.status == 200) {
+                    location.reload();
+                }
+                //refresh page
+                else if (response.status >= 400) {
+                    //If there has been an error
+
+                    if (response.status == 409) {
+                        //If the error was a duplicate ID
+                        this.setErrorMessages([
+                            'Error: there is a duplicate game id present'
+                        ]);
+                        console.error('Duplicate game id error: ', response);
+                    } else {
+                        //If the error was something else
+                        this.setErrorMessages([
+                            'Something went wrong with the data upload. Please try again.'
+                        ]);
+                        console.error(
+                            'Error inserting game results: ',
+                            response
+                        );
+                    }
+                }
+            });
+        } else {
+            this.setErrorMessages(errorMessages);
+        }
+    }
+
+    setErrorMessages(errorMessages: string[]): void {
+        this.errorMessages = errorMessages;
+        this.showErrors = errorMessages.length > 0;
+    }
+
+    /**
+     * Gets the value from the input field with the given name.
+     * Parameters:
+     *  name: The name of the input field in HTML.
+     * Returns:
+     *  The value currently in the input field. Can be null.
+     */
+    getValueFromInput(name: string): string {
+        const e: HTMLInputElement | null = this.template.querySelector(
+            'textarea[name="' + name + '"]'
+        );
+        if (e) {
+            return e.value.trim();
+        }
+        return '';
+    }
+    processLine(textBlob: string): GameData[] {
+        let playerData: PlayerData[] = []; //data for each player input
+        let dataList: GameData[] = []; //list of game data
         let currentData: GameData = { gameId: '', playerData: [] };
         let currentGameId;
         let gameId;
@@ -71,71 +141,6 @@ export default class DataUploader extends LightningElement {
             playerData: playerData
         };
         dataList.push(currentData);
-
-        let errorMessages = validateInput(dataList);
-        //if no errors were found
-        if (errorMessages.length == 0) {
-            let newPlayerData: PlayerData[] = []; //player data without blank entries
-
-            console.log('Sending data: ', dataList);
-
-            //send POST request to api
-            fetch('api/v1/bulkGameResults', {
-                //fetch('api/v1/gameResults', { // Old API communication, use for single data insertion
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(dataList)
-            }).then((response) => {
-                //check response from server
-                if (response.status == 200) location.reload();
-                //refresh page
-                else if (response.status >= 400) {
-                    //If there has been an error
-
-                    if (response.status == 409) {
-                        //If the error was a duplicate ID
-                        this.setErrorMessages([
-                            'Error: there is a duplicate game id present'
-                        ]);
-                        console.error('Duplicate game id error: ', response);
-                    } else {
-                        //If the error was something else
-                        this.setErrorMessages([
-                            'Something went wrong with the data upload. Please try again.'
-                        ]);
-                        console.error(
-                            'Error inserting game results: ',
-                            response
-                        );
-                    }
-                }
-            });
-        } else {
-            this.setErrorMessages(errorMessages);
-        }
-    }
-
-    setErrorMessages(errorMessages: string[]): void {
-        this.errorMessages = errorMessages;
-        this.showErrors = errorMessages.length > 0;
-    }
-
-    /**
-     * Gets the value from the input field with the given name.
-     * Parameters:
-     *  name: The name of the input field in HTML.
-     * Returns:
-     *  The value currently in the input field. Can be null.
-     */
-    getValueFromInput(name: string): string {
-        const e: HTMLInputElement | null = this.template.querySelector(
-            'textarea[name="' + name + '"]'
-        );
-        if (e) {
-            return e.value.trim();
-        }
-        return '';
+        return dataList;
     }
 }

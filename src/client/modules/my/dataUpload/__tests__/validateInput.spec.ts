@@ -12,8 +12,8 @@ import type { GameData, PlayerData } from '../helpers/types';
 
 //jest tests
 describe('Input form field validation', () => {
-    it('Valid input object with two entries has no errors', () => {
-        const testObject: GameData = {
+    it('Valid input object with 1 game and 2 players has no errors', () => {
+        const testGame: GameData = {
             gameId: 'id',
             playerData: [
                 {
@@ -28,13 +28,14 @@ describe('Input form field validation', () => {
                 }
             ]
         };
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(0);
     });
 
-    it('Valid input object with six entries has no errors', () => {
-        const testObject: GameData = {
+    it('Valid input object with 1 game and six entries has no errors', () => {
+        const testGame: GameData = {
             gameId: 'id',
             playerData: [
                 {
@@ -69,13 +70,14 @@ describe('Input form field validation', () => {
                 }
             ]
         };
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(0);
     });
 
     it('Valid input object with scores <= 0 has no errors', () => {
-        const testObject: GameData = {
+        const testGame: GameData = {
             gameId: 'id',
             playerData: [
                 {
@@ -95,13 +97,14 @@ describe('Input form field validation', () => {
                 }
             ]
         };
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(0);
     });
 
     it('Input object with blank game ID is invalid', () => {
-        const testObject: GameData = {
+        const testGame: GameData = {
             gameId: '',
             playerData: [
                 {
@@ -116,23 +119,25 @@ describe('Input form field validation', () => {
                 }
             ]
         };
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).not.toEqual(0);
     });
 
     it('Input object with no entries is invalid', () => {
-        const testObject: GameData = {
+        const testGame: GameData = {
             gameId: 'id',
             playerData: []
         };
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).not.toEqual(0);
     });
 
     it('Input object with one entry is invalid', () => {
-        const testObject: GameData = {
+        const testGame: GameData = {
             gameId: 'id',
             playerData: [
                 {
@@ -142,6 +147,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);
@@ -149,7 +155,7 @@ describe('Input form field validation', () => {
     });
 
     it('Entry missing a name is invalid', () => {
-        const testObject: GameData = {
+        const testGame: GameData = {
             gameId: 'id',
             playerData: [
                 {
@@ -164,6 +170,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);
@@ -171,7 +178,7 @@ describe('Input form field validation', () => {
     });
 
     it('Entry missing a score is invalid', () => {
-        const testObject: GameData = {
+        const testGame: GameData = {
             gameId: 'id',
             playerData: [
                 {
@@ -186,6 +193,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);
@@ -193,7 +201,7 @@ describe('Input form field validation', () => {
     });
 
     it('Input object with a gap between entries is invalid', () => {
-        const testObject: GameData = {
+        const testGame: GameData = {
             gameId: 'id',
             playerData: [
                 {
@@ -213,6 +221,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);
@@ -220,7 +229,7 @@ describe('Input form field validation', () => {
     });
 
     it('Input object with no first entry is invalid', () => {
-        const testObject: GameData = {
+        const testGame: GameData = {
             gameId: 'id',
             playerData: [
                 {
@@ -240,6 +249,8 @@ describe('Input form field validation', () => {
                 }
             ]
         };
+
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(2);
@@ -248,7 +259,7 @@ describe('Input form field validation', () => {
     });
 
     it('Victory points not in descending order is invalid', () => {
-        const testObject: GameData = {
+        const testGame: GameData = {
             gameId: 'id',
             playerData: [
                 {
@@ -268,6 +279,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);
@@ -275,7 +287,7 @@ describe('Input form field validation', () => {
     });
 
     it('Place must be in increasing order', () => {
-        const testObject: GameData = {
+        const testGame: GameData = {
             gameId: 'id',
             playerData: [
                 {
@@ -295,6 +307,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(2);
@@ -303,7 +316,7 @@ describe('Input form field validation', () => {
     });
 
     it('Ties must have equal victory points', () => {
-        const testObject: GameData = {
+        const testGame: GameData = {
             gameId: 'id',
             playerData: [
                 {
@@ -318,6 +331,7 @@ describe('Input form field validation', () => {
                 }
             ]
         };
+        const testObject :GameData[] = [testGame];
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);
