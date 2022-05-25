@@ -77,54 +77,54 @@ export function validateFilledData(pd: PlayerData[]): string[] {
  * Returns:
  *  A list of error messages that were found during validation. If the data is valid, the list will be empty.
  */
-export function validateInput(input: GameData): string[] {
+export function validateInput(input: GameData[]): string[] {
     let errors: string[] = []; //list of error messages
+    for (let data of input) {
+        //check game id
+        if (!data['gameId']) {
+            errors.push(ERRORS.NO_GAMEID);
+        }
 
-    //check game id
-    if (!input['gameId']) {
-        errors.push(ERRORS.NO_GAMEID);
-    }
+        const filledDataErrors = validateFilledData(data.playerData);
+        if (filledDataErrors.length > 0) {
+            errors.push(...filledDataErrors);
+        }
 
-    const filledDataErrors = validateFilledData(input.playerData);
-    if (filledDataErrors.length > 0) {
-        errors.push(...filledDataErrors);
-    }
+        let numNonBlankEntries = 0; //total non blank entries
+        //find all valid entries
+        for (let row of data['playerData'])
+            if (!allEmpty(row)) numNonBlankEntries++;
 
-    let numNonBlankEntries = 0; //total non blank entries
-    //find all valid entries
-    for (let row of input['playerData'])
-        if (!allEmpty(row)) numNonBlankEntries++;
+        if (numNonBlankEntries <= 1) errors.push(ERRORS.MINIMUM_ENTRIES);
 
-    if (numNonBlankEntries <= 1) errors.push(ERRORS.MINIMUM_ENTRIES);
+        //check descending victory points and place
 
-    //check descending victory points and place
+        let lastScore = Number.POSITIVE_INFINITY; //last visited score
+        let lastPlace = 0;
 
-    let lastScore = Number.POSITIVE_INFINITY; //last visited score
-    let lastPlace = 0;
+        //validate points
+        for (let x = 0; x < data['playerData'].length; x++) {
+            let player: PlayerData = data['playerData'][x];
+            //only check non blank entries
+            if (!anyEmpty(player)) {
+                //make sure score is less than previous score
+                if (player.victoryPoints > lastScore) {
+                    errors.push(ERRORS.DECREASING_VP);
+                }
+                if (player.playerPlace < lastPlace) {
+                    errors.push(ERRORS.INCREASING_PLACE);
+                }
+                if (
+                    player.playerPlace === lastPlace &&
+                    player.victoryPoints !== lastScore
+                ) {
+                    errors.push(ERRORS.TIE_VP);
+                }
 
-    //validate points
-    for (let x = 0; x < input['playerData'].length; x++) {
-        let player: PlayerData = input['playerData'][x];
-        //only check non blank entries
-        if (!anyEmpty(player)) {
-            //make sure score is less than previous score
-            if (player.victoryPoints > lastScore) {
-                errors.push(ERRORS.DECREASING_VP);
+                lastScore = player.victoryPoints;
+                lastPlace = player.playerPlace;
             }
-            if (player.playerPlace < lastPlace) {
-                errors.push(ERRORS.INCREASING_PLACE);
-            }
-            if (
-                player.playerPlace === lastPlace &&
-                player.victoryPoints !== lastScore
-            ) {
-                errors.push(ERRORS.TIE_VP);
-            }
-
-            lastScore = player.victoryPoints;
-            lastPlace = player.playerPlace;
         }
     }
-
     return errors;
 }

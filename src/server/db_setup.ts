@@ -188,17 +188,21 @@ export async function insertGameResult(
 export async function checkGameIdExists(
     gameId: string[]
 ): Promise<ErrorObject[]> {
-    // Check if the game already exists in the table
+    //Create an array of $#'s
     let params: string[] = [];
     for (let i = 1; i <= gameId.length; i++) {
         params.push('$' + i);
     }
 
+    // TODO : Convert to simpler method : ... WHERE game_label = ANY($1::string[])
+    // https://stackoverflow.com/questions/10720420/node-postgres-how-to-execute-where-col-in-dynamic-value-list-query
     let queryText: string =
         'SELECT * FROM game_results WHERE game_label IN (' +
         params.join(',') +
         ')';
     const res = await pool.query(queryText, gameId);
+
+    //Create the reutrn value
     let allErrors: ErrorObject[] = [];
 
     for (let row of res.rows) {
@@ -232,17 +236,16 @@ export async function insertGameResults(
     let gameIdExists = await checkGameIdExists(allIds);
 
     if (gameIdExists.length > 0) {
-        return { status: 500, results: gameIdExists };
+        return { status: 409, results: gameIdExists };
     }
 
     //Loops for additional game data
     for (let req of allReq) {
         // If not a duplicate, insert it
-        result = insertGameResult(req);
-
+        result = await insertGameResult(req);
         //If the result is a user input error
         if (result.status == 500 || result.status == 400) {
-            allErrors.concat(result.results);
+            allErrors = allErrors.concat(result.results);
         }
     }
 
