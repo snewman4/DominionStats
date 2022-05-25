@@ -92,14 +92,19 @@ export default class DataUploader extends LightningElement {
                 if (response.status == 200) location.reload();
                 //refresh page
                 else if (response.status >= 400) {
-                    //If there has been an error
-
+                    //If there has been a duplicate error
                     if (response.status == 409) {
-                        //If the error was a duplicate ID
-                        this.setErrorMessages([
-                            'Error: there is a duplicate game id present'
-                        ]);
-                        console.error('Duplicate game id error: ', response);
+                        response
+                            .json()
+                            .then((json) => {
+                                let errors: string[] = [];
+                                for (let res of json) errors.push(res.error);
+                                // Set the error messages to be the response
+                                this.setErrorMessages(errors);
+                            })
+                            .catch(function (err) {
+                                console.log(err);
+                            });
                     } else {
                         //If the error was something else
                         this.setErrorMessages([

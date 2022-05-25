@@ -242,11 +242,10 @@ export async function insertGameResults(
     //Loops for additional game data
     for (let req of allReq) {
         // If not a duplicate, insert it
-        result = insertGameResult(req);
-
+        result = await insertGameResult(req);
         //If the result is a user input error
         if (result.status == 500 || result.status == 400) {
-            allErrors.concat(result.results);
+            allErrors = allErrors.concat(result.results);
         }
     }
 
