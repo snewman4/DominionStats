@@ -40,35 +40,53 @@ export default class DataUploader extends LightningElement {
             });
         }
         */
+
        //data for post
         let dataList: GameData[] = [];
         let textBlob: string = this.getValueFromInput("textArea")
         console.log('textblob:', textBlob);
+
+        //Set up variables
         let currentData: GameData= {
             gameId: "",
             playerData: []
         };
         let currentGameId;
         let gameId;
-        let count:number = 0;
+        let count: number = 0;
+
+        //Split the lines, iterate over each one
         textBlob.split(/[\r\n]+/).forEach((line: string) => {
             console.log('processing line:', line)
+
+            //Split the lines based on whitespace gaps
             let columns: string[] = line.split(/\s+/);
+
+            //Set gameId equal to the first value in the line
             gameId = columns.shift();
+
             if(gameId === null || gameId === undefined || gameId === "" || columns.length !== 3){
+                //If something is wrong with the data
+                //TODO: notify user
                 return;
             }
+
             if(count == 0){
+                //If this is the first game
                 currentGameId = gameId;
                 count += 1;
-            }
-            else if(gameId !== currentGameId){
+            } else if(gameId !== currentGameId){
+                //Otherwise if this is a new game ID from the previous row
+
+                //Add the last game to the data
                 currentData = {
                     gameId: currentGameId,
                     playerData: playerData
                 }
                 console.log('Pushing current data:', currentData)
                 dataList.push(currentData);
+                
+                //Set up variables to keep track of new game
                 currentData = {
                     gameId: "",
                     playerData: []
@@ -76,6 +94,8 @@ export default class DataUploader extends LightningElement {
                 currentGameId = gameId;
                 playerData = [];
             }
+
+            //Read in the next player and add them to the data
             let newPlayer: PlayerData = {
                 playerPlace: parseInt(columns[0]),
                 playerName: columns[1],
@@ -84,13 +104,14 @@ export default class DataUploader extends LightningElement {
             playerData.push(newPlayer);
             
         });
+
+        //Append the last game Id which isn't appended in the loop
         currentData = {
             gameId: currentGameId,
             playerData: playerData
         }
         console.log('Pushing current data:', currentData)
         dataList.push(currentData);
-        debugger
 
         let errorMessagesList:string[] = [];
         for(let data of dataList){
@@ -125,8 +146,9 @@ export default class DataUploader extends LightningElement {
             body: JSON.stringify(dataList)
         }).then((response) => {
             //check response from server
-            if (response.status == 200){ //location.reload();
-            //refresh page
+            if (response.status == 200){ 
+                //refresh page, so updated data appears
+                location.reload();
             } else if (response.status >= 400) {
                 this.setErrorMessages([
                     'Something went wrong with the data upload. Please try again.'
