@@ -29,6 +29,8 @@ export default class DataUploader extends LightningElement {
         textBlob.split(/[\r\n]+/).forEach((line: string) => {
             //splits input by empty space
             let columns: string[] = line.split(/\s+/);
+
+            //Set gameId equal to the first value in the line
             gameId = columns.shift();
             //validates gameid
             if (gameId === null || gameId === undefined || gameId === "" || columns.length !== 3) {
