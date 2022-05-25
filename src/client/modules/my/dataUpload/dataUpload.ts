@@ -17,123 +17,83 @@ export default class DataUploader extends LightningElement {
      */
     gatherDataAndSend(): void {
         let playerData: PlayerData[] = []; //data for each player input
-
-        /*
-        //get entered player data
-        for (let x = 0; x < 6; x++) {
-            playerData.push({
-                playerName: this.getValueFromInput(
-                    'playerName' + (x + 1).toString()
-                ).trim(),
-                playerPlace: parseInt(
-                    this.getValueFromInput(
-                        'playerPlace' + (x + 1).toString().trim()
-                    ),
-                    10
-                ),
-                victoryPoints: parseInt(
-                    this.getValueFromInput(
-                        'victoryPoints' + (x + 1).toString().trim()
-                    ),
-                    10
-                )
-            });
-        }
-        */
-       //data for post
-        let dataList: GameData[] = [];
+        let dataList: GameData[] = []; //list of game data 
+        //gets value from textarea
         let textBlob: string = this.getValueFromInput("textArea")
-        console.log('textblob:', textBlob);
-        let currentData: GameData= {
-            gameId: "",
-            playerData: []
-        };
+        let currentData: GameData = {gameId: "", playerData: []};
         let currentGameId;
         let gameId;
-        let count:number = 0;
+        let count: number = 0;
+
+        //loops through each line
         textBlob.split(/[\r\n]+/).forEach((line: string) => {
-            console.log('processing line:', line)
+            //splits input by empty space
             let columns: string[] = line.split(/\s+/);
             gameId = columns.shift();
-            if(gameId === null || gameId === undefined || gameId === "" || columns.length !== 3){
+            //validates gameid
+            if (gameId === null || gameId === undefined || gameId === "" || columns.length !== 3) {
                 return;
             }
-            if(count == 0){
+            //on first run, only set current to first gameid
+            if (count == 0) {
                 currentGameId = gameId;
                 count += 1;
             }
-            else if(gameId !== currentGameId){
+            //whenever gameid changes, push current data and reset
+            else if (gameId !== currentGameId) {
                 currentData = {
                     gameId: currentGameId,
                     playerData: playerData
                 }
-                console.log('Pushing current data:', currentData)
                 dataList.push(currentData);
-                currentData = {
-                    gameId: "",
-                    playerData: []
-                };
+                currentData = {gameId: "", playerData: []};
                 currentGameId = gameId;
                 playerData = [];
             }
+            //set playerdata, then push
             let newPlayer: PlayerData = {
                 playerPlace: parseInt(columns[0]),
                 playerName: columns[1],
                 victoryPoints: parseInt(columns[2])
             }
             playerData.push(newPlayer);
-            
         });
+
         currentData = {
             gameId: currentGameId,
             playerData: playerData
         }
-        console.log('Pushing current data:', currentData)
         dataList.push(currentData);
-        debugger
 
-        let errorMessagesList:string[] = [];
-        for(let data of dataList){
-          // errorMessagesList.push(validateInput(data)); //validate input data
-            //if no errors were found
-            if (errorMessagesList.length == 0) {
-                let newPlayerData: PlayerData[] = []; //player data without blank entries
+        let errorMessages = validateInput(dataList);
+        //if no errors were found
+        if (errorMessages.length == 0) {
+            let newPlayerData: PlayerData[] = []; //player data without blank entries
 
-                //remove blank input entries
-                for (let playerEntry of data.playerData) {
-                    if (
-                        playerEntry.playerName !== '' &&
-                        !Object.is(playerEntry.victoryPoints, NaN)
-                    ) {
-                        newPlayerData.push(playerEntry);
-                    }
-                } 
-                data.playerData = newPlayerData; //reassign data
-            }   else {
-                    this.setErrorMessages(errorMessagesList);
-            }
+            console.log('Sending data: ', dataList);
+
+            //send POST request to api
+            fetch('api/v1/bulkGameResults', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dataList)
+            }).then((response) => {
+                //check response from server
+                if (response.status == 200) {
+                    location.reload();
+                    //refresh page
+                } else if (response.status >= 400) {
+                    this.setErrorMessages([
+                        'Something went wrong with the data upload. Please try again.'
+                    ]);
+                    console.error('Error inserting game results: ', response);
+                }
+            });
+        } else {
+            this.setErrorMessages(errorMessages);
         }
-      
-        console.log('Sending data: ', dataList);
-
-        //send POST request to api
-        fetch('api/v1/bulkGameResults', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataList)
-        }).then((response) => {
-            //check response from server
-            if (response.status == 200){ //location.reload();
-            //refresh page
-            } else if (response.status >= 400) {
-                this.setErrorMessages([
-                    'Something went wrong with the data upload. Please try again.'
-                ]);
-                console.error('Error inserting game results: ', response);
-            }
-        });
     }
 
     setErrorMessages(errorMessages: string[]): void {
