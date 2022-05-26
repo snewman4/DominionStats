@@ -16,57 +16,9 @@ export default class DataUploader extends LightningElement {
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
      */
     gatherDataAndSend(): void {
-        let playerData: PlayerData[] = []; //data for each player input
-        let dataList: GameData[] = []; //list of game data 
         //gets value from textarea
-        let textBlob: string = this.getValueFromInput("textArea")
-        let currentData: GameData = {gameId: "", playerData: []};
-        let currentGameId;
-        let gameId;
-        let count: number = 0;
-
-        //loops through each line
-        textBlob.split(/[\r\n]+/).forEach((line: string) => {
-            //splits input by empty space
-            let columns: string[] = line.split(/\s+/);
-
-            //Set gameId equal to the first value in the line
-            gameId = columns.shift();
-            //validates gameid
-            if (gameId === null || gameId === undefined || gameId === "" || columns.length !== 3) {
-                return;
-            }
-            //on first run, only set current to first gameid
-            if (count == 0) {
-                currentGameId = gameId;
-                count += 1;
-            }
-            //whenever gameid changes, push current data and reset
-            else if (gameId !== currentGameId) {
-                currentData = {
-                    gameId: currentGameId,
-                    playerData: playerData
-                }
-                dataList.push(currentData);
-                currentData = {gameId: "", playerData: []};
-                currentGameId = gameId;
-                playerData = [];
-            }
-            //set playerdata, then push
-            let newPlayer: PlayerData = {
-                playerPlace: parseInt(columns[0]),
-                playerName: columns[1],
-                victoryPoints: parseInt(columns[2])
-            }
-            playerData.push(newPlayer);
-        });
-
-        currentData = {
-            gameId: currentGameId,
-            playerData: playerData
-        }
-        dataList.push(currentData);
-
+        let textBlob: string = this.getValueFromInput('textArea');
+        let dataList: GameData[] = this.processLine(textBlob);
         let errorMessages = validateInput(dataList);
         //if no errors were found
         if (errorMessages.length == 0) {
@@ -84,23 +36,33 @@ export default class DataUploader extends LightningElement {
                 body: JSON.stringify(dataList)
             }).then((response) => {
                 //check response from server
-                if (response.status == 200) location.reload();
+                if (response.status == 200) {
+                    location.reload();
+                }
                 //refresh page
                 else if (response.status >= 400) {
-                    //If there has been an error
-
-                    if(response.status == 409){
-                        //If the error was a duplicate ID
-                        this.setErrorMessages([
-                            "Error: there is a duplicate game id present"
-                        ])
-                        console.error('Duplicate game id error: ', response);
-                    }else{
+                    //If there has been a duplicate error
+                    if (response.status == 409) {
+                        response
+                            .json()
+                            .then((json) => {
+                                let errors: string[] = [];
+                                for (let res of json) errors.push(res.error);
+                                // Set the error messages to be the response
+                                this.setErrorMessages(errors);
+                            })
+                            .catch(function (err) {
+                                console.log(err);
+                            });
+                    } else {
                         //If the error was something else
                         this.setErrorMessages([
                             'Something went wrong with the data upload. Please try again.'
                         ]);
-                        console.error('Error inserting game results: ', response);
+                        console.error(
+                            'Error inserting game results: ',
+                            response
+                        );
                     }
                 }
             });
@@ -129,5 +91,61 @@ export default class DataUploader extends LightningElement {
             return e.value.trim();
         }
         return '';
+    }
+    processLine(textBlob: string): GameData[] {
+        let playerData: PlayerData[] = []; //data for each player input
+        let dataList: GameData[] = []; //list of game data
+        let currentData: GameData = { gameId: '', playerData: [] };
+        let currentGameId;
+        let gameId;
+        let count = 0;
+
+        //loops through each line
+        textBlob.split(/[\r\n]+/).forEach((line: string) => {
+            //splits input by empty space
+            let columns: string[] = line.split(/\s+/);
+
+            //Set gameId equal to the first value in the line
+            gameId = columns.shift();
+            //validates gameid
+            if (
+                gameId === null ||
+                gameId === undefined ||
+                gameId === '' ||
+                columns.length !== 3
+            ) {
+                return;
+            }
+            //on first run, only set current to first gameid
+            if (count == 0) {
+                currentGameId = gameId;
+                count += 1;
+            }
+            //whenever gameid changes, push current data and reset
+            else if (gameId !== currentGameId) {
+                currentData = {
+                    gameId: currentGameId,
+                    playerData: playerData
+                };
+                dataList.push(currentData);
+                currentData = { gameId: '', playerData: [] };
+                currentGameId = gameId;
+                playerData = [];
+            }
+            //set playerdata, then push
+            let newPlayer: PlayerData = {
+                playerPlace: parseInt(columns[0]),
+                playerName: columns[1],
+                victoryPoints: parseInt(columns[2])
+            };
+            playerData.push(newPlayer);
+        });
+
+        currentData = {
+            gameId: currentGameId,
+            playerData: playerData
+        };
+        dataList.push(currentData);
+        return dataList;
     }
 }

@@ -1,32 +1,42 @@
 <template>
-    
-        <div class="slds-text-heading_small"><b>Enter game results below:</b></div>
+    <div class="slds-text-heading_small"><b>Enter game results below:</b></div>
 
-        <div class="slds-form-element">
-        <label class="slds-form-element__label" for="textarea-id-01">Copy and paste data from the google sheets.</label>
-        <br>
-        <label class="slds-form-element__label" for="textarea-id-02">Input Format: GameID Player_Placement Player_Name Player_Points</label>
-        <br>
+    <div class="slds-form-element">
+        <label class="slds-form-element__label" for="textarea-id-01"
+            >Copy and paste data from the google sheets.</label
+        >
+        <br />
+        <label class="slds-form-element__label" for="textarea-id-02"
+            >Input Format: GameID Player_Placement Player_Name Player_Points
+            etc.</label
+        >
+        <br />
         <div class="slds-form-element__control">
-        <textarea id="inputTextArea" name = "textArea" rows=5 class="slds-textarea" placeholder= 'Ex. 20220525a Matthew 1 64'>
-    </textarea>
+            <textarea
+                id="inputTextArea"
+                name="textArea"
+                rows="5"
+                class="slds-textarea"
+                placeholder="Ex. 20220525a Matthew 1 64"
+            >
+            </textarea>
         </div>
-        </div>
+    </div>
 
-          <lightning-button
-          label="Submit"
-          variant="brand-outline"
-          onclick={gatherDataAndSend}
-        ></lightning-button>
+    <lightning-button
+        label="Submit"
+        variant="brand-outline"
+        onclick={gatherDataAndSend}
+    ></lightning-button>
 
-        <br>
+    <br />
 
-        <template if:true={showErrors}>
-            <template for:each={errorMessages} for:item="entry">
-                <div key={entry}>
-                    <p class="slds-p-left_small" name="errorMessage">{entry}</p>
-                    <br />
-                </div>
-            </template>
+    <template if:true={showErrors}>
+        <template for:each={errorMessages} for:item="entry">
+            <div key={entry}>
+                <p class="slds-p-left_small" name="errorMessage">{entry}</p>
+                <br />
+            </div>
         </template>
+    </template>
 </template>
