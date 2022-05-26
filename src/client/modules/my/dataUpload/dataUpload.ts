@@ -20,6 +20,12 @@ export default class DataUploader extends LightningElement {
         let textBlob: string = this.getValueFromInput('textArea');
         let dataList: GameData[] = this.processLine(textBlob);
         let errorMessages = validateInput(dataList);
+        
+        let file = this.getValueFromFile("file-upload-input-107");
+        console.log('File: ', file.files);
+        
+        debugger
+
         //if no errors were found
         if (errorMessages.length == 0) {
             let newPlayerData: PlayerData[] = []; //player data without blank entries
@@ -69,6 +75,7 @@ export default class DataUploader extends LightningElement {
         } else {
             this.setErrorMessages(errorMessages);
         }
+        
     }
 
     setErrorMessages(errorMessages: string[]): void {
@@ -92,6 +99,17 @@ export default class DataUploader extends LightningElement {
         }
         return '';
     }
+
+    getValueFromFile(name: string): HTMLInputElement {
+        const e: HTMLInputElement | null = this.template.querySelector(
+            'input[name="' + name + '"]'
+        );
+        if (e) {
+            return e;
+        }
+        return null;
+    }
+
     processLine(textBlob: string): GameData[] {
         let playerData: PlayerData[] = []; //data for each player input
         let dataList: GameData[] = []; //list of game data
