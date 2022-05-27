@@ -79,12 +79,15 @@ export interface PlayedCard {
 export interface PlayerEffect {
     player: string; // player effected
     action?: number; // # of actions added
+    buy?: number; // # of buys added
     gain?: PlayedCard[]; // list of cards gained
     draw?: number; // # of cards drawn
     discard?: number; // # of cards discarded
+    topdeck?: PlayedCard[]; // list of cards put back into deck
     trash?: PlayedCard[]; // list of cards trashed
     villagers?: number; // # of villagers gained
     coffers?: number; // # of coffers gained
     VP?: number; // # of victory points gained
+    buyingPower?: number; // # of buying power added
     otherPlayers?: PlayerEffect[]; // list of effects on other players
 }
