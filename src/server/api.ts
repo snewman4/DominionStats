@@ -252,7 +252,7 @@ function setupRoutes() {
 
     // New API access to endpoint, use for log data insertion
     app.post(
-        'api/v1/logUpload',
+        '/api/v1/logUpload',
         ensureLoggedIn({throw: true}),
         async(req, res) =>{
             if(process.env.NODB){

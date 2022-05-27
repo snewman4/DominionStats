@@ -151,6 +151,15 @@ export default class DataUploader extends LightningElement {
 
     //Processes and sends the log to the server
     logSend(): void{
-        //TODO: implement
+        //TODO: implement with log file
+        fetch('api/v1/logUpload', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: ""
+        }).then((response) => {
+            console.log(response.status);
+        });
     }
 }
