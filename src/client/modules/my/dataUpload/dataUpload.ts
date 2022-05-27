@@ -20,11 +20,11 @@ export default class DataUploader extends LightningElement {
         let textBlob: string = this.getValueFromInput('textArea');
         let dataList: GameData[] = this.processLine(textBlob);
         let errorMessages = validateInput(dataList);
-        
-        let file = this.getValueFromFile("file-upload-input-107");
-        console.log('File: ', file.files);
-        
-        debugger
+
+        let fileText = this.template.querySelector('input[name="file-upload-input-107"]') as HTMLInputElement;
+        if (fileText !== null && fileText.files !== null) {
+            fileText.files[0].text().then(function(result) { console.log('file: ', result); let fileString = result })
+        }
 
         //if no errors were found
         if (errorMessages.length == 0) {
@@ -98,16 +98,6 @@ export default class DataUploader extends LightningElement {
             return e.value.trim();
         }
         return '';
-    }
-
-    getValueFromFile(name: string): HTMLInputElement {
-        const e: HTMLInputElement | null = this.template.querySelector(
-            'input[name="' + name + '"]'
-        );
-        if (e) {
-            return e;
-        }
-        return null;
     }
 
     processLine(textBlob: string): GameData[] {
