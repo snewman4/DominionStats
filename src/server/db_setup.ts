@@ -258,20 +258,14 @@ export async function insertGameResults(
     }
 }
 
-
 //Function for adding a log to the log database
-export async function insertLog(
-    log: string
-): Promise<GameResultsFormResult>{
+export async function insertLog(log: string): Promise<GameResultsFormResult> {
     //TODO: implement
-    return {status: 500, results: []};
+    return { status: 500, results: [] };
 }
 
-
 //Helper function for trimming a log
-function trimLog(
-    log: string
-): string{
+function trimLog(log: string): string {
     //TODO: implement
-    return "";
+    return '';
 }
