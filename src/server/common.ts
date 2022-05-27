@@ -57,3 +57,29 @@ export interface DominionUser {
     email: string;
     name: string;
 }
+
+export interface PlayerTurn {
+    gameId: string;
+    playerTurn: number;
+    playerName: string;
+    playedCards: PlayedCard[];
+    purchasedCards: PlayedCard[];
+}
+
+export interface PlayedCard {
+    card: string;
+    effect: Effect;
+    phase: "action" | "buy" | "night";
+    durationResolve: boolean;
+    usedVillagers: boolean;
+}
+
+export interface Effect {
+    gain: PlayedCard[];
+    draw: string[];
+    action: number;
+    villagers: number;
+    coffers: number;
+    VP: number;
+    trash: PlayedCard[];
+}
