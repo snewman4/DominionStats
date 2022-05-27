@@ -66,20 +66,25 @@ export interface PlayerTurn {
     purchasedCards: PlayedCard[];
 }
 
+// Interface of card used
 export interface PlayedCard {
-    card: string;
-    effect: Effect;
-    phase: "action" | "buy" | "night";
-    durationResolve: boolean;
-    usedVillagers: boolean;
+    card: string; // name of card
+    effect: PlayerEffect[]; // list of effects of card
+    phase: "action" | "buy" | "night" | "attack" | "reaction"; // phase the card was used/bought in
+    durationResolve: boolean; // used as result of duration?
+    usedVillagers: boolean; // used as result of villagers?
 }
 
-export interface Effect {
-    gain: PlayedCard[];
-    draw: string[];
-    action: number;
-    villagers: number;
-    coffers: number;
-    VP: number;
-    trash: PlayedCard[];
+// Interface of various effects a card can have
+export interface PlayerEffect {
+    player: string; // player effected
+    action?: number; // # of actions added
+    gain?: PlayedCard[]; // list of cards gained
+    draw?: number; // # of cards drawn
+    discard?: number; // # of cards discarded
+    trash?: PlayedCard[]; // list of cards trashed
+    villagers?: number; // # of villagers gained
+    coffers?: number; // # of coffers gained
+    VP?: number; // # of victory points gained
+    otherPlayers?: PlayerEffect[]; // list of effects on other players
 }
