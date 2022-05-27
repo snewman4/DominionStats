@@ -15,7 +15,8 @@ import {
     testQueryAll,
     getGameResultsFromDb,
     insertGameResult,
-    insertGameResults
+    insertGameResults,
+    insertLog
 } from './db_setup';
 
 function setupRoutes() {
@@ -248,6 +249,20 @@ function setupRoutes() {
             return res.status(insertResult.status).json(insertResult.results);
         }
     );
+
+    // New API access to endpoint, use for log data insertion
+    app.post(
+        'api/v1/logUpload',
+        ensureLoggedIn({throw: true}),
+        async(req, res) =>{
+            if(process.env.NODB){
+                return res.status(501).send();
+            }
+
+            const logInsertResult = await insertLog(req.body);
+            return res.status(logInsertResult.status).json(logInsertResult.results);
+        }
+    )
 
     app.get('/api/v1/gameResults', async (req, res) => {
         if (process.env.NODB) {

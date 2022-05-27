@@ -148,4 +148,9 @@ export default class DataUploader extends LightningElement {
         dataList.push(currentData);
         return dataList;
     }
+
+    //Processes and sends the log to the server
+    logSend(): void{
+        //TODO: implement
+    }
 }
