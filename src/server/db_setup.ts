@@ -265,7 +265,7 @@ export async function insertLog(log: string): Promise<GameResultsFormResult> {
     //Parse the data
     log = trimLog(log);
     console.log(log);
-    
+
     //Placeholder return statement
     return { status: 200, results: [] };
 }
@@ -275,7 +275,7 @@ function trimLog(log: string): string {
     //TODO: implement, may need more processing
 
     //Removes < > and any characters between them, will not work with nested tags but should be fine with the HTML elements in the logs
-    log = log.replace(/\<[\s\S]*?\>/g, "");
+    log = log.replace(/<[\s\S]*?>/g, '');
 
     return log;
 }
