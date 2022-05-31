@@ -264,6 +264,7 @@ export async function insertLog(log: string): Promise<GameResultsFormResult> {
 
     //Parse the data
     log = trimLog(log);
+    console.log(log);
     
     //Placeholder return statement
     return { status: 200, results: [] };
