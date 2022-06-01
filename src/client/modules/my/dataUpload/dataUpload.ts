@@ -21,9 +21,14 @@ export default class DataUploader extends LightningElement {
         let dataList: GameData[] = this.processLine(textBlob);
         let errorMessages = validateInput(dataList);
 
-        let fileText = this.template.querySelector('input[name="file-upload-input-107"]') as HTMLInputElement;
+        let fileText = this.template.querySelector(
+            'input[name="file-upload-input-107"]'
+        ) as HTMLInputElement;
         if (fileText !== null && fileText.files !== null) {
-            fileText.files[0].text().then(function(result) { console.log('file: ', result); let fileString = result })
+            fileText.files[0].text().then(function (result) {
+                console.log('file: ', result);
+                let fileString = result;
+            });
         }
 
         //if no errors were found
@@ -75,7 +80,6 @@ export default class DataUploader extends LightningElement {
         } else {
             this.setErrorMessages(errorMessages);
         }
-        
     }
 
     setErrorMessages(errorMessages: string[]): void {
