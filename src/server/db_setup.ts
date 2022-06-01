@@ -10,6 +10,10 @@ import type {
     PlayerResultForm,
     GameResultsFormResult
 } from './common';
+import type {
+    PlayerTurn,
+    PlayedCard
+} from './log_values';
 
 /**
  * Single global pool to be used for all queries
@@ -260,22 +264,82 @@ export async function insertGameResults(
 
 //Function for adding a log to the log database
 export async function insertLog(log: string): Promise<GameResultsFormResult> {
-    //TODO: implement
+    // TODO: implement
 
-    //Parse the data
-    log = trimLog(log);
-    console.log(log);
+    // TODO : Extract from the log just the log element of the JSON
+    // TODO : Fill in function with gameID, list of players, and log portion of JSON
+    let dataValues: PlayerTurn[] = parseLog("", [], "");
     
     //Placeholder return statement
     return { status: 200, results: [] };
 }
 
-//Helper function for trimming a log
-function trimLog(log: string): string {
+// TODO (?) : Make a new file to contain all of these helper functions
+
+// Helper function to parse the actual log of the game
+function parseLog(gameID: string, players: string[], log: string): PlayerTurn[] {
+    let game: string[] = trimLog(log);
+
+    let fullGame: PlayerTurn[] = [];
+
+    for(let turn of game) {
+        let turnResult: PlayerTurn | null = handleTurn(gameID, turn);
+        if(turnResult != null) {
+            fullGame.push(turnResult);
+        }
+    }
+
+    return fullGame;
+}
+
+// Helper function for trimming a log
+function trimLog(log: string): string[] {
     //TODO: implement, may need more processing
 
-    //Removes < > and any characters between them, will not work with nested tags but should be fine with the HTML elements in the logs
+    //Removes < > and any characters between them
     log = log.replace(/\<[\s\S]*?\>/g, "");
+    return log.split('Turn'); // Splits game up into turns
+}
 
-    return log;
+// TODO : Lots of work for handleTurn :(
+// Helper function to handle the individual turn of a game
+function handleTurn(gameID: string, turn: string) {
+    // Split up the turn into sentences
+    let splitTurn: string[] = turn.split('  ');
+    // Remove unnecessary spaces
+    splitTurn = splitTurn.filter(element => { return element !== ''; }).map(element => element.trim());
+
+    console.log(splitTurn);
+
+    // Check if this is a turn or the beginning of the game
+    // TODO : Better handling of not-a-turn
+    if(isNaN(Number(splitTurn[0][0]))) {
+        return null;
+    }
+
+    let activeTurn: number = 0;
+    let activePlayer: string = "";
+    let playedCards: PlayedCard[] = [];
+    let purchasedCards: PlayedCard[] = [];
+
+    for(let sentence of splitTurn) {
+        let splitSentence = sentence.split(' ');
+        // Handles the first sentence of the turn, w/ turn number and name
+        if(!isNaN(Number(splitSentence[0]))) {
+            activeTurn = Number(splitSentence[0]);
+            // TODO : Handle players with multi-word names, i.e. "Lord Rat"
+            activePlayer = splitSentence[2];
+            continue;
+        }
+    }
+
+    let thisTurn: PlayerTurn = {
+        gameId: gameID,
+        playerTurn: activeTurn,
+        playerName: activePlayer,
+        playedCards: playedCards,
+        purchasedCards: purchasedCards
+    }
+
+    return thisTurn;
 }

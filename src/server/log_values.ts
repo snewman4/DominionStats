@@ -33,7 +33,7 @@ export interface ActionEffect extends PlayerEffect {
 
 export function isActionEffect(pe: PlayerEffect): pe is ActionEffect {
     return (
-        pe.type === 'action' && Number.isInteger((pe as ActionEffect).action)
+        pe.type === 'action' && !isNaN(Number((pe as ActionEffect).action))
     );
 }
 
@@ -44,7 +44,7 @@ export interface BuyEffect extends PlayerEffect {
 }
 
 export function isBuyEffect(pe: PlayerEffect): pe is BuyEffect {
-    return pe.type === 'buy' && Number.isInteger((pe as BuyEffect).buy);
+    return pe.type === 'buy' && !isNaN(Number((pe as BuyEffect).buy));
 }
 
 // list of cards gained
@@ -74,7 +74,7 @@ export interface DrawEffect extends PlayerEffect {
 }
 
 export function isDrawEffect(pe: PlayerEffect): pe is DrawEffect {
-    return pe.type === 'draw' && Number.isInteger((pe as DrawEffect).draw);
+    return pe.type === 'draw' && !isNaN(Number((pe as DrawEffect).draw));
 }
 
 // list of cards put back into deck
@@ -94,9 +94,7 @@ export interface DiscardEffect extends PlayerEffect {
 }
 
 export function isDiscardEffect(pe: PlayerEffect): pe is DiscardEffect {
-    return (
-        pe.type === 'discard' && Number.isInteger((pe as DiscardEffect).discard)
-    );
+    return pe.type === 'discard' && !isNaN(Number((pe as DiscardEffect).discard));
 }
 
 // # of villagers gained
@@ -108,7 +106,7 @@ export interface VillagerEffect extends PlayerEffect {
 export function isVillagerEffect(pe: PlayerEffect): pe is VillagerEffect {
     return (
         pe.type === 'villagers' &&
-        Number.isInteger((pe as VillagerEffect).villagers)
+        !isNaN(Number((pe as VillagerEffect).villagers))
     );
 }
 
@@ -120,7 +118,7 @@ export interface CofferEffect extends PlayerEffect {
 
 export function isCofferEffect(pe: PlayerEffect): pe is CofferEffect {
     return (
-        pe.type === 'coffers' && Number.isInteger((pe as CofferEffect).coffers)
+        pe.type === 'coffers' && !isNaN(Number((pe as CofferEffect).coffers))
     );
 }
 
@@ -131,7 +129,7 @@ export interface VPEffect extends PlayerEffect {
 }
 
 export function isVPEffect(pe: PlayerEffect): pe is VPEffect {
-    return pe.type === 'VP' && Number.isInteger((pe as VPEffect).VP);
+    return pe.type === 'VP' && !isNaN(Number((pe as VPEffect).VP));
 }
 
 // # of buying power added
@@ -143,7 +141,7 @@ export interface BuyingPowerEffect extends PlayerEffect {
 export function isBuyingPowerEffect(pe: PlayerEffect): pe is BuyingPowerEffect {
     return (
         pe.type === 'buying power' &&
-        Number.isInteger((pe as BuyingPowerEffect).buyingPower)
+        !isNaN(Number((pe as BuyingPowerEffect).buyingPower))
     );
 }
 
