@@ -20,7 +20,7 @@ export default class DataUploader extends LightningElement {
         let textBlob: string = this.getValueFromInput('textArea');
         let dataList: GameData[] = this.processLine(textBlob);
         let errorMessages = validateInput(dataList);
-        let fileString:String = "";
+        let fileString: string = "";
         let fileText = this.template.querySelector(
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
@@ -34,7 +34,7 @@ export default class DataUploader extends LightningElement {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(fileString)
+                body: JSON.stringify(eval(fileString))
             });
         }
 
