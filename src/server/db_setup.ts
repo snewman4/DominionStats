@@ -327,8 +327,7 @@ function handleTurn(gameID: string, turn: string) {
         // Handles the first sentence of the turn, w/ turn number and name
         if(!isNaN(Number(splitSentence[0]))) {
             activeTurn = Number(splitSentence[0]);
-            // TODO : Handle players with multi-word names, i.e. "Lord Rat"
-            activePlayer = splitSentence[2];
+            activePlayer = sentence.substring(sentence.indexOf("-") + 2);
             continue;
         }
     }
