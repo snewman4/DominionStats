@@ -306,10 +306,11 @@ function trimLog(log: string): string[] {
 function handleTurn(gameID: string, turn: string) {
     // Split up the turn into sentences
     let splitTurn: string[] = turn.split('  ');
+
     // Remove unnecessary spaces
     splitTurn = splitTurn.filter(element => { return element !== ''; }).map(element => element.trim());
 
-    console.log(splitTurn);
+    console.log(splitTurn); //TODO: remove when done testing
 
     // Check if this is a turn or the beginning of the game
     // TODO : Better handling of not-a-turn
@@ -329,6 +330,49 @@ function handleTurn(gameID: string, turn: string) {
             activeTurn = Number(splitSentence[0]);
             activePlayer = sentence.substring(sentence.indexOf("-") + 2);
             continue;
+        }else if(splitSentence.length > 1 && splitSentence[1] === "plays"){
+            //Handles a played card
+
+            //Default values for tracking information
+            let cardName: string = "";
+            let phase = 'action';
+            let durationResolve = false;
+            let usedVillagers = false;
+
+            let cardStartIndex = 0;
+            let amount = 1;
+
+
+            for(let i = 2; i < splitSentence.length; i++){
+                if(splitSentence[i] === "a" || splitSentence[i] === "an"){
+                    //Start tracking for start of a card name
+                    cardStartIndex = i+1;
+                    amount = 1;
+                }else if(!isNaN(Number(splitSentence[i]))){
+                    //If the current string is a number, denoting multiple of a card
+                    cardStartIndex = i+1;
+                    amount = Number(splitSentence[i]);
+                }else if(splitSentence[i].slice(-1) === "." || splitSentence[i] === "and"){
+                    //If the current string ends in a . it is the end of the name of the card
+                    if(splitSentence[i].slice(-1) === "."){
+                        cardName = splitSentence.slice(cardStartIndex, i+1).join(" ");
+                        cardName = cardName.slice(0,-1) //Get rid of period
+                    }else{
+                        cardName = splitSentence.slice(cardStartIndex, i).join(" ");
+                    }
+
+                    if(amount > 1){
+                        cardName.slice(0,-1); //Chop off 's' from card name
+                                              //May not work in every case, TODO: needs testing
+                    }
+
+                    //Append card to card array
+                    //TODO: implement other parameters for the card such as phase
+                    for(let i = 0; i < amount; i++){
+                        playedCards.push({card: cardName,  effect: [], phase: 'action', durationResolve: durationResolve, usedVillagers: usedVillagers});
+                    }
+                }
+            }
         }
     }
 
