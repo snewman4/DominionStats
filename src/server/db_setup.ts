@@ -257,3 +257,25 @@ export async function insertGameResults(
         return { status: 200, results: [] };
     }
 }
+
+//Function for adding a log to the log database
+export async function insertLog(log: string): Promise<GameResultsFormResult> {
+    //TODO: implement
+
+    //Parse the data
+    log = trimLog(log);
+    console.log(log);
+
+    //Placeholder return statement
+    return { status: 200, results: [] };
+}
+
+//Helper function for trimming a log
+function trimLog(log: string): string {
+    //TODO: implement, may need more processing
+
+    //Removes < > and any characters between them, will not work with nested tags but should be fine with the HTML elements in the logs
+    log = log.replace(/<[\s\S]*?>/g, '');
+
+    return log;
+}
