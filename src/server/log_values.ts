@@ -32,9 +32,7 @@ export interface ActionEffect extends PlayerEffect {
 }
 
 export function isActionEffect(pe: PlayerEffect): pe is ActionEffect {
-    return (
-        pe.type === 'action' && !isNaN(Number((pe as ActionEffect).action))
-    );
+    return pe.type === 'action' && !isNaN(Number((pe as ActionEffect).action));
 }
 
 // # of buys added
@@ -94,7 +92,9 @@ export interface DiscardEffect extends PlayerEffect {
 }
 
 export function isDiscardEffect(pe: PlayerEffect): pe is DiscardEffect {
-    return pe.type === 'discard' && !isNaN(Number((pe as DiscardEffect).discard));
+    return (
+        pe.type === 'discard' && !isNaN(Number((pe as DiscardEffect).discard))
+    );
 }
 
 // # of villagers gained
