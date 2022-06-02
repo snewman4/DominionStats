@@ -103,12 +103,22 @@ function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     let durationResolve = false;
     let usedVillagers = false;
     let amount = 1;
+    let cardIndexOffset = 0;
 
     let retList: PlayedCard[] = [];
     if (sentence.length === 0) return retList; // Empty list case
     if (sentence[0] === 'and') return handlePlayKeyword(sentence.slice(1)); // Remove leading and
 
-    cardName = sentence[1];
+    for(let i = 1; i < sentence.length; i++){
+        if(
+            sentence[i].charAt(sentence[i].length - 1) === '.' ||
+            sentence[i].charAt(sentence[i].length - 1) === ',' ||
+            sentence[i+1] === "and"
+        ){
+            cardName = sentence.slice(1, i+1).join(" ");
+            cardIndexOffset = i;
+        }
+    }
 
     // Single of this type of card, more cards to follow
     if (
@@ -116,7 +126,7 @@ function handlePlayKeyword(sentence: string[]): PlayedCard[] {
         cardName.charAt(cardName.length - 1) !== '.'
     ) {
         cardName = cardName.replace(',', '');
-        retList = retList.concat(handlePlayKeyword(sentence.slice(2)));
+        retList = retList.concat(handlePlayKeyword(sentence.slice(cardIndexOffset + 1)));
     }
     // Single of this type of card, last of played cards
     else if (isNaN(Number(sentence[0]))) {
@@ -128,13 +138,14 @@ function handlePlayKeyword(sentence: string[]): PlayedCard[] {
         // More cards to follow
         if (cardName.charAt(cardName.length - 1) !== '.') {
             cardName = cardName.replace(',', '').slice(0, -1); // Chop off 's' from card name, TODO : needs testing
-            retList = retList.concat(handlePlayKeyword(sentence.slice(2)));
+            retList = retList.concat(handlePlayKeyword(sentence.slice(cardIndexOffset + 1)));
         }
         // Last card of the played cards
         else {
             cardName = cardName.replace('.', '').slice(0, -1); // Chop off 's' from card name, TODO : needs testing
         }
     }
+
     phase = cards['PlayKeyword'][cardName as keyof typeof cards['PlayKeyword']];
     for (let i = 0; i < amount; i++)
         retList.push(
