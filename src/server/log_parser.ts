@@ -109,12 +109,14 @@ function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     if (sentence.length === 0) return retList; // Empty list case
     if (sentence[0] === 'and') return handlePlayKeyword(sentence.slice(1)); // Remove leading and
 
+    //Loop through strings until the end of the card name is found
     for(let i = 1; i < sentence.length; i++){
         if(
             sentence[i].charAt(sentence[i].length - 1) === '.' ||
             sentence[i].charAt(sentence[i].length - 1) === ',' ||
             sentence[i+1] === "and"
         ){
+            //Once it's found set the name and cardIndexOffset
             cardName = sentence.slice(1, i+1).join(" ");
             cardIndexOffset = i;
         }
