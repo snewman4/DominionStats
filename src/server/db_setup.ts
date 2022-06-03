@@ -261,13 +261,30 @@ export async function insertGameResults(
 }
 
 //Function for adding a log to the log database
-export async function insertLog(log: string): Promise<GameResultsFormResult> {
+export async function insertLog(log: object): Promise<GameResultsFormResult> {
+    let allErrors: ErrorObject[] = [];
+    let allTurns: PlayerTurn[] = [];
     // TODO: implement
+    let gameID: string;
+    let players: string[];
+    let gameLog: string;
+    for (let key in log) {
+        gameID = log[key]["gameID"];
+        players = log[key]["players"];
+        gameLog = log[key]["log"];
+        // Check that all of the above elements actually exist in log
+        if(gameID === undefined || players === undefined || gameLog === undefined) {
+            allErrors.push({ status: 'error', error: 'Log does not match expected format' });
+            break;
+        } else {
+            // TODO : Make parseLog able to return error, handle that
+            allTurns.concat(parseLog(gameID, players, gameLog));
+        }
+    }
 
-    // TODO : Extract from the log just the log element of the JSON
-    // TODO : Fill in function with gameID, list of players, and log portion of JSON
-    let dataValues: PlayerTurn[] = parseLog('', [], '');
-
-    //Placeholder return statement
-    return { status: 200, results: [] };
+    if (allErrors.length != 0) {
+        return { status: 400, results: allErrors };
+    } else {
+        return { status: 200, results: [] };
+    }
 }
