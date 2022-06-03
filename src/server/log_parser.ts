@@ -172,7 +172,7 @@ function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     return retList;
 }
 
-function handleBuyKeyword(sentence: string[]): PlayedCard{
+export function handleBuyKeyword(sentence: string[]): PlayedCard{
     //Default values
     let cardName = sentence.join(" ").slice(0,-1) //Chop off period
     let phase = 'buy';
@@ -184,7 +184,7 @@ function handleBuyKeyword(sentence: string[]): PlayedCard{
     return generateCard(cardName, phase, effect, durationResolve, usedVillagers);
 }
 
-function generateCard(
+export function generateCard(
     card: string,
     phase: string,
     effect: PlayerEffect[],
