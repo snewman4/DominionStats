@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS log_game_round (
-	id serial PRIMARY KEY,
+	id serial,
     game_label VARCHAR(255) NOT NULL,
     player_name VARCHAR(255) NOT NULL,
     cards_played JSON NOT NULL,
