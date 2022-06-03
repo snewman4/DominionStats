@@ -79,8 +79,8 @@ function handleTurn(gameID: string, turn: string): PlayerTurn | null {
                     );
                     break;
                 case 'buys':
-                    purchasedCards.push(
-                        handleBuyKeyword(splitSentence.slice(5))
+                    purchasedCards = purchasedCards.concat(
+                        handleBuyKeyword(splitSentence.slice(4))
                     );
             }
         }
@@ -125,7 +125,12 @@ function handlePlayKeyword(sentence: string[]): PlayedCard[] {
             sentence[i+1] === "and"
         ){
             //Once it's found set the name and cardIndexOffset
-            cardName = sentence.slice(1, i+1).join(" ");
+            if(sentence[i].slice(0,-1) === "again"){
+                //If again is at the end get rid of it but copy over punctuation for processing
+                cardName = sentence.slice(1,i).join(" ") + sentence[i].slice(-1);
+            }else{
+                cardName = sentence.slice(1, i+1).join(" ");
+            }
             cardIndexOffset = i;
             break;
         }
@@ -157,7 +162,15 @@ function handlePlayKeyword(sentence: string[]): PlayedCard[] {
         }
     }
 
-    phase = cards['PlayKeyword'][cardName as keyof typeof cards['PlayKeyword']];
+    //Singularizing card name and verifying the card exists
+    let tempCardName = singularize(cardName);
+    if(tempCardName === ""){
+        throw new Error("Not a valid card name: " + tempCardName);
+    }
+    cardName = tempCardName;
+
+    //Push the cards to return list
+    phase = cards['PlayKeyword'][cardName.toLowerCase() as keyof typeof cards['PlayKeyword']];
     for (let i = 0; i < amount; i++)
         retList.push(
             generateCard(
@@ -172,16 +185,34 @@ function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     return retList;
 }
 
-export function handleBuyKeyword(sentence: string[]): PlayedCard{
+export function handleBuyKeyword(sentence: string[]): PlayedCard[]{
     //Default values
-    let cardName = sentence.join(" ").slice(0,-1) //Chop off period
+    let amount = 1;
+
+    if(!isNaN(Number(sentence[0]))){
+        //If there is more than 1 card bought
+        amount = Number(sentence[0]);
+    }
+   
+    //Setting default values
+    let tempCardName = sentence.slice(1).join(" ").slice(0,-1); //Chop off period
+    let cardName = singularize(tempCardName);
+    if(cardName === ""){
+        throw new Error("Not a valid card name: " + tempCardName);
+    }
+
     let phase = 'buy';
     let effect: PlayerEffect[] = [];
     let durationResolve = false;
     let usedVillagers = false;
-     
+    let retList: PlayedCard[] = [];
 
-    return generateCard(cardName, phase, effect, durationResolve, usedVillagers);
+    //Adding cards to returning array
+    for(let i = 0; i < amount; i++){
+        retList.push(generateCard(cardName, phase, effect, durationResolve, usedVillagers));
+    }
+
+    return retList;
 }
 
 export function generateCard(
@@ -223,4 +254,20 @@ export function generateCard(
             throw new Error('not a valid card phase: ' + card + ' ' + phase);
     }
     return retCard;
+}
+
+//Singularizes a card, or returns an empty string is the word isn't a card
+function singularize(word: string): string{
+    let lowerWord = word.toLowerCase();
+    if(cards["AllCards"].includes(lowerWord)){
+        return word;
+    }else if(lowerWord.slice(-3) === "ies" && cards["AllCards"].includes(lowerWord.slice(0,-3) + "y")){
+        return word.slice(0,-3) + "y";
+    }else if(lowerWord.slice(-2) === "es" && cards["AllCards"].includes(lowerWord.slice(0,-2))){
+        return word.slice(0,-2);
+    }else if(cards["AllCards"].includes(lowerWord.slice(0,-1))){
+        return word.slice(0,-1);
+    }
+
+    return "";
 }

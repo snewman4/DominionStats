@@ -94,7 +94,7 @@ describe('Card Generation', () => {
 
 describe('Buy Keyword Handling', () => {
     it('Valid input of single card', () => {
-        const testCard: PlayedCard = handleBuyKeyword(["Silver"]);
+        const testCard: PlayedCard[] = handleBuyKeyword(["Silver"]);
 
         expect(testCard).toEqual({
             card: "Silver",
