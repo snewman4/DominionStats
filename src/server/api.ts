@@ -26,7 +26,7 @@ function setupRoutes() {
     app.use(compression());
 
     app.use(bodyParser.urlencoded({ extended: true }));
-    app.use(bodyParser.json({limit: '5mb'}));
+    app.use(bodyParser.json({ limit: '5mb' }));
 
     const HOST = process.env.HOST || 'localhost';
     const PORT = process.env.PORT || 3001;
