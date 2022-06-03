@@ -78,6 +78,10 @@ function handleTurn(gameID: string, turn: string): PlayerTurn | null {
                         handlePlayKeyword(splitSentence.slice(2))
                     );
                     break;
+                case 'buys':
+                    purchasedCards.push(
+                        handleBuyKeyword(splitSentence.slice(5))
+                    );
             }
         }
     }
@@ -166,6 +170,18 @@ function handlePlayKeyword(sentence: string[]): PlayedCard[] {
         );
 
     return retList;
+}
+
+function handleBuyKeyword(sentence: string[]): PlayedCard{
+    //Default values
+    let cardName = sentence.join(" ").slice(0,-1) //Chop off period
+    let phase = 'buy';
+    let effect: PlayerEffect[] = [];
+    let durationResolve = false;
+    let usedVillagers = false;
+     
+
+    return generateCard(cardName, phase, effect, durationResolve, usedVillagers);
 }
 
 function generateCard(
