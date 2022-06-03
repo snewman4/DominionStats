@@ -95,6 +95,10 @@ function handleTurn(gameID: string, turn: string): PlayerTurn | null {
     return thisTurn;
 }
 
+// TODO : Add handling for using a secondary way
+// "W plays an Ironmonger using Way of the Monkey"
+// Function to handle the plays keyword, such as
+// "Matt plays a copper"
 function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     // Default values for tracking information
     let cardName = '';
