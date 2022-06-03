@@ -20,6 +20,26 @@ export default class DataUploader extends LightningElement {
         let textBlob: string = this.getValueFromInput('textArea');
         let dataList: GameData[] = this.processLine(textBlob);
         let errorMessages = validateInput(dataList);
+        // Get file values
+        let fileString: string = "";
+        let fileText = this.template.querySelector(
+            'input[name="file-upload-input-107"]'
+        ) as HTMLInputElement;
+        if (fileText !== null && fileText.files !== null) {
+            fileText.files[0].text().then((result) => {
+                console.log('file: ', result);
+                fileString = result;
+                fetch('api/v1/logUpload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: fileString
+                });
+                // TODO : Handle the response, potential error handling
+            });
+        }
+
         //if no errors were found
         if (errorMessages.length == 0) {
             let newPlayerData: PlayerData[] = []; //player data without blank entries
@@ -92,6 +112,7 @@ export default class DataUploader extends LightningElement {
         }
         return '';
     }
+
     processLine(textBlob: string): GameData[] {
         let playerData: PlayerData[] = []; //data for each player input
         let dataList: GameData[] = []; //list of game data
@@ -147,19 +168,5 @@ export default class DataUploader extends LightningElement {
         };
         dataList.push(currentData);
         return dataList;
-    }
-
-    //Processes and sends the log to the server
-    logSend(): void {
-        fetch('api/v1/logUpload', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: '' //TODO: replace with log file string
-        }).then((response) => {
-            //TODO: give a better response to user
-            console.log(response.status);
-        });
     }
 }

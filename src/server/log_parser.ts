@@ -119,6 +119,7 @@ function handlePlayKeyword(sentence: string[]): PlayedCard[] {
             //Once it's found set the name and cardIndexOffset
             cardName = sentence.slice(1, i+1).join(" ");
             cardIndexOffset = i;
+            break;
         }
     }
 
