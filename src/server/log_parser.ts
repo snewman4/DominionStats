@@ -162,6 +162,14 @@ function handlePlayKeyword(sentence: string[]): PlayedCard[] {
         }
     }
 
+    //Singularizing card name and verifying the card exists
+    let tempCardName = singularize(cardName);
+    if(tempCardName === ""){
+        throw new Error("Not a valid card name: " + tempCardName);
+    }
+    cardName = tempCardName;
+
+    //Push the cards to return list
     phase = cards['PlayKeyword'][cardName.toLowerCase() as keyof typeof cards['PlayKeyword']];
     for (let i = 0; i < amount; i++)
         retList.push(
