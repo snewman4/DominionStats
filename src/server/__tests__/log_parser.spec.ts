@@ -94,14 +94,172 @@ describe('Card Generation', () => {
 
 describe('Buy Keyword Handling', () => {
     it('Valid input of single card', () => {
-        const testCard: PlayedCard[] = handleBuyKeyword(["Silver"]);
+        const testCard: PlayedCard[] = handleBuyKeyword(["a", "Silver."]);
 
-        expect(testCard).toEqual({
+        expect(testCard).toEqual([{
             card: "Silver",
             effect: [],
             phase: "buy",
             durationResolve: false,
             usedVillagers: false
-        });
+        }]);
+    });
+
+    it('Valid input of a single multi-word card', () => {
+        const testCard: PlayedCard[] = handleBuyKeyword(["a", "Merchant", "Camp."]);
+
+        expect(testCard).toEqual([{
+            card: "Merchant Camp",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }]);
+    });
+
+    it('Valid input of multiple single-word card', () => {
+        const testCard: PlayedCard[] = handleBuyKeyword(["2", "Silvers"]);
+
+        expect(testCard).toEqual([{
+            card: "Silver",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }, {
+            card: "Silver",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }]);
+    });
+
+    it('Valid input of multiple single-word cards with complex plurals', () => {
+        const testCard: PlayedCard[] = handleBuyKeyword(["3", "Spies."]);
+
+        expect(testCard).toEqual([{
+            card: "Spy",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }, {
+            card: "Spy",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }, {
+            card: "Spy",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }]);
+    });
+
+    it('Valid input of multiple multi-word cards', () => {
+        const testCard: PlayedCard[] = handleBuyKeyword(["2", "Capital", "Cities."]);
+
+        expect(testCard).toEqual([{
+            card: "Capital City",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }, {
+            card: "Capital City",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }]);
+    });
+
+    // NOTE : We are not sure that this is how the log prints such a purchase. We will look into it further
+    it('Valid input of multiple multi-word cards', () => {
+        const testCard: PlayedCard[] = handleBuyKeyword(["3", "Families", "of", "Inventors."]);
+
+        expect(testCard).toEqual([{
+            card: "Family of Inventors",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }, {
+            card: "Family of Inventors",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }, {
+            card: "Family of Inventors",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }]);
+    });
+
+    it('Valid input of single pluralized(ish) card', () => {
+        const testCard: PlayedCard[] = handleBuyKeyword(["a", "Gardens."]);
+
+        expect(testCard).toEqual([{
+            card: "Gardens",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }]);
+    });
+
+    it('Valid input of multiple plural cards', () => {
+        const testCard: PlayedCard[] = handleBuyKeyword(["2", "Taxes."]);
+
+        expect(testCard).toEqual([{
+            card: "Tax",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }, {
+            card: "Tax",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }]);
+    });
+
+    // Demonstrates that odd pluralization can still be handled
+    it('Unexpected pluralization', () => {
+        const testCard: PlayedCard[] = handleBuyKeyword(["a", "Palaces."]);
+
+        expect(testCard).toEqual([{
+            card: "Palace",
+            effect: [],
+            phase: "buy",
+            durationResolve: false,
+            usedVillagers: false
+        }]);
+    });
+
+    it('Missing punctuation', () => {
+        expect(() => {
+            handleBuyKeyword(["a", "Gardens"])
+        }).toThrow('Not a valid card name: Garden');
+    });
+
+    it('Invalid card name', () => {
+        expect(() => {
+            handleBuyKeyword(["a", "Stormtrooper."])
+        }).toThrow('Not a valid card name: Stormtrooper');
+    });
+
+    it('Unexpected additional term', () => {
+        expect(() => {
+            handleBuyKeyword(["a", "Gardens.", "Kingdom."])
+        }).toThrow('Not a valid card name: Gardens. Kingdom');
     });
 });
