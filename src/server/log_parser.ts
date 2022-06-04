@@ -255,7 +255,7 @@ export function generateCard(
             break;
         default:
             // TODO : Use errors provided in common.ts?
-            throw new Error('Not a valid card phase: ' + phase + ' for  ' + card);
+            throw new Error('Not a valid card phase: ' + phase + ' for ' + card);
     }
     return retCard;
 }
