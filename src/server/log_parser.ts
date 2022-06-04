@@ -103,7 +103,7 @@ function handleTurn(gameID: string, turn: string): PlayerTurn | null {
 // "W plays an Ironmonger using Way of the Monkey"
 // Function to handle the plays keyword, such as
 // "Matt plays a copper"
-function handlePlayKeyword(sentence: string[]): PlayedCard[] {
+export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     // Default values for tracking information
     let cardName = '';
     let phase = 'action';
@@ -153,24 +153,27 @@ function handlePlayKeyword(sentence: string[]): PlayedCard[] {
         amount = Number(sentence[0]);
         // More cards to follow
         if (cardName.charAt(cardName.length - 1) !== '.') {
-            cardName = cardName.replace(',', '').slice(0, -1); // Chop off 's' from card name, TODO : needs testing
+            cardName = cardName.replace(',', '');
             retList = retList.concat(handlePlayKeyword(sentence.slice(cardIndexOffset + 1)));
         }
         // Last card of the played cards
         else {
-            cardName = cardName.replace('.', '').slice(0, -1); // Chop off 's' from card name, TODO : needs testing
+            cardName = cardName.replace('.', '');
         }
     }
 
     //Singularizing card name and verifying the card exists
-    let tempCardName = singularize(cardName);
-    if(tempCardName === ""){
-        throw new Error("Not a valid card name: " + tempCardName);
+    try {
+        cardName = singularize(cardName);
+    } catch(e) {
+        throw e;
     }
-    cardName = tempCardName;
+
+    // Fetching phase of the card
+    phase = cards['PlayKeyword'][cardName.toLowerCase() as keyof typeof cards['PlayKeyword']];
+    if(phase === undefined) throw new Error('This is not a playable card: ' + cardName);
 
     //Push the cards to return list
-    phase = cards['PlayKeyword'][cardName.toLowerCase() as keyof typeof cards['PlayKeyword']];
     for (let i = 0; i < amount; i++)
         retList.push(
             generateCard(
@@ -195,10 +198,11 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[]{
     }
    
     //Setting default values
-    let tempCardName = sentence.slice(1).join(" ").slice(0,-1); //Chop off period
-    let cardName = singularize(tempCardName);
-    if(cardName === ""){
-        throw new Error("Not a valid card name: " + tempCardName);
+    let cardName = sentence.slice(1).join(" ").slice(0,-1); //Chop off period
+    try {
+        cardName = singularize(cardName);
+    } catch(e) {
+        throw e;
     }
 
     let phase = 'buy';
@@ -251,7 +255,7 @@ export function generateCard(
             break;
         default:
             // TODO : Use errors provided in common.ts?
-            throw new Error('not a valid card phase: ' + card + ' ' + phase);
+            throw new Error('Not a valid card phase: ' + phase + ' for  ' + card);
     }
     return retCard;
 }
@@ -269,5 +273,5 @@ function singularize(word: string): string{
         return word.slice(0,-1);
     }
 
-    return "";
+    throw new Error('Not a valid card name: ' + word);
 }
