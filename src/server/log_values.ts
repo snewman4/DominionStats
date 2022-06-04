@@ -1,6 +1,7 @@
 export interface PlayerTurn {
     gameId: string;
     playerTurn: number;
+    turnIndex: number;
     playerName: string;
     playedCards: PlayedCard[];
     purchasedCards: PlayedCard[];

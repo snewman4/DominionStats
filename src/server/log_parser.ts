@@ -11,10 +11,12 @@ export function parseLog(
 
     let fullGame: PlayerTurn[] = [];
 
+    let iterator = 0; // Tracks the turn index
     for (let turn of game) {
-        let turnResult: PlayerTurn | null = handleTurn(gameID, turn);
+        let turnResult: PlayerTurn | null = handleTurn(gameID, turn, iterator);
         if (turnResult != null) {
             fullGame.push(turnResult);
+            iterator++;
         }
     }
 
@@ -32,7 +34,11 @@ function trimLog(log: string): string[] {
 
 // TODO : Handle more keywords, like reacts
 // Helper function to handle the individual turn of a game
-function handleTurn(gameID: string, turn: string): PlayerTurn | null {
+export function handleTurn(
+    gameID: string,
+    turn: string,
+    turnIndex: number
+): PlayerTurn | null {
     // Split up the turn into sentences
     let splitTurn: string[] = turn.split('  ');
 
@@ -82,6 +88,7 @@ function handleTurn(gameID: string, turn: string): PlayerTurn | null {
                     purchasedCards = purchasedCards.concat(
                         handleBuyKeyword(splitSentence.slice(4))
                     );
+                    break;
             }
         }
     }
@@ -89,6 +96,7 @@ function handleTurn(gameID: string, turn: string): PlayerTurn | null {
     let thisTurn: PlayerTurn = {
         gameId: gameID,
         playerTurn: activeTurn,
+        turnIndex: turnIndex,
         playerName: activePlayer,
         playedCards: playedCards,
         purchasedCards: purchasedCards
@@ -118,18 +126,19 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     if (sentence[0] === 'and') return handlePlayKeyword(sentence.slice(1)); // Remove leading and
 
     //Loop through strings until the end of the card name is found
-    for(let i = 1; i < sentence.length; i++){
-        if(
+    for (let i = 1; i < sentence.length; i++) {
+        if (
             sentence[i].charAt(sentence[i].length - 1) === '.' ||
             sentence[i].charAt(sentence[i].length - 1) === ',' ||
-            sentence[i+1] === "and"
-        ){
+            sentence[i + 1] === 'and'
+        ) {
             //Once it's found set the name and cardIndexOffset
-            if(sentence[i].slice(0,-1) === "again"){
+            if (sentence[i].slice(0, -1) === 'again') {
                 //If again is at the end get rid of it but copy over punctuation for processing
-                cardName = sentence.slice(1,i).join(" ") + sentence[i].slice(-1);
-            }else{
-                cardName = sentence.slice(1, i+1).join(" ");
+                cardName =
+                    sentence.slice(1, i).join(' ') + sentence[i].slice(-1);
+            } else {
+                cardName = sentence.slice(1, i + 1).join(' ');
             }
             cardIndexOffset = i;
             break;
@@ -142,7 +151,9 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
         cardName.charAt(cardName.length - 1) !== '.'
     ) {
         cardName = cardName.replace(',', '');
-        retList = retList.concat(handlePlayKeyword(sentence.slice(cardIndexOffset + 1)));
+        retList = retList.concat(
+            handlePlayKeyword(sentence.slice(cardIndexOffset + 1))
+        );
     }
     // Single of this type of card, last of played cards
     else if (isNaN(Number(sentence[0]))) {
@@ -154,7 +165,9 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
         // More cards to follow
         if (cardName.charAt(cardName.length - 1) !== '.') {
             cardName = cardName.replace(',', '');
-            retList = retList.concat(handlePlayKeyword(sentence.slice(cardIndexOffset + 1)));
+            retList = retList.concat(
+                handlePlayKeyword(sentence.slice(cardIndexOffset + 1))
+            );
         }
         // Last card of the played cards
         else {
@@ -163,15 +176,15 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     }
 
     //Singularizing card name and verifying the card exists
-    try {
-        cardName = singularize(cardName);
-    } catch(e) {
-        throw e;
-    }
+    cardName = singularize(cardName);
 
     // Fetching phase of the card
-    phase = cards['PlayKeyword'][cardName.toLowerCase() as keyof typeof cards['PlayKeyword']];
-    if(phase === undefined) throw new Error('This is not a playable card: ' + cardName);
+    phase =
+        cards['PlayKeyword'][
+            cardName.toLowerCase() as keyof typeof cards['PlayKeyword']
+        ];
+    if (phase === undefined)
+        throw new Error('This is not a playable card: ' + cardName);
 
     //Push the cards to return list
     for (let i = 0; i < amount; i++)
@@ -188,22 +201,18 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     return retList;
 }
 
-export function handleBuyKeyword(sentence: string[]): PlayedCard[]{
+export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
     //Default values
     let amount = 1;
 
-    if(!isNaN(Number(sentence[0]))){
+    if (!isNaN(Number(sentence[0]))) {
         //If there is more than 1 card bought
         amount = Number(sentence[0]);
     }
-   
+
     //Setting default values
-    let cardName = sentence.slice(1).join(" ").slice(0,-1); //Chop off period
-    try {
-        cardName = singularize(cardName);
-    } catch(e) {
-        throw e;
-    }
+    let cardName = sentence.slice(1).join(' ').slice(0, -1); //Chop off period
+    cardName = singularize(cardName);
 
     let phase = 'buy';
     let effect: PlayerEffect[] = [];
@@ -212,8 +221,16 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[]{
     let retList: PlayedCard[] = [];
 
     //Adding cards to returning array
-    for(let i = 0; i < amount; i++){
-        retList.push(generateCard(cardName, phase, effect, durationResolve, usedVillagers));
+    for (let i = 0; i < amount; i++) {
+        retList.push(
+            generateCard(
+                cardName,
+                phase,
+                effect,
+                durationResolve,
+                usedVillagers
+            )
+        );
     }
 
     return retList;
@@ -255,22 +272,30 @@ export function generateCard(
             break;
         default:
             // TODO : Use errors provided in common.ts?
-            throw new Error('Not a valid card phase: ' + phase + ' for ' + card);
+            throw new Error(
+                'Not a valid card phase: ' + phase + ' for ' + card
+            );
     }
     return retCard;
 }
 
 //Singularizes a card, or returns an empty string is the word isn't a card
-function singularize(word: string): string{
+function singularize(word: string): string {
     let lowerWord = word.toLowerCase();
-    if(cards["AllCards"].includes(lowerWord)){
+    if (cards['AllCards'].includes(lowerWord)) {
         return word;
-    }else if(lowerWord.slice(-3) === "ies" && cards["AllCards"].includes(lowerWord.slice(0,-3) + "y")){
-        return word.slice(0,-3) + "y";
-    }else if(lowerWord.slice(-2) === "es" && cards["AllCards"].includes(lowerWord.slice(0,-2))){
-        return word.slice(0,-2);
-    }else if(cards["AllCards"].includes(lowerWord.slice(0,-1))){
-        return word.slice(0,-1);
+    } else if (
+        lowerWord.slice(-3) === 'ies' &&
+        cards['AllCards'].includes(lowerWord.slice(0, -3) + 'y')
+    ) {
+        return word.slice(0, -3) + 'y';
+    } else if (
+        lowerWord.slice(-2) === 'es' &&
+        cards['AllCards'].includes(lowerWord.slice(0, -2))
+    ) {
+        return word.slice(0, -2);
+    } else if (cards['AllCards'].includes(lowerWord.slice(0, -1))) {
+        return word.slice(0, -1);
     }
 
     throw new Error('Not a valid card name: ' + word);

@@ -269,12 +269,19 @@ export async function insertLog(log: object): Promise<GameResultsFormResult> {
     let players: string[];
     let gameLog: string;
     for (let key in log) {
-        gameID = log[key]["gameID"];
-        players = log[key]["players"];
-        gameLog = log[key]["log"];
+        gameID = log[key]['gameID'];
+        players = log[key]['players'];
+        gameLog = log[key]['log'];
         // Check that all of the above elements actually exist in log
-        if(gameID === undefined || players === undefined || gameLog === undefined) {
-            allErrors.push({ status: 'error', error: 'Log does not match expected format' });
+        if (
+            gameID === undefined ||
+            players === undefined ||
+            gameLog === undefined
+        ) {
+            allErrors.push({
+                status: 'error',
+                error: 'Log does not match expected format'
+            });
             break;
         } else {
             // TODO : Make parseLog able to return error, handle that

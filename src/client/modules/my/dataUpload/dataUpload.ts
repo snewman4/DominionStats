@@ -21,7 +21,7 @@ export default class DataUploader extends LightningElement {
         let dataList: GameData[] = this.processLine(textBlob);
         let errorMessages = validateInput(dataList);
         // Get file values
-        let fileString: string = "";
+        let fileString = '';
         let fileText = this.template.querySelector(
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
