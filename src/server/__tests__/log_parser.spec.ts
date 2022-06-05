@@ -875,14 +875,25 @@ describe('Handle Turn', () => {
 
 describe('Parse Log Tests', () => {
     it('Valid log with valid players', () => {
-        const testParse: PlayerTurn[] = parseLog('20220604a', ['snewman1', 'matt.buland'], 'Test Turn');
+        const testParse: PlayerTurn[] = parseLog(
+            '20220604a',
+            [
+                { username: 'snewman1', playerName: 'Sam', playerSymbol: 's' },
+                {
+                    username: 'matt.buland',
+                    playerName: 'Matt',
+                    playerSymbol: 'm'
+                }
+            ],
+            'Test Turn'
+        );
 
         expect(testParse).toBeNull;
     });
 
     it('Invalid list of player names', () => {
         expect(() => {
-            parseLog('20220604a', [], 'Test Turn')
+            parseLog('20220604a', [], 'Test Turn');
         }).toThrow('Insufficient number of players in list');
     });
 });

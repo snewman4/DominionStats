@@ -1,13 +1,15 @@
 import type { PlayerTurn, PlayedCard, PlayerEffect } from './log_values';
 import cards from './cards.json';
+import { UsernameMapping } from './common';
 
 // Helper function to parse the actual log of the game
 export function parseLog(
     gameID: string,
-    players: string[],
+    players: UsernameMapping[],
     log: string
 ): PlayerTurn[] {
-    if (players.length < 2) throw new Error('Insufficient number of players in list');
+    if (players.length < 2)
+        throw new Error('Insufficient number of players in list');
     let game: string[] = trimLog(log);
 
     let fullGame: PlayerTurn[] = [];

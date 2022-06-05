@@ -9,7 +9,10 @@ import type {
     ErrorObject,
     GameResultsForm,
     PlayerResultForm,
-    GameResultsFormResult
+    GameResultsFormResult,
+    UsernameFormResult,
+    LogFormResult,
+    UsernameMapping
 } from './common';
 import type { PlayerTurn } from './log_values';
 
@@ -260,17 +263,26 @@ export async function insertGameResults(
     }
 }
 
+// Function to verify the existence of usernames in the DB
+export async function usernameCheck(
+    usernames: string[]
+): Promise<UsernameFormResult> {
+    // TODO : Username handling
+    return { status: 200, results: [] };
+}
+
 //Function for adding a log to the log database
-export async function insertLog(log: object): Promise<GameResultsFormResult> {
+export async function insertLog(log: object): Promise<LogFormResult> {
     let allErrors: ErrorObject[] = [];
     let allTurns: PlayerTurn[] = [];
     // TODO: implement
     let gameID: string;
-    let players: string[];
+    let players: UsernameMapping[];
     let gameLog: string;
     for (let key in log) {
         gameID = log[key]['gameID'];
         // TODO : Check player usernames against DB
+        // TODO : May need to use JSON.parse() and some other things to get this to work
         players = log[key]['players'];
         gameLog = log[key]['log'];
         // Check that all of the above elements actually exist in log
