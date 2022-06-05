@@ -3,17 +3,20 @@ import {
     handleBuyKeyword,
     handlePlayKeyword,
     handleTurn,
-    parseLog
+    parseLog,
+    updateNames
 } from '../log_parser';
-import { isOtherPlayerEffect } from '../log_values';
+import { BuyEffect, isOtherPlayerEffect } from '../log_values';
 import type {
     PlayedCard,
     PlayerEffect,
     ActionEffect,
     OtherPlayerEffect,
     GainEffect,
-    PlayerTurn
+    PlayerTurn,
+    DrawEffect
 } from '../log_values';
+import { UsernameMapping } from '../common';
 
 // jest tests
 describe('Card Generation', () => {
@@ -852,6 +855,47 @@ describe('Handle Turn', () => {
         expect(testTurn).toBeNull;
     });
 
+    it('Valid turn with multi-word name', () => {
+        const testTurn = handleTurn(
+            '20220604a',
+            '1 - Matt Buland   M plays 2 Coppers. (+$2)   M buys and gains 2 Cellars.',
+            1
+        );
+
+        expect(testTurn).toEqual({
+            gameId: '20220604a',
+            playerTurn: 1,
+            turnIndex: 1,
+            playerName: 'Matt Buland',
+            playedCards: [{
+                card: 'Copper',
+                effect: [],
+                phase: 'buy',
+                durationResolve: false,
+                usedVillagers: false
+            },  {
+                card: 'Copper',
+                effect: [],
+                phase: 'buy',
+                durationResolve: false,
+                usedVillagers: false
+            }],
+            purchasedCards: [{
+                card: 'Cellar',
+                effect: [],
+                phase: 'buy',
+                durationResolve: false,
+                usedVillagers: false
+            }, {
+                card: 'Cellar',
+                effect: [],
+                phase: 'buy',
+                durationResolve: false,
+                usedVillagers: false
+            }]
+        });
+    });
+
     it('Invalid card name play keyword', () => {
         expect(() => {
             handleTurn(
@@ -866,7 +910,7 @@ describe('Handle Turn', () => {
         expect(() => {
             handleTurn(
                 '20220604a',
-                '1 - matt.buland   m plays 2 Coppers. ($+2)   m buys and gains 2 Cellas.',
+                '1 - matt.buland   m plays 2 Coppers. (+$2)   m buys and gains 2 Cellas.',
                 0
             );
         }).toThrow('Not a valid card name: Cellas');
@@ -895,5 +939,179 @@ describe('Parse Log Tests', () => {
         expect(() => {
             parseLog('20220604a', [], 'Test Turn');
         }).toThrow('Insufficient number of players in list');
+    });
+});
+
+describe('Name Updating Tests', () => {
+    it('Valid input', () => {
+        // Active players in the game
+        const players: UsernameMapping[] = [{
+            username: 'matt.buland',
+            playerName: 'Matt',
+            playerSymbol: 'm'
+        }, {
+            username: 'snewman1',
+            playerName: 'Sam On',
+            playerSymbol: 's'
+        }];
+
+        // Raw turn inputs with unaltered names
+        const drawEffect1: DrawEffect = {
+            type: 'draw',
+            player: 'm',
+            draw: 4
+        }
+        const drawEffect2: DrawEffect = {
+            type: 'draw',
+            player: 's',
+            draw: 1
+        }
+        const buyEffect1: BuyEffect = {
+            type: 'buy',
+            player: 'm',
+            buy: 1
+        }
+        const otherPlayerEffect: OtherPlayerEffect = {
+            type: 'other players',
+            player: 'm',
+            otherPlayers: [drawEffect2]
+        }
+        const rawTurn: PlayerTurn = {
+            gameId: '20220604a',
+            playerTurn: 2,
+            turnIndex: 5,
+            playerName: 'matt.buland',
+            playedCards: [{
+                card: 'Council Room',
+                effect: [drawEffect1, buyEffect1, otherPlayerEffect],
+                phase: 'action',
+                durationResolve: false,
+                usedVillagers: false
+            }, {
+                card: 'Copper',
+                effect: [],
+                phase: 'buy',
+                durationResolve: false,
+                usedVillagers: false
+            }],
+            purchasedCards: [{
+                card: 'Ironmonger',
+                effect: [],
+                phase: 'buy',
+                durationResolve: false,
+                usedVillagers: false
+            }]
+        }
+
+        const testUpdate: PlayerTurn = updateNames(rawTurn, players);
+
+        // Expected test outputs
+        const expectDraw1: DrawEffect = {
+            type: 'draw',
+            player: 'Matt',
+            draw: 4
+        }
+        const expectDraw2: DrawEffect = {
+            type: 'draw',
+            player: 'Sam On',
+            draw: 1
+        }
+        const expectBuy1: BuyEffect = {
+            type: 'buy',
+            player: 'Matt',
+            buy: 1
+        }
+        const expectOtherPlayer: OtherPlayerEffect = {
+            type: 'other players',
+            player: 'Matt',
+            otherPlayers: [expectDraw2]
+        }
+        const expectTurn: PlayerTurn = {
+            gameId: '20220604a',
+            playerTurn: 2,
+            turnIndex: 5,
+            playerName: 'Matt',
+            playedCards: [{
+                card: 'Council Room',
+                effect: [drawEffect1, buyEffect1, otherPlayerEffect],
+                phase: 'action',
+                durationResolve: false,
+                usedVillagers: false
+            }, {
+                card: 'Copper',
+                effect: [],
+                phase: 'buy',
+                durationResolve: false,
+                usedVillagers: false
+            }],
+            purchasedCards: [{
+                card: 'Ironmonger',
+                effect: [],
+                phase: 'buy',
+                durationResolve: false,
+                usedVillagers: false
+            }]
+        }
+
+        expect(testUpdate).toEqual(expectTurn);
+    });
+
+    it('Missing name definition, basic', () => {
+        const players: UsernameMapping[] = [{
+            username: 'matt.buland',
+            playerName: 'Matt',
+            playerSymbol: 'm'
+        }, {
+            username: 'snewman1',
+            playerName: 'Sam',
+            playerSymbol: 's'
+        }];
+        const rawTurn: PlayerTurn = {
+            gameId: '20220604a',
+            playerTurn: 1,
+            turnIndex: 2,
+            playerName: 'lord-rat',
+            playedCards: [],
+            purchasedCards: []
+        }
+
+        expect(() => {
+            updateNames(rawTurn, players)
+        }).toThrow('Unrecognized player: lord-rat');
+    });
+
+    it('Missing name definition, effect', () => {
+        const players: UsernameMapping[] = [{
+            username: 'matt.buland',
+            playerName: 'Matt',
+            playerSymbol: 'm'
+        }, {
+            username: 'snewman1',
+            playerName: 'Sam On',
+            playerSymbol: 's'
+        }];
+        const drawEffect: DrawEffect = {
+            type: 'draw',
+            player: 'l',
+            draw: 1
+        }
+        const rawTurn: PlayerTurn = {
+            gameId: '20220604a',
+            playerTurn: 2,
+            turnIndex: 3,
+            playerName: 'matt.buland',
+            playedCards: [{
+                card: 'Cellar',
+                effect: [drawEffect],
+                phase: 'action',
+                durationResolve: false,
+                usedVillagers: false
+            }],
+            purchasedCards: []
+        }
+
+        expect(() => {
+            updateNames(rawTurn, players)
+        }).toThrow('Unrecognized player: l');
     });
 });

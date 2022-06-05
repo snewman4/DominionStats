@@ -35,6 +35,10 @@ function trimLog(log: string): string[] {
     return log.split('Turn'); // Splits game up into turns
 }
 
+export function updateNames(turn: PlayerTurn, players: UsernameMapping[]): PlayerTurn {
+    return turn;
+}
+
 // TODO : Handle more keywords, like reacts
 // Helper function to handle the individual turn of a game
 export function handleTurn(
