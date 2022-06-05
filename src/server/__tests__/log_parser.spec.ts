@@ -867,32 +867,38 @@ describe('Handle Turn', () => {
             playerTurn: 1,
             turnIndex: 1,
             playerName: 'Matt Buland',
-            playedCards: [{
-                card: 'Copper',
-                effect: [],
-                phase: 'buy',
-                durationResolve: false,
-                usedVillagers: false
-            },  {
-                card: 'Copper',
-                effect: [],
-                phase: 'buy',
-                durationResolve: false,
-                usedVillagers: false
-            }],
-            purchasedCards: [{
-                card: 'Cellar',
-                effect: [],
-                phase: 'buy',
-                durationResolve: false,
-                usedVillagers: false
-            }, {
-                card: 'Cellar',
-                effect: [],
-                phase: 'buy',
-                durationResolve: false,
-                usedVillagers: false
-            }]
+            playedCards: [
+                {
+                    card: 'Copper',
+                    effect: [],
+                    phase: 'buy',
+                    durationResolve: false,
+                    usedVillagers: false
+                },
+                {
+                    card: 'Copper',
+                    effect: [],
+                    phase: 'buy',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ],
+            purchasedCards: [
+                {
+                    card: 'Cellar',
+                    effect: [],
+                    phase: 'buy',
+                    durationResolve: false,
+                    usedVillagers: false
+                },
+                {
+                    card: 'Cellar',
+                    effect: [],
+                    phase: 'buy',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ]
         });
     });
 
@@ -945,63 +951,71 @@ describe('Parse Log Tests', () => {
 describe('Name Updating Tests', () => {
     it('Valid input', () => {
         // Active players in the game
-        const players: UsernameMapping[] = [{
-            username: 'matt.buland',
-            playerName: 'Matt',
-            playerSymbol: 'm'
-        }, {
-            username: 'snewman1',
-            playerName: 'Sam On',
-            playerSymbol: 's'
-        }];
+        const players: UsernameMapping[] = [
+            {
+                username: 'matt.buland',
+                playerName: 'Matt',
+                playerSymbol: 'm'
+            },
+            {
+                username: 'snewman1',
+                playerName: 'Sam On',
+                playerSymbol: 's'
+            }
+        ];
 
         // Raw turn inputs with unaltered names
         const drawEffect1: DrawEffect = {
             type: 'draw',
             player: 'm',
             draw: 4
-        }
+        };
         const drawEffect2: DrawEffect = {
             type: 'draw',
             player: 's',
             draw: 1
-        }
+        };
         const buyEffect1: BuyEffect = {
             type: 'buy',
             player: 'm',
             buy: 1
-        }
+        };
         const otherPlayerEffect: OtherPlayerEffect = {
             type: 'other players',
             player: 'm',
             otherPlayers: [drawEffect2]
-        }
+        };
         const rawTurn: PlayerTurn = {
             gameId: '20220604a',
             playerTurn: 2,
             turnIndex: 5,
             playerName: 'matt.buland',
-            playedCards: [{
-                card: 'Council Room',
-                effect: [drawEffect1, buyEffect1, otherPlayerEffect],
-                phase: 'action',
-                durationResolve: false,
-                usedVillagers: false
-            }, {
-                card: 'Copper',
-                effect: [],
-                phase: 'buy',
-                durationResolve: false,
-                usedVillagers: false
-            }],
-            purchasedCards: [{
-                card: 'Ironmonger',
-                effect: [],
-                phase: 'buy',
-                durationResolve: false,
-                usedVillagers: false
-            }]
-        }
+            playedCards: [
+                {
+                    card: 'Council Room',
+                    effect: [drawEffect1, buyEffect1, otherPlayerEffect],
+                    phase: 'action',
+                    durationResolve: false,
+                    usedVillagers: false
+                },
+                {
+                    card: 'Copper',
+                    effect: [],
+                    phase: 'buy',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ],
+            purchasedCards: [
+                {
+                    card: 'Ironmonger',
+                    effect: [],
+                    phase: 'buy',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ]
+        };
 
         const testUpdate: PlayerTurn = updateNames(rawTurn, players);
 
@@ -1010,62 +1024,70 @@ describe('Name Updating Tests', () => {
             type: 'draw',
             player: 'Matt',
             draw: 4
-        }
+        };
         const expectDraw2: DrawEffect = {
             type: 'draw',
             player: 'Sam On',
             draw: 1
-        }
+        };
         const expectBuy1: BuyEffect = {
             type: 'buy',
             player: 'Matt',
             buy: 1
-        }
+        };
         const expectOtherPlayer: OtherPlayerEffect = {
             type: 'other players',
             player: 'Matt',
             otherPlayers: [expectDraw2]
-        }
+        };
         const expectTurn: PlayerTurn = {
             gameId: '20220604a',
             playerTurn: 2,
             turnIndex: 5,
             playerName: 'Matt',
-            playedCards: [{
-                card: 'Council Room',
-                effect: [drawEffect1, buyEffect1, otherPlayerEffect],
-                phase: 'action',
-                durationResolve: false,
-                usedVillagers: false
-            }, {
-                card: 'Copper',
-                effect: [],
-                phase: 'buy',
-                durationResolve: false,
-                usedVillagers: false
-            }],
-            purchasedCards: [{
-                card: 'Ironmonger',
-                effect: [],
-                phase: 'buy',
-                durationResolve: false,
-                usedVillagers: false
-            }]
-        }
+            playedCards: [
+                {
+                    card: 'Council Room',
+                    effect: [drawEffect1, buyEffect1, otherPlayerEffect],
+                    phase: 'action',
+                    durationResolve: false,
+                    usedVillagers: false
+                },
+                {
+                    card: 'Copper',
+                    effect: [],
+                    phase: 'buy',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ],
+            purchasedCards: [
+                {
+                    card: 'Ironmonger',
+                    effect: [],
+                    phase: 'buy',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ]
+        };
 
         expect(testUpdate).toEqual(expectTurn);
     });
 
     it('Missing name definition, basic', () => {
-        const players: UsernameMapping[] = [{
-            username: 'matt.buland',
-            playerName: 'Matt',
-            playerSymbol: 'm'
-        }, {
-            username: 'snewman1',
-            playerName: 'Sam',
-            playerSymbol: 's'
-        }];
+        const players: UsernameMapping[] = [
+            {
+                username: 'matt.buland',
+                playerName: 'Matt',
+                playerSymbol: 'm'
+            },
+            {
+                username: 'snewman1',
+                playerName: 'Sam',
+                playerSymbol: 's'
+            }
+        ];
         const rawTurn: PlayerTurn = {
             gameId: '20220604a',
             playerTurn: 1,
@@ -1073,45 +1095,50 @@ describe('Name Updating Tests', () => {
             playerName: 'lord-rat',
             playedCards: [],
             purchasedCards: []
-        }
+        };
 
         expect(() => {
-            updateNames(rawTurn, players)
+            updateNames(rawTurn, players);
         }).toThrow('Unrecognized player: lord-rat');
     });
 
     it('Missing name definition, effect', () => {
-        const players: UsernameMapping[] = [{
-            username: 'matt.buland',
-            playerName: 'Matt',
-            playerSymbol: 'm'
-        }, {
-            username: 'snewman1',
-            playerName: 'Sam On',
-            playerSymbol: 's'
-        }];
+        const players: UsernameMapping[] = [
+            {
+                username: 'matt.buland',
+                playerName: 'Matt',
+                playerSymbol: 'm'
+            },
+            {
+                username: 'snewman1',
+                playerName: 'Sam On',
+                playerSymbol: 's'
+            }
+        ];
         const drawEffect: DrawEffect = {
             type: 'draw',
             player: 'l',
             draw: 1
-        }
+        };
         const rawTurn: PlayerTurn = {
             gameId: '20220604a',
             playerTurn: 2,
             turnIndex: 3,
             playerName: 'matt.buland',
-            playedCards: [{
-                card: 'Cellar',
-                effect: [drawEffect],
-                phase: 'action',
-                durationResolve: false,
-                usedVillagers: false
-            }],
+            playedCards: [
+                {
+                    card: 'Cellar',
+                    effect: [drawEffect],
+                    phase: 'action',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ],
             purchasedCards: []
-        }
+        };
 
         expect(() => {
-            updateNames(rawTurn, players)
+            updateNames(rawTurn, players);
         }).toThrow('Unrecognized player: l');
     });
 });

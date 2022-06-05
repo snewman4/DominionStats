@@ -17,7 +17,8 @@ export function parseLog(
     let iterator = 0; // Tracks the turn index
     for (let turn of game) {
         let turnResult: PlayerTurn | null = handleTurn(gameID, turn, iterator);
-        if (turnResult != null) {
+        if (turnResult !== null) {
+            turnResult = updateNames(turnResult, players);
             fullGame.push(turnResult);
             iterator++;
         }
@@ -35,8 +36,68 @@ function trimLog(log: string): string[] {
     return log.split('Turn'); // Splits game up into turns
 }
 
-export function updateNames(turn: PlayerTurn, players: UsernameMapping[]): PlayerTurn {
-    return turn;
+// Function to update all name references in a turn based off of the provided mapping
+export function updateNames(
+    turn: PlayerTurn,
+    players: UsernameMapping[]
+): PlayerTurn {
+    let playerNameUpdate: string;
+
+    // Handle playerName associated with turn
+    const matchName = players.filter(
+        (element) =>
+            element.username === turn.playerName ||
+            element.playerName === turn.playerName ||
+            element.playerSymbol === turn.playerName
+    );
+    if (matchName.length === 1) playerNameUpdate = matchName[0].playerName;
+    else {
+        throw new Error('Unrecognized player: ' + turn.playerName);
+    }
+
+    // Handle playerSymbols associated with effects
+    for (let card of turn.playedCards) {
+        for (let effect of card.effect) {
+            let matchSymbol = players.filter(
+                (element) =>
+                    element.username === effect.player ||
+                    element.playerName === effect.player ||
+                    element.playerSymbol === effect.player
+            );
+
+            if (matchSymbol.length === 1)
+                effect.player = matchSymbol[0].playerName;
+            else {
+                throw new Error('Unrecognized player: ' + effect.player);
+            }
+        }
+    }
+
+    for (let card of turn.purchasedCards) {
+        for (let effect of card.effect) {
+            let matchSymbol = players.filter(
+                (element) =>
+                    element.username === effect.player ||
+                    element.playerName === effect.player ||
+                    element.playerSymbol === effect.player
+            );
+
+            if (matchSymbol.length === 1)
+                effect.player = matchSymbol[0].playerName;
+            else {
+                throw new Error('Unrecognized player: ' + effect.player);
+            }
+        }
+    }
+
+    return {
+        gameId: turn.gameId,
+        playerTurn: turn.playerTurn,
+        turnIndex: turn.turnIndex,
+        playerName: playerNameUpdate,
+        playedCards: turn.playedCards,
+        purchasedCards: turn.purchasedCards
+    };
 }
 
 // TODO : Handle more keywords, like reacts
@@ -44,7 +105,7 @@ export function updateNames(turn: PlayerTurn, players: UsernameMapping[]): Playe
 export function handleTurn(
     gameID: string,
     turn: string,
-    turnIndex: number,
+    turnIndex: number
 ): PlayerTurn | null {
     // Split up the turn into sentences
     let splitTurn: string[] = turn.split('  ');
@@ -182,7 +243,7 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     }
 
     // If a card is played using a Way, store the Way, fix the card
-    if(cardName.includes(' using ')) {
+    if (cardName.includes(' using ')) {
         way = cardName.slice(cardName.indexOf(' using ') + 6);
         cardName = cardName.slice(0, cardName.indexOf(' using '));
     }
@@ -294,21 +355,26 @@ export function generateCard(
 //Singularizes a card, or returns an empty string is the word isn't a card
 function singularize(word: string): string {
     let lowerWord = word.toLowerCase();
-    if (cards['AllCards'].includes(lowerWord)) { // Gardens -> Gardens
+    if (cards['AllCards'].includes(lowerWord)) {
+        // Gardens -> Gardens
         return word;
-    } else if ( // Spies -> Spy
+    } else if (
+        // Spies -> Spy
         lowerWord.slice(-3) === 'ies' &&
         cards['AllCards'].includes(lowerWord.slice(0, -3) + 'y')
     ) {
         return word.slice(0, -3) + 'y';
-    } else if ( // Necropolises -> Necropolis
+    } else if (
+        // Necropolises -> Necropolis
         lowerWord.slice(-2) === 'es' &&
         cards['AllCards'].includes(lowerWord.slice(0, -2))
     ) {
         return word.slice(0, -2);
-    } else if (cards['AllCards'].includes(lowerWord.slice(0, -1))) { // Militias -> Militia
+    } else if (cards['AllCards'].includes(lowerWord.slice(0, -1))) {
+        // Militias -> Militia
         return word.slice(0, -1);
-    } else if (cards['AllCards'].includes(lowerWord.slice(0, -1) + 'um')) { // Platina -> Platinum
+    } else if (cards['AllCards'].includes(lowerWord.slice(0, -1) + 'um')) {
+        // Platina -> Platinum
         return word.slice(0, -1) + 'um';
     }
 
