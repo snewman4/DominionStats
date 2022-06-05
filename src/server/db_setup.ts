@@ -270,6 +270,7 @@ export async function insertLog(log: object): Promise<GameResultsFormResult> {
     let gameLog: string;
     for (let key in log) {
         gameID = log[key]['gameID'];
+        // TODO : Check player usernames against DB
         players = log[key]['players'];
         gameLog = log[key]['log'];
         // Check that all of the above elements actually exist in log

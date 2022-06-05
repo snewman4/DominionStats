@@ -57,3 +57,9 @@ export interface DominionUser {
     email: string;
     name: string;
 }
+
+export interface UsernameMapping {
+    username: string;
+    playerName: string;
+    playerSymbol: string;
+}

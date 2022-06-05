@@ -2,7 +2,8 @@ import {
     generateCard,
     handleBuyKeyword,
     handlePlayKeyword,
-    handleTurn
+    handleTurn,
+    parseLog
 } from '../log_parser';
 import { isOtherPlayerEffect } from '../log_values';
 import type {
@@ -765,7 +766,7 @@ describe('Handle Turn', () => {
         });
 
         // Test top-level effect information
-        const effectCard = testTurn.playedCards.filter(
+        const effectCard: PlayedCard = testTurn.playedCards.filter(
             (element) => element.card === 'Council Room'
         )[0];
         expect(effectCard.effect.length).toEqual(3);
@@ -793,7 +794,7 @@ describe('Handle Turn', () => {
         });
 
         // Test that other player effects work
-        const otherPlayerEffect = effectCard.effect.filter(
+        const otherPlayerEffect: PlayerEffect = effectCard.effect.filter(
             (element) => element.type === 'other players'
         )[0];
         if (isOtherPlayerEffect(otherPlayerEffect)) {
@@ -869,5 +870,19 @@ describe('Handle Turn', () => {
                 0
             );
         }).toThrow('Not a valid card name: Cellas');
+    });
+});
+
+describe('Parse Log Tests', () => {
+    it('Valid log with valid players', () => {
+        const testParse: PlayerTurn[] = parseLog('20220604a', ['snewman1', 'matt.buland'], 'Test Turn');
+
+        expect(testParse).toBeNull;
+    });
+
+    it('Invalid list of player names', () => {
+        expect(() => {
+            parseLog('20220604a', [], 'Test Turn')
+        }).toThrow('Insufficient number of players in list');
     });
 });

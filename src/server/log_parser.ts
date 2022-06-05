@@ -7,6 +7,7 @@ export function parseLog(
     players: string[],
     log: string
 ): PlayerTurn[] {
+    if (players.length < 2) throw new Error('Insufficient number of players in list');
     let game: string[] = trimLog(log);
 
     let fullGame: PlayerTurn[] = [];
@@ -57,9 +58,7 @@ export function handleTurn(
 
     // Check if this is a turn or the beginning of the game
     // TODO : Better handling of not-a-turn
-    if (isNaN(Number(splitTurn[0][0]))) {
-        return null;
-    }
+    if (splitTurn.length < 1 || isNaN(Number(splitTurn[0][0]))) return null;
 
     let activeTurn = 0;
     let activePlayer = '';
