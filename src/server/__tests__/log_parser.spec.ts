@@ -736,7 +736,7 @@ describe('Handle Turn', () => {
     it('Valid turn with effects', () => {
         const testTurn: PlayerTurn = handleTurn(
             '20220604a',
-            '3 - matt.buland   matt.buland plays a Council Room.   matt.buland draws 2 Coppers and 2 Estates.   matt.buland gets +1 Buy.   W draws a card.   j shuffles their deck.   j draws a card.   g shuffles their deck.   g draws a card.   D draws a card.   a draws a card.   matt.buland plays 5 Coppers. (+$5)   matt.buland buys and gains an Ironmonger.   matt.buland shuffles their deck.   matt.buland draws 2 Coppers, 2 Estates and a Cellar.',
+            '3 - matt.buland   m plays a Council Room.   m draws 2 Coppers and 2 Estates.   m gets +1 Buy.   W draws a card.   j shuffles their deck.   j draws a card.   g shuffles their deck.   g draws a card.   D draws a card.   a draws a card.   m plays 5 Coppers. (+$5)   m buys and gains an Ironmonger.   m shuffles their deck.   m draws 2 Coppers, 2 Estates and a Cellar.',
             6
         );
 
@@ -784,12 +784,12 @@ describe('Handle Turn', () => {
         ).toEqual(1);
         expect(effectCard.effect).toContainEqual({
             type: 'draw',
-            player: 'matt.buland',
+            player: 'm',
             draw: 4
         });
         expect(effectCard.effect).toContainEqual({
             type: 'buy',
-            player: 'matt.buland',
+            player: 'm',
             buy: 1
         });
 
@@ -798,7 +798,7 @@ describe('Handle Turn', () => {
             (element) => element.type === 'other players'
         )[0];
         if (isOtherPlayerEffect(otherPlayerEffect)) {
-            expect(otherPlayerEffect.player).toEqual('matt.buland');
+            expect(otherPlayerEffect.player).toEqual('m');
             expect(otherPlayerEffect.otherPlayers.length).toEqual(5);
             expect(
                 otherPlayerEffect.otherPlayers.filter(
@@ -856,7 +856,7 @@ describe('Handle Turn', () => {
         expect(() => {
             handleTurn(
                 '20220604a',
-                '1 - matt.buland   matt.buland plays 2 Stormtroopers.   matt.buland buys and gains a Cellar.   matt.buland draws 5 cards.',
+                '1 - matt.buland   m plays 2 Stormtroopers.   m buys and gains a Cellar.   m draws 5 cards.',
                 0
             );
         }).toThrow('Not a valid card name: Stormtroopers');
@@ -866,7 +866,7 @@ describe('Handle Turn', () => {
         expect(() => {
             handleTurn(
                 '20220604a',
-                '1 - matt.buland   matt.buland plays 2 Coppers. ($+2)   matt.buland buys and gains 2 Cellas.',
+                '1 - matt.buland   m plays 2 Coppers. ($+2)   m buys and gains 2 Cellas.',
                 0
             );
         }).toThrow('Not a valid card name: Cellas');

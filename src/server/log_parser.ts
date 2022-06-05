@@ -40,7 +40,7 @@ function trimLog(log: string): string[] {
 export function handleTurn(
     gameID: string,
     turn: string,
-    turnIndex: number
+    turnIndex: number,
 ): PlayerTurn | null {
     // Split up the turn into sentences
     let splitTurn: string[] = turn.split('  ');
@@ -119,6 +119,7 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     let effect: PlayerEffect[] = [];
     let durationResolve = false;
     let usedVillagers = false;
+    let way: string; // Holds the Way used, if one is used
     let amount = 1;
     let cardIndexOffset = 0;
 
@@ -174,6 +175,12 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
         else {
             cardName = cardName.replace('.', '');
         }
+    }
+
+    // If a card is played using a Way, store the Way, fix the card
+    if(cardName.includes(' using ')) {
+        way = cardName.slice(cardName.indexOf(' using ') + 6);
+        cardName = cardName.slice(0, cardName.indexOf(' using '));
     }
 
     //Singularizing card name and verifying the card exists
@@ -283,20 +290,22 @@ export function generateCard(
 //Singularizes a card, or returns an empty string is the word isn't a card
 function singularize(word: string): string {
     let lowerWord = word.toLowerCase();
-    if (cards['AllCards'].includes(lowerWord)) {
+    if (cards['AllCards'].includes(lowerWord)) { // Gardens -> Gardens
         return word;
-    } else if (
+    } else if ( // Spies -> Spy
         lowerWord.slice(-3) === 'ies' &&
         cards['AllCards'].includes(lowerWord.slice(0, -3) + 'y')
     ) {
         return word.slice(0, -3) + 'y';
-    } else if (
+    } else if ( // Necropolises -> Necropolis
         lowerWord.slice(-2) === 'es' &&
         cards['AllCards'].includes(lowerWord.slice(0, -2))
     ) {
         return word.slice(0, -2);
-    } else if (cards['AllCards'].includes(lowerWord.slice(0, -1))) {
+    } else if (cards['AllCards'].includes(lowerWord.slice(0, -1))) { // Militias -> Militia
         return word.slice(0, -1);
+    } else if (cards['AllCards'].includes(lowerWord.slice(0, -1) + 'um')) { // Platina -> Platinum
+        return word.slice(0, -1) + 'um';
     }
 
     throw new Error('Not a valid card name: ' + word);
