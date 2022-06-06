@@ -29,7 +29,6 @@ export function parseLog(
 
 // Helper function for trimming a log
 function trimLog(log: string): string[] {
-    //TODO: implement, may need more processing
 
     // This uses a very specific string to identify what is an effect of another card, and appends the EFFECT
     // prefix to the sentence.
@@ -294,9 +293,20 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
         //If there is more than 1 card bought
         amount = Number(sentence[0]);
     }
+    
+    let cardName: string;
+
+    //Dealing with leading/no leading word
+    if(sentence[0] !== "a" && sentence[0] !== "an" && !isNaN(Number(sentence[0]))){
+        //If there isn't a leading a/an/number
+        cardName = sentence.slice(0).join(' ');
+    }else{
+        //Else there is a leading a/an/number
+        cardName = sentence.slice(1).join(' ');
+    }
 
     //Setting default values
-    let cardName = sentence.slice(1).join(' ').slice(0, -1); //Chop off period
+    cardName = cardName.slice(0, -1); //Chop off period
     cardName = singularize(cardName);
 
     let phase = 'buy';
