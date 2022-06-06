@@ -332,7 +332,6 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
 
     //Setting default values
     if(cardName.slice(-1) === "." || cardName.slice(-1) === ","){
-        console.log(cardName);
         cardName = cardName.slice(0, -1); //Chop off period/comma
     }
     cardName = singularize(cardName);
