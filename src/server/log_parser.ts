@@ -16,6 +16,7 @@ export function parseLog(
 
     let iterator = 0; // Tracks the turn index
     for (let turn of game) {
+        console.log(turn);
         let turnResult: PlayerTurn | null = handleTurn(gameID, turn, iterator);
         if (turnResult !== null) {
             turnResult = updateNames(turnResult, players);
@@ -289,9 +290,28 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
     //Default values
     let amount = 1;
 
+    let retList: PlayedCard[] = [];
+
     //If there is "and gains" in the sentence get rid of it
     if(sentence[0] === "and"){
         sentence = sentence.slice(2);
+    }
+
+    //If there are multiple cards bought that are comma seperated
+    if(sentence.join().indexOf(",") != -1){
+        for(let i = 0; i < sentence.length; i++){
+            if(sentence[i].slice(-1) === ","){
+                retList.concat(handleBuyKeyword(sentence.slice(i+1)));
+                sentence = sentence.slice(0, i+1);
+                break;
+            }
+        }
+    }
+
+    //If there are multiple cards sepereated by an "and"
+    if(sentence.indexOf("and") != -1){
+        retList.concat(handleBuyKeyword(sentence.slice(sentence.indexOf("and") + 1)));
+        sentence = sentence.slice(0, sentence.indexOf("and"));
     }
 
     if (!isNaN(Number(sentence[0]))) {
@@ -311,14 +331,16 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
     }
 
     //Setting default values
-    cardName = cardName.slice(0, -1); //Chop off period
+    if(cardName.slice(-1) === "." || cardName.slice(-1) === ","){
+        console.log(cardName);
+        cardName = cardName.slice(0, -1); //Chop off period/comma
+    }
     cardName = singularize(cardName);
 
     let phase = 'buy';
     let effect: PlayerEffect[] = [];
     let durationResolve = false;
     let usedVillagers = false;
-    let retList: PlayedCard[] = [];
 
     //Adding cards to returning array
     for (let i = 0; i < amount; i++) {
