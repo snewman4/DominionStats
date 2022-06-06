@@ -79,11 +79,11 @@ export function isDrawEffect(pe: PlayerEffect): pe is DrawEffect {
 // list of cards put back into deck
 export interface DeckEffect extends PlayerEffect {
     type: 'topdeck';
-    topdeck: PlayedCard[];
+    topdeck: number;
 }
 
 export function isDeckEffect(pe: PlayerEffect): pe is DeckEffect {
-    return pe.type === 'topdeck' && Array.isArray((pe as DeckEffect).topdeck);
+    return pe.type === 'topdeck' && !isNaN(Number((pe as DeckEffect).topdeck));
 }
 
 // # of cards discarded

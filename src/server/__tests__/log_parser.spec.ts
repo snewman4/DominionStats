@@ -6,7 +6,7 @@ import {
     parseLog,
     updateNames
 } from '../log_parser';
-import { BuyEffect, isOtherPlayerEffect } from '../log_values';
+import { BuyEffect, isGainEffect, isOtherPlayerEffect, isReactionEffect } from '../log_values';
 import type {
     PlayedCard,
     PlayerEffect,
@@ -242,40 +242,6 @@ describe('Buy Keyword Handling', () => {
         expect(testCard).toEqual([
             {
                 card: 'Jack of All Trades',
-                effect: [],
-                phase: 'buy',
-                durationResolve: false,
-                usedVillagers: false
-            }
-        ]);
-    });
-
-    // NOTE : We are not sure that this is how the log prints such a purchase. We will look into it further
-    it('Valid input of multiple multi-word cards', () => {
-        const testCard: PlayedCard[] = handleBuyKeyword([
-            '3',
-            'Families',
-            'of',
-            'Inventors.'
-        ]);
-
-        expect(testCard).toEqual([
-            {
-                card: 'Family of Inventors',
-                effect: [],
-                phase: 'buy',
-                durationResolve: false,
-                usedVillagers: false
-            },
-            {
-                card: 'Family of Inventors',
-                effect: [],
-                phase: 'buy',
-                durationResolve: false,
-                usedVillagers: false
-            },
-            {
-                card: 'Family of Inventors',
                 effect: [],
                 phase: 'buy',
                 durationResolve: false,
@@ -833,89 +799,6 @@ describe('Handle Turn', () => {
         });
     });
 
-    it('Valid turn with nested effects', () => {
-        const testTurn: PlayerTurn = handleTurn(
-            '20220606a',
-            '11 - tsornson   t plays a Horse.   EFFECT t draws 2 cards.   EFFECT t gets +1 Action.   EFFECT t returns a Horse to the Horse Pile.   t plays a Harbinger.   EFFECT t draws a card.   EFFECT t gets +1 Action.   t plays a Camel Train using Way of the Ox.   EFFECT t gets +2 Actions.   t plays a Sleigh.   EFFECT t gains a Horse.   EFFECT EFFECT t reacts with a Sleigh.   EFFECT EFFECT t discards a Sleigh.   EFFECT EFFECT t looks at 2 cards.   EFFECT EFFECT t topdecks a card.   EFFECT t gains a Horse.',
-            3
-        );
-
-        // Test basic information
-        expect(testTurn.gameId).toEqual('20220606a');
-        expect(testTurn.playerTurn).toEqual(11);
-        expect(testTurn.turnIndex).toEqual(3);
-        expect(testTurn.playerName).toEqual('tsornson');
-
-        // Test basic played card information
-        expect(testTurn.playedCards.length).toEqual(4);
-        expect(
-            testTurn.playedCards.filter((element) => element.card === 'Horse')
-                .length
-        ).toEqual(1);
-        expect(
-            testTurn.playedCards.filter(
-                (element) => element.card === 'Harbinger'
-            ).length
-        ).toEqual(1);
-        expect(
-            testTurn.playedCards.filter(
-                (element) => element.card === 'Camel Train'
-            ).length
-        ).toEqual(1);
-        expect(
-            testTurn.playedCards.filter((element) => element.card === 'Sleigh')
-                .length
-        ).toEqual(1);
-
-        // Test top-level effect information
-        const horseCard: PlayedCard = testTurn.playedCards.filter(
-            (element) => element.card === 'Horse'
-        )[0];
-        expect(horseCard.phase).toEqual('action');
-        expect(horseCard.effect.length).toEqual(2);
-        expect(horseCard.effect).toContainEqual({
-            type: 'draw',
-            player: 't',
-            draw: 2
-        });
-        expect(horseCard.effect).toContainEqual({
-            type: 'action',
-            player: 't',
-            action: 1
-        });
-        const harbingerCard: PlayedCard = testTurn.playedCards.filter(
-            (element) => element.card === 'Harbinger'
-        )[0];
-        expect(harbingerCard.phase).toEqual('action');
-        expect(harbingerCard.effect.length).toEqual(2);
-        expect(harbingerCard.effect).toContainEqual({
-            type: 'draw',
-            player: 't',
-            draw: 1
-        });
-        expect(harbingerCard.effect).toContainEqual({
-            type: 'action',
-            player: 't',
-            action: 1
-        });
-        const camelCard: PlayedCard = testTurn.playedCards.filter(
-            (element) => element.card === 'Camel Train'
-        )[0];
-        expect(camelCard.phase).toEqual('action');
-        expect(camelCard.effect).toEqual([
-            {
-                type: 'action',
-                player: 't',
-                action: 2
-            }
-        ]);
-
-        // Test nested effects
-        const sleighCard1: PlayedCard = testTurn.playedCards.filter(
-            (element) => element.card === 'Sleigh'
-        )[0];
-    });
-
     it('Valid input of non-turn', () => {
         const testTurn = handleTurn(
             '20220604a',
@@ -991,6 +874,140 @@ describe('Handle Turn', () => {
                 0
             );
         }).toThrow('Not a valid card name: Cellas');
+    });
+});
+
+describe('In-Depth Single Valid Turn Test', () => {
+    const testTurn: PlayerTurn = handleTurn('20220606a', '11 - tsornson   t plays a Horse.   EFFECT t draws 2 cards.   EFFECT t gets +1 Action.   EFFECT t returns a Horse to the Horse Pile.   t plays a Harbinger.   EFFECT t draws a card.   EFFECT t gets +1 Action.   t plays a Camel Train using Way of the Ox.   EFFECT t gets +2 Actions.   t plays a Sleigh.   EFFECT t gains a Horse.   EFFECT EFFECT t reacts with a Sleigh.   EFFECT EFFECT t discards a Sleigh.   EFFECT EFFECT t looks at 2 cards.   EFFECT EFFECT t topdecks a card.   EFFECT t gains a Horse.   t plays 2 Coppers. (+$2)   t ends their buy phase.   EFFECT t loses 1 Coin.   EFFECT t gets +1 Coffers. (Pageant)   t draws 5 cards.', 3);
+
+    it('Basic turn information', () => {
+        expect(testTurn.gameId).toEqual('20220606a');
+        expect(testTurn.playerTurn).toEqual(11);
+        expect(testTurn.turnIndex).toEqual(3);
+        expect(testTurn.playerName).toEqual('tsornson');
+    });
+
+    it('Basic played card information', () => {
+        expect(testTurn.playedCards.length).toEqual(6);
+        expect(
+            testTurn.playedCards.filter((element) => element.card === 'Horse')
+                .length
+        ).toEqual(1);
+        expect(
+            testTurn.playedCards.filter(
+                (element) => element.card === 'Harbinger'
+            ).length
+        ).toEqual(1);
+        expect(
+            testTurn.playedCards.filter(
+                (element) => element.card === 'Camel Train'
+            ).length
+        ).toEqual(1);
+        expect(
+            testTurn.playedCards.filter((element) => element.card === 'Sleigh')
+                .length
+        ).toEqual(1);
+        expect(testTurn.playedCards.filter(element => element.card === 'Copper').length).toEqual(2);
+        expect(testTurn.playedCards).toContainEqual({
+            card: 'Copper',
+            effect: [],
+            phase: 'buy',
+            durationResolve: false,
+            usedVillagers: false
+        });
+    });
+
+    it('Basic purchased card information', () => {
+        expect(testTurn.purchasedCards.length).toEqual(0);
+    });
+
+    it('Top level effect information', () => {
+        // Test top-level effect information
+        const horseCard: PlayedCard = testTurn.playedCards.filter(
+            (element) => element.card === 'Horse'
+        )[0];
+        expect(horseCard.phase).toEqual('action');
+        expect(horseCard.effect.length).toEqual(2);
+        expect(horseCard.effect).toContainEqual({
+            type: 'draw',
+            player: 't',
+            draw: 2
+        });
+        expect(horseCard.effect).toContainEqual({
+            type: 'action',
+            player: 't',
+            action: 1
+        });
+        const harbingerCard: PlayedCard = testTurn.playedCards.filter(
+            (element) => element.card === 'Harbinger'
+        )[0];
+        expect(harbingerCard.phase).toEqual('action');
+        expect(harbingerCard.effect.length).toEqual(2);
+        expect(harbingerCard.effect).toContainEqual({
+            type: 'draw',
+            player: 't',
+            draw: 1
+        });
+        expect(harbingerCard.effect).toContainEqual({
+            type: 'action',
+            player: 't',
+            action: 1
+        });
+        const camelCard: PlayedCard = testTurn.playedCards.filter(
+            (element) => element.card === 'Camel Train'
+        )[0];
+        expect(camelCard.phase).toEqual('action');
+        expect(camelCard.effect).toEqual([
+            {
+                type: 'action',
+                player: 't',
+                action: 2
+            }
+        ]);
+    });
+
+    it('Nested effects', () => {
+        const sleighCard1: PlayedCard = testTurn.playedCards.filter(
+            (element) => element.card === 'Sleigh'
+        )[0];
+        // Basic card information
+        expect(sleighCard1.phase).toEqual('action');
+        expect(sleighCard1.effect.length).toEqual(1);
+        expect(sleighCard1.effect.filter(element => element.type === 'gain').length).toEqual(1);
+        // Card effect information
+        const gainEffect: PlayerEffect = sleighCard1.effect.filter(element => element.type === 'gain')[0];
+        if(isGainEffect(gainEffect)) {
+            // Top level gained cards
+            expect(gainEffect.gain.length).toEqual(2);
+            expect(gainEffect.gain.filter(element => element.card === 'Horse' && element.effect.length === 0).length).toEqual(1);
+            expect(gainEffect.gain.filter(element => element.card === 'Horse' && element.effect.length !== 0).length).toEqual(1);
+            expect(gainEffect.gain.filter(element => element.card === 'Horse' && element.effect.length === 0)).toEqual([{
+                card: 'Horse',
+                effect: [],
+                phase: 'action',
+                durationResolve: false,
+                usedVillagers: false
+            }]);
+            // Cards with effects of their own
+            const horseWEffect: PlayedCard = gainEffect.gain.filter(element => element.card === 'Horse' && element.effect.length !== 0)[0];
+            expect(horseWEffect.phase).toEqual('action');
+            expect(horseWEffect.effect.length).toEqual(1);
+            const reactEffect: PlayerEffect = horseWEffect.effect[0];
+            if(isReactionEffect(reactEffect)) {
+                expect(reactEffect.reaction.phase).toEqual('reaction');
+                expect(reactEffect.reaction.effect.length).toEqual(2);
+                expect(reactEffect.reaction.effect).toContainEqual({
+                    type: 'discard',
+                    player: 't',
+                    discard: 1
+                });
+                expect(reactEffect.reaction.effect).toContainEqual({
+                    type: 'topdeck',
+                    player: 't',
+                    topdeck: 1
+                });
+            }
+        }
     });
 });
 
