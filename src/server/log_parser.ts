@@ -163,7 +163,7 @@ export function handleTurn(
                     break;
                 case 'buys':
                     purchasedCards = purchasedCards.concat(
-                        handleBuyKeyword(splitSentence.slice(4))
+                        handleBuyKeyword(splitSentence.slice(2))
                     );
                     break;
             }
@@ -289,6 +289,11 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
     //Default values
     let amount = 1;
 
+    //If there is "and gains" in the sentence get rid of it
+    if(sentence[0] === "and"){
+        sentence = sentence.slice(2);
+    }
+
     if (!isNaN(Number(sentence[0]))) {
         //If there is more than 1 card bought
         amount = Number(sentence[0]);
@@ -297,7 +302,7 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
     let cardName: string;
 
     //Dealing with leading/no leading word
-    if(sentence[0] !== "a" && sentence[0] !== "an" && !isNaN(Number(sentence[0]))){
+    if(sentence[0] !== "a" && sentence[0] !== "an" && isNaN(Number(sentence[0]))){
         //If there isn't a leading a/an/number
         cardName = sentence.slice(0).join(' ');
     }else{
