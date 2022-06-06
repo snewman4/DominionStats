@@ -39,7 +39,10 @@ function trimLog(log: string): string[] {
         'EFFECT '
     );
     // Handles nested effects
-    log = log.replace(/<div style=\"display:inline; padding-left:3.5em; text-indent:-0.5em;\">/g, 'EFFECT EFFECT ');
+    log = log.replace(
+        /<div style="display:inline; padding-left:3.5em; text-indent:-0.5em;">/g,
+        'EFFECT EFFECT '
+    );
     //Removes < > and any characters between them
     log = log.replace(/<[\s\S]*?>/g, '');
     return log.split('Turn'); // Splits game up into turns

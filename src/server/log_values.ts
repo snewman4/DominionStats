@@ -158,3 +158,13 @@ export function isOtherPlayerEffect(pe: PlayerEffect): pe is OtherPlayerEffect {
         Array.isArray((pe as OtherPlayerEffect).otherPlayers)
     );
 }
+
+// reaction card, where player describes the player who reacted
+export interface ReactionEffect extends PlayerEffect {
+    type: 'reaction';
+    reaction: PlayedCard;
+}
+
+export function isReactionEffect(pe: PlayerEffect): pe is ReactionEffect {
+    return pe.type === 'reaction' && 'reaction' in pe;
+}
