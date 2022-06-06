@@ -297,14 +297,23 @@ export async function insertLog(log: object): Promise<LogFormResult> {
             });
             break;
         } else {
-            // TODO : Make parseLog able to return error, handle that
-            allTurns.concat(parseLog(gameID, players, gameLog));
+            // TODO : Verify that this error handling actually catches correctly,
+            // and returns the correct message
+            try {
+                allTurns = parseLog(gameID, players, gameLog);
+            } catch (e: any) {
+                console.log(e.message);
+                allErrors.push({
+                    status: 'error',
+                    error: e.message
+                });
+            }
         }
     }
 
     if (allErrors.length != 0) {
         return { status: 400, results: allErrors };
     } else {
-        return { status: 200, results: [] };
+        return { status: 200, results: allTurns };
     }
 }
