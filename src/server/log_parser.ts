@@ -31,6 +31,10 @@ export function parseLog(
 function trimLog(log: string): string[] {
     //TODO: implement, may need more processing
 
+    // This uses a very specific string to identify what is an effect of another card, and appends the EFFECT
+    // prefix to the sentence.
+    // This is not at all a good way to do this, but it does seem to work for every card we've tested so far
+    log = log.replace(/<div style=\"display:inline; padding-left:2em; text-indent:-0.5em;\">/g, 'EFFECT ');
     //Removes < > and any characters between them
     log = log.replace(/<[\s\S]*?>/g, '');
     return log.split('Turn'); // Splits game up into turns

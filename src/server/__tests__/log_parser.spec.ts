@@ -739,7 +739,7 @@ describe('Handle Turn', () => {
     it('Valid turn with effects', () => {
         const testTurn: PlayerTurn = handleTurn(
             '20220604a',
-            '3 - matt.buland   m plays a Council Room.   m draws 2 Coppers and 2 Estates.   m gets +1 Buy.   W draws a card.   j shuffles their deck.   j draws a card.   g shuffles their deck.   g draws a card.   D draws a card.   a draws a card.   m plays 5 Coppers. (+$5)   m buys and gains an Ironmonger.   m shuffles their deck.   m draws 2 Coppers, 2 Estates and a Cellar.',
+            '3 - matt.buland   m plays a Council Room.   EFFECT m draws 2 Coppers and 2 Estates.   EFFECT m gets +1 Buy.   EFFECT W draws a card.   EFFECT j shuffles their deck.   EFFECT j draws a card.   EFFECT g shuffles their deck.   EFFECT g draws a card.   EFFECT D draws a card.   EFFECT a draws a card.   m plays 5 Coppers. (+$5)   m buys and gains an Ironmonger.   m shuffles their deck.   m draws 2 Coppers, 2 Estates and a Cellar.',
             6
         );
 
