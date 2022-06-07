@@ -4,7 +4,8 @@ import {
     handlePlayKeyword,
     handleTurn,
     parseLog,
-    updateNames
+    updateNames,
+    handleEffect
 } from '../log_parser';
 import {
     BuyEffect,
@@ -1374,5 +1375,179 @@ describe('Name Updating Tests', () => {
         expect(() => {
             updateNames(rawTurn, players);
         }).toThrow('Unrecognized player: l');
+    });
+});
+
+describe('Effect Generation Tests', () => {
+    it('Valid action effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['t', 'gets', '+1', 'Action.'], 'action');
+
+        expect(effectTest).toEqual({
+            type: 'action',
+            player: 't',
+            action: 1
+        });
+    });
+
+    it('Valid gain effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['t', 'gains', '2', 'Horses.'], 'action');
+
+        expect(effectTest).toEqual({
+            type: 'gain',
+            player: 't',
+            gain: [{
+                card: 'Horse',
+                effect: [],
+                phase: 'action',
+                durationResolve: false,
+                usedVillagers: false
+            }, {
+                card: 'Horse',
+                effect: [],
+                phase: 'action',
+                durationResolve: false,
+                usedVillagers: false
+            }]
+        });
+    });
+
+    it('Valid trash effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['m', 'trashes', 'an', 'Estate.'], 'action');
+
+        expect(effectTest).toEqual({
+            type: 'trash',
+            player: 'm',
+            trash: [{
+                card: 'Estate',
+                effect: [],
+                phase: 'action',
+                durationResolve: false,
+                usedVillagers: false
+            }]
+        });
+    });
+
+    it('Valid draw effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['t', 'draws', '2', 'cards.'], 'action');
+
+        expect(effectTest).toEqual({
+            type: 'draw',
+            player: 't',
+            draw: 2
+        });
+    });
+
+    it('Valid draw effect with multiple cards, player-side', () => {
+        const effectTest: PlayerEffect = handleEffect(['m', 'draws', 'a', 'Copper,', 'a', 'Silver', 'and', 'a', 'Platinum.'], 'action');
+
+        expect(effectTest).toEqual({
+            type: 'draw',
+            player: 'm',
+            draw: 3
+        });
+    });
+
+    it('Valid topdeck effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['W', 'topdecks', 'a', 'card.'], 'action');
+
+        expect(effectTest).toEqual({
+            type: 'topdeck',
+            player: 'W',
+            topdeck: 1
+        });
+    });
+
+    it('Valid topdeck effect, multi-word player-side', () => {
+        const effectTest: PlayerEffect = handleEffect(['m', 'topdecks', 'a', 'Treasure', 'Trove.'], 'action');
+
+        expect(effectTest).toEqual({
+            type: 'topdeck',
+            player: 'm',
+            topdeck: 1
+        });
+    });
+
+    it('Valid exile discard effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['j', 'discards', 'a', 'Gold', 'from', 'Exile.'], 'buy');
+
+        expect(effectTest).toEqual({
+            type: 'discard',
+            player: 'j',
+            discard: 1
+        });
+    });
+
+    it('Valid plural exile discard effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['D', 'discards', '3', 'Golds', 'from', 'Exile,'], 'buy');
+
+        expect(effectTest).toEqual({
+            type: 'discard',
+            player: 'D',
+            discard: 3
+        });
+    });
+
+    it('Valid coffers effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['t', 'gets', '+1', 'Coffers.', '(Pageant)'], 'buy');
+
+        expect(effectTest).toEqual({
+            type: 'coffers',
+            player: 't',
+            coffers: 1
+        });
+    });
+
+    it('Valid buying power effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['W', 'gets', '+$2.'], 'attack');
+
+        expect(effectTest).toEqual({
+            type: 'buying power',
+            player: 'W',
+            buyingPower: 2
+        });
+    });
+
+    it('Valid reaction effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['t', 'reacts', 'with', 'a', 'Sleigh.'], 'action');
+
+        expect(effectTest).toEqual({
+            type: 'reaction',
+            player: 't',
+            reaction: {
+                card: 'Sleigh',
+                effect: [],
+                phase: 'reaction',
+                durationResolve: false,
+                usedVillagers: false
+            }
+        });
+    });
+
+    it('Valid exile effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['D', 'exiles', 'a', 'Gold.'], 'action');
+
+        expect(effectTest).toEqual({
+            type: 'exile',
+            player: 'D',
+            exile: [{
+                card: 'Gold',
+                effect: [],
+                phase: 'action',
+                durationResolve: false,
+                usedVillagers: false
+            }]
+        });
+    });
+
+    it('Valid not-a-tracked-effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['j', 'loses', '1', 'Coin'], 'buy');
+
+        expect(effectTest).toEqual(null);
+    });
+
+    it('Valid not-a-tracked-effect', () => {
+        const effectTest: PlayerEffect = handleEffect(['t', 'returns', 'a', 'Horse', 'to', 'the', 'Horse', 'pile.'], 'action');
+
+        expect(effectTest).toEqual(null);
     });
 });

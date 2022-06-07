@@ -168,3 +168,13 @@ export interface ReactionEffect extends PlayerEffect {
 export function isReactionEffect(pe: PlayerEffect): pe is ReactionEffect {
     return pe.type === 'reaction' && 'reaction' in pe;
 }
+
+
+export interface ExileEffect extends PlayerEffect {
+    type: 'exile',
+    exile: PlayedCard[]
+}
+
+export function isExileEffect(pe: PlayerEffect): pe is ExileEffect {
+    return pe.type === 'exile' && Array.isArray((pe as ExileEffect).exile);
+}

@@ -365,6 +365,14 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
     return retList;
 }
 
+// Make sure to check for 'EFFECT' and 'EFFECT EFFECT' before passing into this
+export function handleEffect(sentence: string[], phase: string): PlayerEffect | null {
+    return {
+        type: 'PLACEHOLDER',
+        player: 'PLACEHOLDER'
+    };
+}
+
 export function generateCard(
     card: string,
     phase: string,
