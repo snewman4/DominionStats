@@ -15,7 +15,9 @@ export function parseLog(
     let fullGame: PlayerTurn[] = [];
 
     let iterator = 0; // Tracks the turn index
+    console.log("Game length: " + game.length);
     for (let turn of game) {
+        console.log("Turn: ");
         console.log(turn);
         let turnResult: PlayerTurn | null = handleTurn(gameID, turn, iterator);
         if (turnResult !== null) {
@@ -42,6 +44,23 @@ function trimLog(log: string): string[] {
         /<div style="display:inline; padding-left:3.5em; text-indent:-0.5em;">/g,
         'EFFECT EFFECT '
     );
+    //Does the same but for the newer/other div method
+    //Single effect
+    log = log.replace(
+        /<div style=\"padding-left: 4.545454545454546%; width:93.45454545454545%;\" >/g,
+        'EFFECT'
+    );
+    //Nested effect
+    log = log.replace(
+        /<div style=\"padding-left: 8.333333333333332%; width:89.66666666666667%;\" >/g,
+        'EFFECT EFFECT'
+    );
+    //Double nested effect
+    log = log.replace(
+        /<div style=\"padding-left: 11.538461538461538%; width:86.46153846153847%;\" >/g,
+        'EFFECT EFFECT EFFECT'
+    );
+
     //Removes < > and any characters between them
     log = log.replace(/<[\s\S]*?>/g, '');
     return log.split('Turn'); // Splits game up into turns
@@ -64,7 +83,7 @@ export function updateNames(
     if (matchName.length === 1 && matchName[0].playerName)
         playerNameUpdate = matchName[0].playerName;
     else {
-        throw new Error('Unrecognized player: ' + turn.playerName);
+        //throw new Error('Unrecognized player: ' + turn.playerName);
     }
 
     // Handle playerSymbols associated with effects
@@ -80,7 +99,7 @@ export function updateNames(
             if (matchSymbol.length === 1 && matchSymbol[0].playerName)
                 effect.player = matchSymbol[0].playerName;
             else {
-                throw new Error('Unrecognized player: ' + effect.player);
+                //throw new Error('Unrecognized player: ' + effect.player);
             }
         }
     }
@@ -97,11 +116,12 @@ export function updateNames(
             if (matchSymbol.length === 1 && matchSymbol[0].playerName)
                 effect.player = matchSymbol[0].playerName;
             else {
-                throw new Error('Unrecognized player: ' + effect.player);
+                //throw new Error('Unrecognized player: ' + effect.player);
             }
         }
     }
-
+    
+    playerNameUpdate = "";
     return {
         gameId: turn.gameId,
         playerTurn: turn.playerTurn,
@@ -133,6 +153,7 @@ export function handleTurn(
             return element !== '';
         });
 
+    console.log("unprocessed turn:");
     console.log(splitTurn); //TODO: remove when done testing
 
     // Check if this is a turn or the beginning of the game
@@ -180,6 +201,7 @@ export function handleTurn(
         purchasedCards: purchasedCards
     };
 
+    console.log("Processed turn:");
     console.log(thisTurn);
 
     return thisTurn;
