@@ -267,39 +267,106 @@ export async function insertGameResults(
 export async function usernameCheck(
     usernames: string[]
 ): Promise<UsernameFormResult> {
-    // TODO : Username handling
-    return { status: 200, results: [] };
+    let userList: UsernameMapping[] = [];
+    let allErrors: ErrorObject[] = [];
+
+    //Create an array of $#'s
+    let params: string[] = [];
+    for (let i = 1; i <= usernames.length; i++) {
+        params.push('$' + i);
+    }
+
+    // TODO : Convert to simpler method : ... WHERE game_label = ANY($1::string[])
+    // https://stackoverflow.com/questions/10720420/node-postgres-how-to-execute-where-col-in-dynamic-value-list-query
+    let queryText: string =
+        'SELECT DISTINCT * FROM known_usernames WHERE username IN (' +
+        params.join(',') +
+        ')';
+    const res = await pool.query(queryText, usernames);
+
+    // Add elements that were defined in the database
+    for (let row of res.rows) {
+        userList.push({
+            username: row.username,
+            playerName: row.player_name,
+            playerSymbol: undefined
+        });
+    }
+
+    // Add elements that were not defined in the database
+    for (let username of usernames) {
+        if (
+            userList.filter((element) => element.username === username)
+                .length === 0
+        ) {
+            userList.push({
+                username: username,
+                playerName: undefined,
+                playerSymbol: undefined
+            });
+        }
+    }
+
+    // Attempt to generate unique symbols
+    try {
+        userList = userSymbolGenerator(userList);
+    } catch (e: any) {
+        allErrors.push({ status: 'error', error: e.message });
+    }
+
+    if (allErrors.length != 0) {
+        return { status: 400, results: allErrors };
+    }
+    return { status: 200, results: userList };
 }
 
 // Helper function to generate username symbols
-export function userSymbolGenerator(names: UsernameMapping[]): UsernameMapping[] {
+export function userSymbolGenerator(
+    names: UsernameMapping[]
+): UsernameMapping[] {
     let dupSym: string | undefined;
-    for(let name of names) {
+    for (let name of names) {
         // If duplicate username, error
-        if(names.filter(element => element.username === name.username).length > 1) throw new Error('Duplicate usernames in player names: ' + name.username);
+        if (
+            names.filter((element) => element.username === name.username)
+                .length > 1
+        )
+            throw new Error(
+                'Duplicate usernames in player names: ' + name.username
+            );
         // If symbols are undefined
-        if(name.playerSymbol === undefined) name.playerSymbol = name.username[0];
+        if (name.playerSymbol === undefined)
+            name.playerSymbol = name.username[0];
         // Check for duplicate symbols
-        if(names.filter(element => element.playerSymbol === name.playerSymbol).length > 1) {
+        if (
+            names.filter(
+                (element) => element.playerSymbol === name.playerSymbol
+            ).length > 1
+        ) {
             dupSym = name.playerSymbol;
             break;
         }
     }
-    
-    // No duplicates
-    if(dupSym === undefined) return names;
 
-    let duplicateNames = names.filter(element => element.playerSymbol === dupSym);
+    // No duplicates
+    if (dupSym === undefined) return names;
+
+    let duplicateNames = names.filter(
+        (element) => element.playerSymbol === dupSym
+    );
     let updated = false; // Makes sure that at least one element was updated
-    for(let name of duplicateNames) {
-        if(name.username.length > dupSym.length) {
+    for (let name of duplicateNames) {
+        if (name.username.length > dupSym.length) {
             // For each name, add an extra character to the symbol
-            name.playerSymbol = name.username.slice(0,dupSym.length + 1);
+            name.playerSymbol = name.username.slice(0, dupSym.length + 1);
             updated = true;
         }
         // If the symbol is as long as the username, then it cannot be extended further
     }
-    if(!updated) throw new Error('Unable to generate unique symbol. Closest form: ' + dupSym);
+    if (!updated)
+        throw new Error(
+            'Unable to generate unique symbol. Closest form: ' + dupSym
+        );
     return userSymbolGenerator(names);
 }
 

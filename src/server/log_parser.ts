@@ -30,7 +30,6 @@ export function parseLog(
 
 // Helper function for trimming a log
 function trimLog(log: string): string[] {
-
     // This uses a very specific string to identify what is an effect of another card, and appends the EFFECT
     // prefix to the sentence.
     // This is not at all a good way to do this, but it does seem to work for every card we've tested so far
@@ -62,7 +61,8 @@ export function updateNames(
             element.playerName === turn.playerName ||
             element.playerSymbol === turn.playerName
     );
-    if (matchName.length === 1) playerNameUpdate = matchName[0].playerName;
+    if (matchName.length === 1 && matchName[0].playerName)
+        playerNameUpdate = matchName[0].playerName;
     else {
         throw new Error('Unrecognized player: ' + turn.playerName);
     }
@@ -77,7 +77,7 @@ export function updateNames(
                     element.playerSymbol === effect.player
             );
 
-            if (matchSymbol.length === 1)
+            if (matchSymbol.length === 1 && matchSymbol[0].playerName)
                 effect.player = matchSymbol[0].playerName;
             else {
                 throw new Error('Unrecognized player: ' + effect.player);
@@ -94,7 +94,7 @@ export function updateNames(
                     element.playerSymbol === effect.player
             );
 
-            if (matchSymbol.length === 1)
+            if (matchSymbol.length === 1 && matchSymbol[0].playerName)
                 effect.player = matchSymbol[0].playerName;
             else {
                 throw new Error('Unrecognized player: ' + effect.player);
@@ -293,45 +293,53 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
     let retList: PlayedCard[] = [];
 
     //If there is "and gains" in the sentence get rid of it
-    if(sentence[0] === "and"){
+    if (sentence[0] === 'and') {
         sentence = sentence.slice(2);
     }
 
     //If there are multiple cards bought that are comma seperated
-    if(sentence.join().indexOf(",") != -1){
-        for(let i = 0; i < sentence.length; i++){
-            if(sentence[i].slice(-1) === ","){
-                retList = retList.concat(handleBuyKeyword(sentence.slice(i+1)));
-                sentence = sentence.slice(0, i+1);
+    if (sentence.join().indexOf(',') != -1) {
+        for (let i = 0; i < sentence.length; i++) {
+            if (sentence[i].slice(-1) === ',') {
+                retList = retList.concat(
+                    handleBuyKeyword(sentence.slice(i + 1))
+                );
+                sentence = sentence.slice(0, i + 1);
                 break;
             }
         }
     }
 
     //If there are multiple cards sepereated by an "and"
-    if(sentence.indexOf("and") != -1){
-        retList = retList.concat(handleBuyKeyword(sentence.slice(sentence.indexOf("and") + 1)));
-        sentence = sentence.slice(0, sentence.indexOf("and"));
+    if (sentence.indexOf('and') != -1) {
+        retList = retList.concat(
+            handleBuyKeyword(sentence.slice(sentence.indexOf('and') + 1))
+        );
+        sentence = sentence.slice(0, sentence.indexOf('and'));
     }
 
     if (!isNaN(Number(sentence[0]))) {
         //If there is more than 1 card bought
         amount = Number(sentence[0]);
     }
-    
+
     let cardName: string;
 
     //Dealing with leading/no leading word
-    if(sentence[0] !== "a" && sentence[0] !== "an" && isNaN(Number(sentence[0]))){
+    if (
+        sentence[0] !== 'a' &&
+        sentence[0] !== 'an' &&
+        isNaN(Number(sentence[0]))
+    ) {
         //If there isn't a leading a/an/number
         cardName = sentence.slice(0).join(' ');
-    }else{
+    } else {
         //Else there is a leading a/an/number
         cardName = sentence.slice(1).join(' ');
     }
 
     //Setting default values
-    if(cardName.slice(-1) === "." || cardName.slice(-1) === ","){
+    if (cardName.slice(-1) === '.' || cardName.slice(-1) === ',') {
         cardName = cardName.slice(0, -1); //Chop off period/comma
     }
     cardName = singularize(cardName);

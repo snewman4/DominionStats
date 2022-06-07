@@ -1,13 +1,21 @@
 import { UsernameMapping } from '../common';
-import {
-    usernameCheck,
-    userSymbolGenerator
-} from '../db_setup';
+import { usernameCheck, userSymbolGenerator } from '../db_setup';
 
 // jest tests
 describe('User Symbol Generation', () => {
     it('Valid usernames', () => {
-        const testNames: UsernameMapping[] = userSymbolGenerator([{ username: 'snewman1', playerName: 'Sam', playerSymbol: undefined }, { username: 'matt.buland', playerName: 'Matt', playerSymbol: undefined }]);
+        const testNames: UsernameMapping[] = userSymbolGenerator([
+            {
+                username: 'snewman1',
+                playerName: 'Sam',
+                playerSymbol: undefined
+            },
+            {
+                username: 'matt.buland',
+                playerName: 'Matt',
+                playerSymbol: undefined
+            }
+        ]);
 
         expect(testNames.length).toEqual(2);
         expect(testNames).toContainEqual({
@@ -23,7 +31,14 @@ describe('User Symbol Generation', () => {
     });
 
     it('Valid usernames with similar letters', () => {
-        const testNames: UsernameMapping[] = userSymbolGenerator([{ username: 'snewman1', playerName: undefined, playerSymbol: undefined }, { username: 'snewman2', playerName: 'Sam', playerSymbol: undefined }]);
+        const testNames: UsernameMapping[] = userSymbolGenerator([
+            {
+                username: 'snewman1',
+                playerName: undefined,
+                playerSymbol: undefined
+            },
+            { username: 'snewman2', playerName: 'Sam', playerSymbol: undefined }
+        ]);
 
         expect(testNames.length).toEqual(2);
         expect(testNames).toContainEqual({
@@ -35,12 +50,18 @@ describe('User Symbol Generation', () => {
             username: 'snewman2',
             playerName: 'Sam',
             playerSymbol: 'snewman2'
-        })
-
+        });
     });
 
     it('Valid usernames with predefined symbols', () => {
-        const testNames: UsernameMapping[] = userSymbolGenerator([{ username: 'snewman1', playerName: 'Sam', playerSymbol: 'marker' }, { username: 'matt.buland', playerName: 'Matt', playerSymbol: 'tester' }]);
+        const testNames: UsernameMapping[] = userSymbolGenerator([
+            { username: 'snewman1', playerName: 'Sam', playerSymbol: 'marker' },
+            {
+                username: 'matt.buland',
+                playerName: 'Matt',
+                playerSymbol: 'tester'
+            }
+        ]);
 
         expect(testNames.length).toEqual(2);
         expect(testNames).toContainEqual({
@@ -56,7 +77,18 @@ describe('User Symbol Generation', () => {
     });
 
     it('Valid usernames with one substring of other', () => {
-        const testNames: UsernameMapping[] = userSymbolGenerator([{ username: 'snewman1', playerName: 'Sam', playerSymbol: undefined }, { username: 'snewman12', playerName: 'Matt', playerSymbol: undefined }]);
+        const testNames: UsernameMapping[] = userSymbolGenerator([
+            {
+                username: 'snewman1',
+                playerName: 'Sam',
+                playerSymbol: undefined
+            },
+            {
+                username: 'snewman12',
+                playerName: 'Matt',
+                playerSymbol: undefined
+            }
+        ]);
 
         expect(testNames.length).toEqual(2);
         expect(testNames).toContainEqual({
@@ -77,19 +109,23 @@ describe('User Symbol Generation', () => {
                 username: 'sam11',
                 playerName: 'Sam',
                 playerSymbol: undefined
-            }, {
+            },
+            {
                 username: 'sarah1',
                 playerName: 'Sarah',
                 playerSymbol: undefined
-            }, {
+            },
+            {
                 username: 'matt8',
                 playerName: 'Matt',
                 playerSymbol: undefined
-            }, {
+            },
+            {
                 username: 'matthew1',
                 playerName: 'Matthew',
                 playerSymbol: undefined
-            }, {
+            },
+            {
                 username: 'king',
                 playerName: 'King',
                 playerSymbol: undefined
@@ -126,7 +162,18 @@ describe('User Symbol Generation', () => {
 
     it('Invalid, identical usernames', () => {
         expect(() => {
-            userSymbolGenerator([{ username: 'snewman1', playerName: 'Sam', playerSymbol: undefined }, { username: 'snewman1', playerName: 'Matt', playerSymbol: undefined }])
+            userSymbolGenerator([
+                {
+                    username: 'snewman1',
+                    playerName: 'Sam',
+                    playerSymbol: undefined
+                },
+                {
+                    username: 'snewman1',
+                    playerName: 'Matt',
+                    playerSymbol: undefined
+                }
+            ]);
         }).toThrow('Duplicate usernames in player names: snewman1');
     });
 });
