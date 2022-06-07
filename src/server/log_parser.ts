@@ -47,17 +47,17 @@ function trimLog(log: string): string[] {
     //Does the same but for the newer/other div method
     //Single effect
     log = log.replace(
-        /<div style=\"padding-left: 4.545454545454546%; width:93.45454545454545%;\" >/g,
+        /<div style=\"padding-left: 4.[0-9]{0,20}%; width:93.[0-9]{0,20}%;\" >/g,
         'EFFECT'
     );
     //Nested effect
     log = log.replace(
-        /<div style=\"padding-left: 8.333333333333332%; width:89.66666666666667%;\" >/g,
+        /<div style=\"padding-left: 8.[0-9]{0,20}%; width:89.[0-9]{0,20}%;\" >/g,
         'EFFECT EFFECT'
     );
     //Double nested effect
     log = log.replace(
-        /<div style=\"padding-left: 11.538461538461538%; width:86.46153846153847%;\" >/g,
+        /<div style=\"padding-left: 11.[0-9]{0,20}%; width:86.[0-9]{0,20}%;\" >/g,
         'EFFECT EFFECT EFFECT'
     );
 
@@ -83,7 +83,7 @@ export function updateNames(
     if (matchName.length === 1 && matchName[0].playerName)
         playerNameUpdate = matchName[0].playerName;
     else {
-        //throw new Error('Unrecognized player: ' + turn.playerName);
+        throw new Error('Unrecognized player: ' + turn.playerName);
     }
 
     // Handle playerSymbols associated with effects
@@ -99,7 +99,7 @@ export function updateNames(
             if (matchSymbol.length === 1 && matchSymbol[0].playerName)
                 effect.player = matchSymbol[0].playerName;
             else {
-                //throw new Error('Unrecognized player: ' + effect.player);
+                throw new Error('Unrecognized player: ' + effect.player);
             }
         }
     }
@@ -116,12 +116,10 @@ export function updateNames(
             if (matchSymbol.length === 1 && matchSymbol[0].playerName)
                 effect.player = matchSymbol[0].playerName;
             else {
-                //throw new Error('Unrecognized player: ' + effect.player);
+                throw new Error('Unrecognized player: ' + effect.player);
             }
         }
     }
-    
-    playerNameUpdate = "";
     return {
         gameId: turn.gameId,
         playerTurn: turn.playerTurn,
