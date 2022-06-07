@@ -205,6 +205,7 @@ export function handleTurn(
     return thisTurn;
 }
 
+// TODO : Migrate handlePlayKeyword down to listCard
 // TODO : Add handling for using a secondary way
 // "W plays an Ironmonger using Way of the Monkey"
 // Function to handle the plays keyword, such as
@@ -308,83 +309,13 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
 
 export function handleBuyKeyword(
     sentence: string[],
-    phase = 'buy'
 ): PlayedCard[] {
-    //Default values
-    let amount = 1;
-
-    let retList: PlayedCard[] = [];
-
     //If there is "and gains" in the sentence get rid of it
     if (sentence[0] === 'and') {
         sentence = sentence.slice(2);
     }
 
-    //If there are multiple cards bought that are comma seperated
-    if (sentence.join().indexOf(',') != -1) {
-        for (let i = 0; i < sentence.length; i++) {
-            if (sentence[i].slice(-1) === ',') {
-                retList = retList.concat(
-                    handleBuyKeyword(sentence.slice(i + 1))
-                );
-                sentence = sentence.slice(0, i + 1);
-                break;
-            }
-        }
-    }
-
-    //If there are multiple cards sepereated by an "and"
-    if (sentence.indexOf('and') != -1) {
-        retList = retList.concat(
-            handleBuyKeyword(sentence.slice(sentence.indexOf('and') + 1))
-        );
-        sentence = sentence.slice(0, sentence.indexOf('and'));
-    }
-
-    if (!isNaN(Number(sentence[0]))) {
-        //If there is more than 1 card bought
-        amount = Number(sentence[0]);
-    }
-
-    let cardName: string;
-
-    //Dealing with leading/no leading word
-    if (
-        sentence[0] !== 'a' &&
-        sentence[0] !== 'an' &&
-        isNaN(Number(sentence[0]))
-    ) {
-        //If there isn't a leading a/an/number
-        cardName = sentence.slice(0).join(' ');
-    } else {
-        //Else there is a leading a/an/number
-        cardName = sentence.slice(1).join(' ');
-    }
-
-    //Setting default values
-    if (cardName.slice(-1) === '.' || cardName.slice(-1) === ',') {
-        cardName = cardName.slice(0, -1); //Chop off period/comma
-    }
-    cardName = singularize(cardName);
-
-    let effect: PlayerEffect[] = [];
-    let durationResolve = false;
-    let usedVillagers = false;
-
-    //Adding cards to returning array
-    for (let i = 0; i < amount; i++) {
-        retList.push(
-            generateCard(
-                cardName,
-                phase,
-                effect,
-                durationResolve,
-                usedVillagers
-            )
-        );
-    }
-
-    return retList;
+    return listCards(sentence, 'buy');
 }
 
 // Make sure to check for 'EFFECT' and 'EFFECT EFFECT' before passing into this
@@ -434,14 +365,14 @@ export function handleEffect(sentence: string[], phase: string) {
             return {
                 type: 'gain',
                 player: player,
-                gain: handleBuyKeyword(sentence.slice(2), phase) // kind of hack-y but it works
+                gain: listCards(sentence.slice(2), phase)
             };
 
         case 'trashes':
             return {
                 type: 'trash',
                 player: player,
-                trash: handleBuyKeyword(sentence.slice(2), phase) // again, hack-y
+                trash: listCards(sentence.slice(2), phase)
             };
 
         case 'draws':
@@ -482,7 +413,7 @@ export function handleEffect(sentence: string[], phase: string) {
             return {
                 type: 'exile',
                 player: player,
-                exile: handleBuyKeyword(sentence.slice(2), phase)
+                exile: listCards(sentence.slice(2), phase)
             };
 
         default:
@@ -490,9 +421,78 @@ export function handleEffect(sentence: string[], phase: string) {
     }
 }
 
+// TODO : Migrate handlePlayKeyword down here too
 // Function to generate a list of cards interacted with in a sentence
 function listCards(sentence: string[], phase) {
-    return null;
+    //Default values
+    let amount = 1;
+    let retList: PlayedCard[] = [];
+
+    //If there are multiple cards bought that are comma seperated
+    if (sentence.join().indexOf(',') != -1) {
+        for (let i = 0; i < sentence.length; i++) {
+            if (sentence[i].slice(-1) === ',') {
+                retList = retList.concat(
+                    listCards(sentence.slice(i + 1), phase)
+                );
+                sentence = sentence.slice(0, i + 1);
+                break;
+            }
+        }
+    }
+
+    //If there are multiple cards sepereated by an "and"
+    if (sentence.indexOf('and') != -1) {
+        retList = retList.concat(
+            listCards(sentence.slice(sentence.indexOf('and') + 1), phase)
+        );
+        sentence = sentence.slice(0, sentence.indexOf('and'));
+    }
+
+    if (!isNaN(Number(sentence[0]))) {
+        //If there is more than 1 card bought
+        amount = Number(sentence[0]);
+    }
+
+    let cardName: string;
+
+    //Dealing with leading/no leading word
+    if (
+        sentence[0] !== 'a' &&
+        sentence[0] !== 'an' &&
+        isNaN(Number(sentence[0]))
+    ) {
+        //If there isn't a leading a/an/number
+        cardName = sentence.slice(0).join(' ');
+    } else {
+        //Else there is a leading a/an/number
+        cardName = sentence.slice(1).join(' ');
+    }
+
+    //Setting default values
+    if (cardName.slice(-1) === '.' || cardName.slice(-1) === ',') {
+        cardName = cardName.slice(0, -1); //Chop off period/comma
+    }
+    cardName = singularize(cardName);
+
+    let effect: PlayerEffect[] = [];
+    let durationResolve = false;
+    let usedVillagers = false;
+
+    //Adding cards to returning array
+    for (let i = 0; i < amount; i++) {
+        retList.push(
+            generateCard(
+                cardName,
+                phase,
+                effect,
+                durationResolve,
+                usedVillagers
+            )
+        );
+    }
+
+    return retList;
 }
 
 // Function to determine the number of cards interacted with in a sentence
