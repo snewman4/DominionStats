@@ -32,6 +32,7 @@ export default class DataUploader extends LightningElement {
         if (fileText !== null && fileText.files !== null) {
             fileText.files[0].text().then((result) => {
                 fileString = result;
+                console.log('file: ', result);
                 fileString = this.replaceGameIds(fileString);
                 fetch('api/v1/logUpload', {
                     method: 'POST',
@@ -125,8 +126,7 @@ export default class DataUploader extends LightningElement {
         let newGameID: string = "";
         let letter = "a";
         let gameIDs: string[] = [];
-        let newFile = "";
-
+        let oldFile = file;
         while(file.indexOf("\"#") !== -1){
             replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
             newGameID = file.substring(file.indexOf("\"date\"") + 15,file.indexOf("\"date\"") + 19 ) + file.substring(file.indexOf("\"date\"") + 12,file.indexOf("\"date\"") + 14) + file.substring(file.indexOf("\"date\"") + 9,file.indexOf("\"date\"") + 11 ) + letter;
@@ -140,16 +140,16 @@ export default class DataUploader extends LightningElement {
                 currentDate = date;
             }
             //These lines will actually replace the gameIDs in the file
-             newFile = file.replace(dateString, "\"Date\"");
-             newFile = file.replace(replace, newGameID);
+            file = file.replace(dateString, "\"Date\"");
+            file = file.replace(replace, newGameID);
         }
         //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
         let response = prompt("Do these Game ID's look correct? (Y/N) \n" + gameIDs);
         if(response === "Y" || response === "Yes" || response === "YES" || response === "y" || response === "yes"){
-            return newFile;
+            return file;
         }
         else{
-            return file;
+            return oldFile;
         }
     }
        
