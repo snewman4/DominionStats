@@ -1218,7 +1218,8 @@ describe('Name Updating Tests', () => {
                 username: 'matt.buland',
                 playerName: 'Matt',
                 playerSymbol: 'm'
-            }, {
+            },
+            {
                 username: 'snewman1',
                 playerName: 'Sam',
                 playerSymbol: 's'
@@ -1228,12 +1229,12 @@ describe('Name Updating Tests', () => {
             type: 'discard',
             player: 's',
             discard: 1
-        }
+        };
         const buyingPower: BuyingPowerEffect = {
             type: 'buying power',
             player: 'm',
             buyingPower: 1
-        }
+        };
         const reaction: ReactionEffect = {
             type: 'reaction',
             player: 'm',
@@ -1244,27 +1245,31 @@ describe('Name Updating Tests', () => {
                 durationResolve: false,
                 usedVillagers: false
             }
-        }
+        };
         const rawTurn: PlayerTurn = {
             gameId: '20220606a',
             playerTurn: 2,
             turnIndex: 4,
             playerName: 'snewman1',
-            playedCards: [{
-                card: 'Horse',
-                effect: [ reaction ],
-                phase: 'action',
-                durationResolve: false,
-                usedVillagers: false
-            }],
-            purchasedCards: [{
-                card: 'Horse',
-                effect: [ reaction ],
-                phase: 'buy',
-                durationResolve: false,
-                usedVillagers: false
-            }]
-        }
+            playedCards: [
+                {
+                    card: 'Horse',
+                    effect: [reaction],
+                    phase: 'action',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ],
+            purchasedCards: [
+                {
+                    card: 'Horse',
+                    effect: [reaction],
+                    phase: 'buy',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ]
+        };
 
         const testUpdate: PlayerTurn = updateNames(rawTurn, players);
 
@@ -1278,7 +1283,7 @@ describe('Name Updating Tests', () => {
         expect(testUpdate.playedCards[0].effect.length).toEqual(1);
         const playEffect: PlayerEffect = testUpdate.playedCards[0].effect[0];
         expect(playEffect.player).toEqual('Matt');
-        if(isReactionEffect(playEffect)) {
+        if (isReactionEffect(playEffect)) {
             expect(playEffect.reaction.effect.length).toEqual(2);
             expect(playEffect.reaction.effect).toContainEqual({
                 type: 'discard',
@@ -1295,7 +1300,7 @@ describe('Name Updating Tests', () => {
         expect(testUpdate.purchasedCards[0].effect.length).toEqual(1);
         const buyEffect: PlayerEffect = testUpdate.purchasedCards[0].effect[0];
         expect(buyEffect.player).toEqual('Matt');
-        if(isReactionEffect(buyEffect)) {
+        if (isReactionEffect(buyEffect)) {
             expect(buyEffect.reaction.effect.length).toEqual(2);
             expect(buyEffect.reaction.effect).toContainEqual({
                 type: 'discard',
@@ -1380,7 +1385,10 @@ describe('Name Updating Tests', () => {
 
 describe('Effect Generation Tests', () => {
     it('Valid action effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['t', 'gets', '+1', 'Action.'], 'action');
+        const effectTest: PlayerEffect = handleEffect(
+            ['t', 'gets', '+1', 'Action.'],
+            'action'
+        );
 
         expect(effectTest).toEqual({
             type: 'action',
@@ -1389,46 +1397,82 @@ describe('Effect Generation Tests', () => {
         });
     });
 
+    // TODO : Add test for buy effect
     it('Valid gain effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['t', 'gains', '2', 'Horses.'], 'action');
+        const effectTest: PlayerEffect = handleEffect(
+            ['L', 'gains', 'a', 'Curse.'],
+            'attack'
+        );
+
+        expect(effectTest).toEqual({
+            type: 'gain',
+            player: 'L',
+            gain: [
+                {
+                    card: 'Curse',
+                    effect: [],
+                    phase: 'attack',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ]
+        });
+    });
+
+    it('Valid gain effect', () => {
+        const effectTest: PlayerEffect = handleEffect(
+            ['t', 'gains', '2', 'Horses.'],
+            'action'
+        );
 
         expect(effectTest).toEqual({
             type: 'gain',
             player: 't',
-            gain: [{
-                card: 'Horse',
-                effect: [],
-                phase: 'action',
-                durationResolve: false,
-                usedVillagers: false
-            }, {
-                card: 'Horse',
-                effect: [],
-                phase: 'action',
-                durationResolve: false,
-                usedVillagers: false
-            }]
+            gain: [
+                {
+                    card: 'Horse',
+                    effect: [],
+                    phase: 'action',
+                    durationResolve: false,
+                    usedVillagers: false
+                },
+                {
+                    card: 'Horse',
+                    effect: [],
+                    phase: 'action',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ]
         });
     });
 
     it('Valid trash effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['m', 'trashes', 'an', 'Estate.'], 'action');
+        const effectTest: PlayerEffect = handleEffect(
+            ['m', 'trashes', 'an', 'Estate.'],
+            'action'
+        );
 
         expect(effectTest).toEqual({
             type: 'trash',
             player: 'm',
-            trash: [{
-                card: 'Estate',
-                effect: [],
-                phase: 'action',
-                durationResolve: false,
-                usedVillagers: false
-            }]
+            trash: [
+                {
+                    card: 'Estate',
+                    effect: [],
+                    phase: 'action',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ]
         });
     });
 
     it('Valid draw effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['t', 'draws', '2', 'cards.'], 'action');
+        const effectTest: PlayerEffect = handleEffect(
+            ['t', 'draws', '2', 'cards.'],
+            'action'
+        );
 
         expect(effectTest).toEqual({
             type: 'draw',
@@ -1438,7 +1482,20 @@ describe('Effect Generation Tests', () => {
     });
 
     it('Valid draw effect with multiple cards, player-side', () => {
-        const effectTest: PlayerEffect = handleEffect(['m', 'draws', 'a', 'Copper,', 'a', 'Silver', 'and', 'a', 'Platinum.'], 'action');
+        const effectTest: PlayerEffect = handleEffect(
+            [
+                'm',
+                'draws',
+                'a',
+                'Copper,',
+                'a',
+                'Silver',
+                'and',
+                'a',
+                'Platinum.'
+            ],
+            'action'
+        );
 
         expect(effectTest).toEqual({
             type: 'draw',
@@ -1448,7 +1505,10 @@ describe('Effect Generation Tests', () => {
     });
 
     it('Valid topdeck effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['W', 'topdecks', 'a', 'card.'], 'action');
+        const effectTest: PlayerEffect = handleEffect(
+            ['W', 'topdecks', 'a', 'card.'],
+            'action'
+        );
 
         expect(effectTest).toEqual({
             type: 'topdeck',
@@ -1458,7 +1518,10 @@ describe('Effect Generation Tests', () => {
     });
 
     it('Valid topdeck effect, multi-word player-side', () => {
-        const effectTest: PlayerEffect = handleEffect(['m', 'topdecks', 'a', 'Treasure', 'Trove.'], 'action');
+        const effectTest: PlayerEffect = handleEffect(
+            ['m', 'topdecks', 'a', 'Treasure', 'Trove.'],
+            'action'
+        );
 
         expect(effectTest).toEqual({
             type: 'topdeck',
@@ -1467,8 +1530,24 @@ describe('Effect Generation Tests', () => {
         });
     });
 
+    it('Plural discard effect', () => {
+        const effectTest: PlayerEffect = handleEffect(
+            ['s', 'discards', 'a', 'card', 'and', 'a', 'Copper.'],
+            'attack'
+        );
+
+        expect(effectTest).toEqual({
+            type: 'discard',
+            player: 's',
+            discard: 2
+        });
+    });
+
     it('Valid exile discard effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['j', 'discards', 'a', 'Gold', 'from', 'Exile.'], 'buy');
+        const effectTest: PlayerEffect = handleEffect(
+            ['j', 'discards', 'a', 'Gold', 'from', 'Exile.'],
+            'buy'
+        );
 
         expect(effectTest).toEqual({
             type: 'discard',
@@ -1478,7 +1557,10 @@ describe('Effect Generation Tests', () => {
     });
 
     it('Valid plural exile discard effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['D', 'discards', '3', 'Golds', 'from', 'Exile,'], 'buy');
+        const effectTest: PlayerEffect = handleEffect(
+            ['D', 'discards', '3', 'Golds', 'from', 'Exile,'],
+            'buy'
+        );
 
         expect(effectTest).toEqual({
             type: 'discard',
@@ -1487,8 +1569,13 @@ describe('Effect Generation Tests', () => {
         });
     });
 
+    // TODO : Add test for villagers effect
+
     it('Valid coffers effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['t', 'gets', '+1', 'Coffers.', '(Pageant)'], 'buy');
+        const effectTest: PlayerEffect = handleEffect(
+            ['t', 'gets', '+1', 'Coffers.', '(Pageant)'],
+            'buy'
+        );
 
         expect(effectTest).toEqual({
             type: 'coffers',
@@ -1497,8 +1584,13 @@ describe('Effect Generation Tests', () => {
         });
     });
 
+    // TODO : Add test for VP effect
+
     it('Valid buying power effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['W', 'gets', '+$2.'], 'attack');
+        const effectTest: PlayerEffect = handleEffect(
+            ['W', 'gets', '+$2.'],
+            'attack'
+        );
 
         expect(effectTest).toEqual({
             type: 'buying power',
@@ -1507,8 +1599,26 @@ describe('Effect Generation Tests', () => {
         });
     });
 
+    it('Valid buying power effect, postponed', () => {
+        const effectTest: PlayerEffect = handleEffect(
+            ['L', 'gets', '+$1.', '(Merchant)'],
+            'buy'
+        );
+
+        expect(effectTest).toEqual({
+            type: 'buying power',
+            player: 'L',
+            buyingPower: 1
+        });
+    });
+
+    // TODO : Add test for other players effect
+
     it('Valid reaction effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['t', 'reacts', 'with', 'a', 'Sleigh.'], 'action');
+        const effectTest: PlayerEffect = handleEffect(
+            ['t', 'reacts', 'with', 'a', 'Sleigh.'],
+            'action'
+        );
 
         expect(effectTest).toEqual({
             type: 'reaction',
@@ -1524,30 +1634,53 @@ describe('Effect Generation Tests', () => {
     });
 
     it('Valid exile effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['D', 'exiles', 'a', 'Gold.'], 'action');
+        const effectTest: PlayerEffect = handleEffect(
+            ['D', 'exiles', 'a', 'Gold.'],
+            'action'
+        );
 
         expect(effectTest).toEqual({
             type: 'exile',
             player: 'D',
-            exile: [{
-                card: 'Gold',
-                effect: [],
-                phase: 'action',
-                durationResolve: false,
-                usedVillagers: false
-            }]
+            exile: [
+                {
+                    card: 'Gold',
+                    effect: [],
+                    phase: 'action',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ]
         });
     });
 
     it('Valid not-a-tracked-effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['j', 'loses', '1', 'Coin'], 'buy');
+        const effectTest: PlayerEffect = handleEffect(
+            ['j', 'loses', '1', 'Coin'],
+            'buy'
+        );
 
         expect(effectTest).toEqual(null);
     });
 
     it('Valid not-a-tracked-effect', () => {
-        const effectTest: PlayerEffect = handleEffect(['t', 'returns', 'a', 'Horse', 'to', 'the', 'Horse', 'pile.'], 'action');
+        const effectTest: PlayerEffect = handleEffect(
+            ['t', 'returns', 'a', 'Horse', 'to', 'the', 'Horse', 'pile.'],
+            'action'
+        );
 
         expect(effectTest).toEqual(null);
+    });
+
+    it('Invalid, too short effect', () => {
+        expect(() => {
+            handleEffect(['t', 'gets'], 'action');
+        }).toThrow('Effect too short: t gets');
+    });
+
+    it('Invalid phase', () => {
+        expect(() => {
+            handleEffect(['t', 'gains', 'a', 'Gardens.'], 'slay');
+        }).toThrow('Not a valid card phase: slay for Gardens');
     });
 });

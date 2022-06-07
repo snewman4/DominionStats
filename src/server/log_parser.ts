@@ -15,9 +15,9 @@ export function parseLog(
     let fullGame: PlayerTurn[] = [];
 
     let iterator = 0; // Tracks the turn index
-    console.log("Game length: " + game.length);
+    console.log('Game length: ' + game.length);
     for (let turn of game) {
-        console.log("Turn: ");
+        console.log('Turn: ');
         console.log(turn);
         let turnResult: PlayerTurn | null = handleTurn(gameID, turn, iterator);
         if (turnResult !== null) {
@@ -47,17 +47,17 @@ function trimLog(log: string): string[] {
     //Does the same but for the newer/other div method
     //Single effect
     log = log.replace(
-        /<div style=\"padding-left: 4.[0-9]{0,20}%; width:93.[0-9]{0,20}%;\" >/g,
+        /<div style="padding-left: 4.[0-9]{0,20}%; width:93.[0-9]{0,20}%;" >/g,
         'EFFECT'
     );
     //Nested effect
     log = log.replace(
-        /<div style=\"padding-left: 8.[0-9]{0,20}%; width:89.[0-9]{0,20}%;\" >/g,
+        /<div style="padding-left: 8.[0-9]{0,20}%; width:89.[0-9]{0,20}%;" >/g,
         'EFFECT EFFECT'
     );
     //Double nested effect
     log = log.replace(
-        /<div style=\"padding-left: 11.[0-9]{0,20}%; width:86.[0-9]{0,20}%;\" >/g,
+        /<div style="padding-left: 11.[0-9]{0,20}%; width:86.[0-9]{0,20}%;" >/g,
         'EFFECT EFFECT EFFECT'
     );
 
@@ -151,7 +151,7 @@ export function handleTurn(
             return element !== '';
         });
 
-    console.log("unprocessed turn:");
+    console.log('unprocessed turn:');
     console.log(splitTurn); //TODO: remove when done testing
 
     // Check if this is a turn or the beginning of the game
@@ -199,7 +199,7 @@ export function handleTurn(
         purchasedCards: purchasedCards
     };
 
-    console.log("Processed turn:");
+    console.log('Processed turn:');
     console.log(thisTurn);
 
     return thisTurn;
@@ -306,7 +306,10 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     return retList;
 }
 
-export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
+export function handleBuyKeyword(
+    sentence: string[],
+    phase = 'buy'
+): PlayedCard[] {
     //Default values
     let amount = 1;
 
@@ -364,7 +367,6 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
     }
     cardName = singularize(cardName);
 
-    let phase = 'buy';
     let effect: PlayerEffect[] = [];
     let durationResolve = false;
     let usedVillagers = false;
@@ -386,11 +388,123 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
 }
 
 // Make sure to check for 'EFFECT' and 'EFFECT EFFECT' before passing into this
-export function handleEffect(sentence: string[], phase: string): PlayerEffect | null {
-    return {
-        type: 'PLACEHOLDER',
-        player: 'PLACEHOLDER'
-    };
+export function handleEffect(sentence: string[], phase: string) {
+    if (sentence.length < 3)
+        throw new Error('Effect too short: ' + sentence.join(' '));
+    let player: string = sentence[0];
+    let keyword: string = sentence[1];
+    let amount: number;
+    let type: string;
+
+    switch (keyword) {
+        case 'gets':
+            // If it is a buying power effect
+            if (sentence[2][1] === '$' && sentence[2].slice(-1) === '.') {
+                amount = Number(sentence[2].slice(2, -1));
+                return {
+                    type: 'buying power',
+                    player: player,
+                    buyingPower: amount
+                };
+            }
+            // If not buying power, need more info
+            if (sentence.length < 4)
+                throw new Error('Effect too short: ' + sentence.join(' '));
+            amount = Number(sentence[2].slice(1));
+            type = sentence[3].slice(0, -1);
+            switch (type) {
+                case 'Action':
+                    return {
+                        type: 'action',
+                        player: player,
+                        action: amount
+                    };
+                case 'Coffers':
+                    return {
+                        type: 'coffers',
+                        player: player,
+                        coffers: amount
+                    };
+                // TODO : Add more get keyword effects
+                default:
+                    throw new Error('Unknown effect: ' + sentence.join(' '));
+            }
+
+        case 'gains':
+            return {
+                type: 'gain',
+                player: player,
+                gain: handleBuyKeyword(sentence.slice(2), phase) // kind of hack-y but it works
+            };
+
+        case 'trashes':
+            return {
+                type: 'trash',
+                player: player,
+                trash: handleBuyKeyword(sentence.slice(2), phase) // again, hack-y
+            };
+
+        case 'draws':
+            return {
+                type: 'draw',
+                player: player,
+                draw: numCards(sentence.slice(2), 0)
+            };
+
+        case 'topdecks':
+            return {
+                type: 'topdeck',
+                player: player,
+                topdeck: numCards(sentence.slice(2), 0)
+            };
+
+        case 'discards':
+            return {
+                type: 'discard',
+                player: player,
+                discard: numCards(sentence.slice(2), 0)
+            };
+
+        case 'reacts':
+            return {
+                type: 'reaction',
+                player: player,
+                reaction: generateCard(
+                    sentence.slice(4).join(' ').slice(0, -1),
+                    'reaction',
+                    [],
+                    false,
+                    false
+                )
+            };
+
+        case 'exiles':
+            return {
+                type: 'exile',
+                player: player,
+                exile: handleBuyKeyword(sentence.slice(2), phase)
+            };
+
+        default:
+            return null; // some effects are not tracked, and null represents that
+    }
+}
+
+// Function to generate a list of cards interacted with in a sentence
+function listCards(sentence: string[], phase) {
+    return null;
+}
+
+// Function to determine the number of cards interacted with in a sentence
+function numCards(sentence: string[], initialAmount: number): number {
+    let amount: number = initialAmount;
+    if (sentence.length === 0) return amount; // Empty sentence
+    if (sentence[0] === 'a' || sentence[0] === 'an') amount++;
+    // Single card
+    else if (!isNaN(Number(sentence[0]))) amount += Number(sentence[0]); // Number of cards
+    // No card names have the words "a" or "an" in them, or a number, so we don't need to
+    // worry about actually reading the cards' names. Just iterate through each word
+    return numCards(sentence.slice(1), amount);
 }
 
 export function generateCard(

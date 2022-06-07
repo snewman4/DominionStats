@@ -169,10 +169,9 @@ export function isReactionEffect(pe: PlayerEffect): pe is ReactionEffect {
     return pe.type === 'reaction' && 'reaction' in pe;
 }
 
-
 export interface ExileEffect extends PlayerEffect {
-    type: 'exile',
-    exile: PlayedCard[]
+    type: 'exile';
+    exile: PlayedCard[];
 }
 
 export function isExileEffect(pe: PlayerEffect): pe is ExileEffect {
