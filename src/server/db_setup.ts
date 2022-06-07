@@ -271,6 +271,38 @@ export async function usernameCheck(
     return { status: 200, results: [] };
 }
 
+// Helper function to generate username symbols
+export function userSymbolGenerator(names: UsernameMapping[]): UsernameMapping[] {
+    let dupSym: string | undefined;
+    for(let name of names) {
+        // If duplicate username, error
+        if(names.filter(element => element.username === name.username).length > 1) throw new Error('Duplicate usernames in player names: ' + name.username);
+        // If symbols are undefined
+        if(name.playerSymbol === undefined) name.playerSymbol = name.username[0];
+        // Check for duplicate symbols
+        if(names.filter(element => element.playerSymbol === name.playerSymbol).length > 1) {
+            dupSym = name.playerSymbol;
+            break;
+        }
+    }
+    
+    // No duplicates
+    if(dupSym === undefined) return names;
+
+    let duplicateNames = names.filter(element => element.playerSymbol === dupSym);
+    let updated = false; // Makes sure that at least one element was updated
+    for(let name of duplicateNames) {
+        if(name.username.length > dupSym.length) {
+            // For each name, add an extra character to the symbol
+            name.playerSymbol = name.username.slice(0,dupSym.length + 1);
+            updated = true;
+        }
+        // If the symbol is as long as the username, then it cannot be extended further
+    }
+    if(!updated) throw new Error('Unable to generate unique symbol. Closest form: ' + dupSym);
+    return userSymbolGenerator(names);
+}
+
 //Function for adding a log to the log database
 export async function insertLog(log: object): Promise<LogFormResult> {
     let allErrors: ErrorObject[] = [];

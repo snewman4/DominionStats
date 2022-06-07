@@ -348,9 +348,15 @@ describe('Buy Keyword Handling', () => {
     });
 
     it('Missing punctuation', () => {
-        expect(() => {
-            handleBuyKeyword(['a', 'Gardens']);
-        }).toThrow('Not a valid card name: Garden');
+        const testCard: PlayedCard[] = handleBuyKeyword(['a', 'Gardens']);
+
+        expect(testCard).toEqual([{
+            card: 'Gardens',
+            effect: [],
+            phase: 'buy',
+            durationResolve: false,
+            usedVillagers: false
+        }]);
     });
 
     it('Invalid card name', () => {

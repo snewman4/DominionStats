@@ -301,7 +301,7 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
     if(sentence.join().indexOf(",") != -1){
         for(let i = 0; i < sentence.length; i++){
             if(sentence[i].slice(-1) === ","){
-                retList.concat(handleBuyKeyword(sentence.slice(i+1)));
+                retList = retList.concat(handleBuyKeyword(sentence.slice(i+1)));
                 sentence = sentence.slice(0, i+1);
                 break;
             }
@@ -310,7 +310,7 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
 
     //If there are multiple cards sepereated by an "and"
     if(sentence.indexOf("and") != -1){
-        retList.concat(handleBuyKeyword(sentence.slice(sentence.indexOf("and") + 1)));
+        retList = retList.concat(handleBuyKeyword(sentence.slice(sentence.indexOf("and") + 1)));
         sentence = sentence.slice(0, sentence.indexOf("and"));
     }
 
