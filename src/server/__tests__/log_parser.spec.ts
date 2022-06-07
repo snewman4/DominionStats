@@ -8,9 +8,12 @@ import {
 } from '../log_parser';
 import {
     BuyEffect,
+    BuyingPowerEffect,
+    DiscardEffect,
     isGainEffect,
     isOtherPlayerEffect,
-    isReactionEffect
+    isReactionEffect,
+    ReactionEffect
 } from '../log_values';
 import type {
     PlayedCard,
@@ -1206,6 +1209,104 @@ describe('Name Updating Tests', () => {
         };
 
         expect(testUpdate).toEqual(expectTurn);
+    });
+
+    it('Nested names within effects', () => {
+        const players: UsernameMapping[] = [
+            {
+                username: 'matt.buland',
+                playerName: 'Matt',
+                playerSymbol: 'm'
+            }, {
+                username: 'snewman1',
+                playerName: 'Sam',
+                playerSymbol: 's'
+            }
+        ];
+        const discard: DiscardEffect = {
+            type: 'discard',
+            player: 's',
+            discard: 1
+        }
+        const buyingPower: BuyingPowerEffect = {
+            type: 'buying power',
+            player: 'm',
+            buyingPower: 1
+        }
+        const reaction: ReactionEffect = {
+            type: 'reaction',
+            player: 'm',
+            reaction: {
+                card: 'Militia',
+                effect: [discard, buyingPower],
+                phase: 'attack',
+                durationResolve: false,
+                usedVillagers: false
+            }
+        }
+        const rawTurn: PlayerTurn = {
+            gameId: '20220606a',
+            playerTurn: 2,
+            turnIndex: 4,
+            playerName: 'snewman1',
+            playedCards: [{
+                card: 'Horse',
+                effect: [ reaction ],
+                phase: 'action',
+                durationResolve: false,
+                usedVillagers: false
+            }],
+            purchasedCards: [{
+                card: 'Horse',
+                effect: [ reaction ],
+                phase: 'buy',
+                durationResolve: false,
+                usedVillagers: false
+            }]
+        }
+
+        const testUpdate: PlayerTurn = updateNames(rawTurn, players);
+
+        expect(testUpdate.gameId).toEqual('20220606a');
+        expect(testUpdate.playerTurn).toEqual(2);
+        expect(testUpdate.turnIndex).toEqual(4);
+        expect(testUpdate.playerName).toEqual('Sam');
+        expect(testUpdate.playedCards.length).toEqual(1);
+        expect(testUpdate.purchasedCards.length).toEqual(1);
+
+        expect(testUpdate.playedCards[0].effect.length).toEqual(1);
+        const playEffect: PlayerEffect = testUpdate.playedCards[0].effect[0];
+        expect(playEffect.player).toEqual('Matt');
+        if(isReactionEffect(playEffect)) {
+            expect(playEffect.reaction.effect.length).toEqual(2);
+            expect(playEffect.reaction.effect).toContainEqual({
+                type: 'discard',
+                player: 'Sam',
+                discard: 1
+            });
+            expect(playEffect.reaction.effect).toContainEqual({
+                type: 'buying power',
+                player: 'Matt',
+                buyingPower: 1
+            });
+        }
+
+        expect(testUpdate.purchasedCards[0].effect.length).toEqual(1);
+        const buyEffect: PlayerEffect = testUpdate.purchasedCards[0].effect[0];
+        expect(buyEffect.player).toEqual('Matt');
+        if(isReactionEffect(buyEffect)) {
+            expect(buyEffect.reaction.effect.length).toEqual(2);
+            expect(buyEffect.reaction.effect).toContainEqual({
+                type: 'discard',
+                player: 'Sam',
+                discard: 1
+            });
+            expect(buyEffect.reaction.effect).toContainEqual({
+                type: 'buying power',
+                player: 'Matt',
+                buyingPower: 1
+            });
+        }
     });
 
     it('Missing name definition, basic', () => {
