@@ -152,7 +152,9 @@ export default class DataUploader extends LightningElement {
         for(let i = 0; i < gameIDs.length; i++){
             gameIDsDisplay += gameIDs[i] + "\n";
         }
-        e.value = gameIDsDisplay;
+        if(e){
+            e.value = gameIDsDisplay;
+        }
     }
 
     //Replace each gameID in file with new format based on the date
