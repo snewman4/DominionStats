@@ -1,11 +1,16 @@
 import { LightningElement } from 'lwc';
 import { validateInput } from './helpers/validateInput';
 import type { GameData, PlayerData } from './helpers/types';
+import { ConnectedScatterplot } from '../d3Charts/connectedScatter';
 
 const todaysDate = new Date();
 const year = todaysDate.getFullYear();
 const month = (todaysDate.getMonth() + 1).toString().padStart(2, '0');
 const day = todaysDate.getDate().toString().padStart(2, '0');
+
+declare global {
+    var logFile: string;
+  }
 
 export default class DataUploader extends LightningElement {
     defaultGameId = `${year}${month}${day}a`;
@@ -30,11 +35,12 @@ export default class DataUploader extends LightningElement {
         let fileText = this.template.querySelector(
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
+        /*
         if (fileText !== null && fileText.files !== null) {
             fileText.files[0].text().then((result) => {
                 fileString = result;
                // console.log('file: ', result);
-                fileString = this.replaceGameIds(fileString);
+                fileString = this.replaceGameIDs(fileString);
                 fetch('api/v1/logUpload', {
                     method: 'POST',
                     headers: {
@@ -45,6 +51,7 @@ export default class DataUploader extends LightningElement {
                 // TODO : Handle the response, potential error handling
             });
         }
+        */
 
         //if no errors were found
         if (errorMessages.length == 0) {
@@ -99,17 +106,17 @@ export default class DataUploader extends LightningElement {
 
     uploadFile(): void {
         //get file values
-        let fileString = "";
+        //let fileString = "";
         let fileText = this.template.querySelector(
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
         if (fileText !== null && fileText.files !== null) {
             fileText.files[0].text().then((result) => {
-                fileString = result;
+                globalThis.logFile = result;
                 
-                fileString = this.replaceGameIds(fileString);
+                this.displayNewGameIDs(globalThis.logFile);
                 //fileString = this.validatePlayers(JSON.parse(fileString));
-                console.log('OBJECT: ', this.validatePlayers(JSON.parse(fileString)));
+                console.log('OBJECT: ', this.validatePlayers(JSON.parse(globalThis.logFile)));
                 
                 /*
                 fetch('api/v1/logUpload', {
@@ -162,7 +169,7 @@ export default class DataUploader extends LightningElement {
     }
 
     //Replace each gameID in file with new format based on the date
-    replaceGameIds(file:string):string{
+    displayNewGameIDs(file:string):void{
         let replace = "";
         let date = "";
         let dateString = "";
@@ -195,7 +202,6 @@ export default class DataUploader extends LightningElement {
             
             file = file.replace(dateString, "\"Date\"");
             file = file.replace(replace, newGameID);
-            
         }
         //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
         this.showGameArea = true;
@@ -221,29 +227,38 @@ export default class DataUploader extends LightningElement {
         // else{
         //     return oldFile;
         // }
-        return file;
+      //  return file;
     }
 
-    replaceGameIDs(): void{
+    confirmGameIDs(): void{
         //gets value from textarea
         let newGameIDs: string[] = [];
         let textBlob: string = this.getValueFromInput('gameInputArea');
         textBlob.split(/[\r\n]+/).forEach((line: string) => {
             newGameIDs.push(line);
         });
-        for(let i = 0; i < newGameIDs.length; i++){
-            console.log(newGameIDs[i]);
-        }
+        globalThis.logFile = this.replaceGameIDs(globalThis.logFile, newGameIDs);
+
         this.showGameArea = false;
-        /*
-        let dataList: GameData[] = this.processLine(textBlob);
-        let gameIds: string[] = [];
-        console.log(textBlob);
-        console.log("hi");
-        for(let game of dataList){
-            gameIds.push(game.gameId);
+
+        fetch('api/v1/logUpload', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: globalThis.logFile
+        });
+    }
+
+    replaceGameIDs(file:string, newGameIDs:string[]): string{
+        let replace = "";
+        let gameIDsCount = 0;
+        while(file.indexOf("\"#") !== -1){
+            replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
+            file = file.replace(replace, newGameIDs[gameIDsCount]);
+            gameIDsCount++;
         }
-        */
+        return file;
     }
        
     validatePlayers(file:Object): Object {
