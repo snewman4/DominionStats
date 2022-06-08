@@ -140,6 +140,15 @@ export default class DataUploader extends LightningElement {
         let oldFile = file;
         while(file.indexOf("\"#") !== -1){
             replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
+            /*
+            let tester: string = file.substring(file.indexOf("\"date\"") + 2);
+            console.log(tester);
+            if(tester === " "){
+                newGameID = file.substring(file.indexOf("\"date\"") + 15,file.indexOf("\"date\"") + 19 ) + file.substring(file.indexOf("\"date\"") + 12,file.indexOf("\"date\"") + 14) + file.substring(file.indexOf("\"date\"") + 9,file.indexOf("\"date\"") + 11 ) + letter;
+            } else {
+                newGameID = "Test";
+            }
+            */
             newGameID = file.substring(file.indexOf("\"date\"") + 15,file.indexOf("\"date\"") + 19 ) + file.substring(file.indexOf("\"date\"") + 12,file.indexOf("\"date\"") + 14) + file.substring(file.indexOf("\"date\"") + 9,file.indexOf("\"date\"") + 11 ) + letter;
             gameIDs.push(newGameID);
             letter = String.fromCharCode(letter.charCodeAt(0) + 1);
@@ -157,7 +166,17 @@ export default class DataUploader extends LightningElement {
         //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
         this.showGameArea = true;
         this.setValueFromInput("gameInputArea", gameIDs);
-        debugger;
+        
+         //Prompt test stuff
+        let gameIDsDisplay: string = "";
+        for(let ids of gameIDs){
+            gameIDsDisplay += ids + " ";
+        }
+        
+        let response = prompt("Do these Game ID's look correct? (Y/N) \n" , gameIDsDisplay);
+        console.log(response);
+        
+
         // (<HTMLInputElement>document.getElementById('gameArea')).value = JSON.stringify(gameIDs);
        // let response = prompt("Do these Game ID's look correct? (Y/N) \n" + gameIDs);
         // if(response === "Y" || response === "Yes" || response === "YES" || response === "y" || response === "yes"){
