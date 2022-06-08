@@ -547,15 +547,35 @@ describe('Play Keyword Handling', () => {
         ]);
 
         expect(testCard.length).toEqual(3);
-        expect(
-            testCard.filter((element) => element.card === 'Artisan').length
-        ).toEqual(1);
-        expect(
-            testCard.filter((element) => element.card === 'Spy').length
-        ).toEqual(1);
-        expect(
-            testCard.filter((element) => element.card === 'Gold').length
-        ).toEqual(1);
+        expect(testCard).toContainEqual({
+            card: 'Artisan',
+            effect: [],
+            phase: 'action',
+            durationResolve: false,
+            usedVillagers: false
+        });
+        expect(testCard).toContainEqual({
+            card: 'Spy',
+            effect: [],
+            phase: 'attack',
+            durationResolve: false,
+            usedVillagers: false
+        });
+        expect(testCard).toContainEqual({
+            card: 'Gold',
+            effect: [],
+            phase: 'buy',
+            durationResolve: false,
+            usedVillagers: false
+        });
+    });
+
+    it('Valid multiple, single difference cards, Oxford comma', () => {
+        const testCard: PlayedCard[] = handlePlayKeyword([
+            'an', 'Artisan,', 'a', 'Spy,', 'and', 'a', 'Gold.'
+        ]);
+
+        expect(testCard.length).toEqual(3);
         expect(testCard).toContainEqual({
             card: 'Artisan',
             effect: [],
