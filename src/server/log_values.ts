@@ -86,10 +86,10 @@ export function isDeckEffect(pe: PlayerEffect): pe is DeckEffect {
     return pe.type === 'topdeck' && !isNaN(Number((pe as DeckEffect).topdeck));
 }
 
-// # of cards discarded
+// cards discarded
 export interface DiscardEffect extends PlayerEffect {
     type: 'discard';
-    discard: number;
+    discard: PlayedCard[];
 }
 
 export function isDiscardEffect(pe: PlayerEffect): pe is DiscardEffect {

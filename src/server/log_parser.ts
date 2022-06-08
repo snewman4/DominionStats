@@ -1,4 +1,4 @@
-import { PlayerTurn, PlayedCard, PlayerEffect, isGainEffect, isTrashEffect, isOtherPlayerEffect, isReactionEffect, isExileEffect } from './log_values';
+import { PlayerTurn, PlayedCard, PlayerEffect, isGainEffect, isTrashEffect, isOtherPlayerEffect, isReactionEffect, isExileEffect, GainEffect, ExileEffect, ReactionEffect, TrashEffect, DiscardEffect } from './log_values';
 import cards from './cards.json';
 import { UsernameMapping } from './common';
 
@@ -36,28 +36,28 @@ function trimLog(log: string): string[] {
     // This is not at all a good way to do this, but it does seem to work for every card we've tested so far
     log = log.replace(
         /<div style="display:inline; padding-left:2em; text-indent:-0.5em;">/g,
-        'EFFECT '
+        'spacing EFFECT 1 '
     );
     // Handles nested effects
     log = log.replace(
         /<div style="display:inline; padding-left:3.5em; text-indent:-0.5em;">/g,
-        'EFFECT EFFECT '
+        'spacing EFFECT 2 '
     );
     //Does the same but for the newer/other div method
     //Single effect
     log = log.replace(
         /<div style="padding-left: 4.[0-9]{0,20}%; width:93.[0-9]{0,20}%;" >/g,
-        'EFFECT'
+        'spacing EFFECT 1'
     );
     //Nested effect
     log = log.replace(
         /<div style="padding-left: 8.[0-9]{0,20}%; width:89.[0-9]{0,20}%;" >/g,
-        'EFFECT EFFECT'
+        'spacing EFFECT 2'
     );
     //Double nested effect
     log = log.replace(
         /<div style="padding-left: 11.[0-9]{0,20}%; width:86.[0-9]{0,20}%;" >/g,
-        'EFFECT EFFECT EFFECT'
+        'spacing EFFECT 3'
     );
 
     //Removes < > and any characters between them
@@ -186,6 +186,7 @@ export function handleTurn(
     let activePlayer = '';
     let playedCards: PlayedCard[] = [];
     let purchasedCards: PlayedCard[] = [];
+    let activeCards: PlayedCard[] = [{} as PlayedCard];
 
     for (let sentence of splitTurn) {
         let splitSentence = sentence.split(' ');
@@ -200,15 +201,57 @@ export function handleTurn(
 
             switch (keyword) {
                 //Handles a played card
+                case 'EFFECT':
+                    if(Number(splitSentence[2]) - 1 > activeCards.length){
+                        throw new Error('There was an error with effect processing with line: ' + sentence);
+                    }else{
+                        //Sets up the effect
+                        let effect = handleEffect(splitSentence.slice(3), 'action');
+                        activeCards[Number(splitSentence[2]) - 1].effect.push(effect);
+                        //console.log(activeCards[Number(splitSentence[1]) - 1]);
+                        let activeCard = {};
+
+                        //If the effect can cause other effects
+                        if(effect.type === 'gain'){
+                            let gainEffect = effect as GainEffect;
+                            activeCard = gainEffect.gain[gainEffect.gain.length -1]; //Just using last card for now
+                        }else if(effect.type === 'trash'){
+                            let trashEffect = effect as TrashEffect;
+                            activeCard = trashEffect.trash[trashEffect.trash.length - 1];
+                        }else if(effect.type === 'discard'){
+                            let discardEffect = effect as DiscardEffect;
+                            activeCard = discardEffect.discard[discardEffect.discard.length - 1];
+                        }else if(effect.type === 'reaction'){
+                            let reactionEffect = effect as ReactionEffect;
+                            activeCard = reactionEffect.reaction;
+                        }else if(effect.type === 'exile'){
+                            let exileEffect = effect as ExileEffect;
+                            activeCard = exileEffect.exile[exileEffect.exile.length - 1];
+                        }
+
+                        //If the effect is an effect that can cause other effects
+                        if(Object.keys(activeCard).length !== 0){
+                            //If activeCard has a value
+                            if(activeCards.length - 1 < Number(splitSentence[2]) ){
+                                //Need to append
+                                activeCards.push(activeCard as PlayedCard);
+                            }else{
+                                activeCards[Number(splitSentence[2])] = activeCard as PlayedCard;
+                            }
+                        }
+                    }
+                    break;
                 case 'plays':
                     playedCards = playedCards.concat(
                         handlePlayKeyword(splitSentence.slice(2))
                     );
+                    activeCards[0] = playedCards[playedCards.length - 1];
                     break;
                 case 'buys':
                     purchasedCards = purchasedCards.concat(
                         handleBuyKeyword(splitSentence.slice(2))
                     );
+                    activeCards[0] = playedCards[playedCards.length - 1];
                     break;
             }
         }
@@ -340,7 +383,7 @@ export function handleBuyKeyword(
 }
 
 // Make sure to check for 'EFFECT' and 'EFFECT EFFECT' before passing into this
-export function handleEffect(sentence: string[], phase: string) {
+export function handleEffect(sentence: string[], phase: string){
     if (sentence.length < 3)
         throw new Error('Effect too short: ' + sentence.join(' '));
     let player: string = sentence[0];
@@ -414,7 +457,7 @@ export function handleEffect(sentence: string[], phase: string) {
             return {
                 type: 'discard',
                 player: player,
-                discard: numCards(sentence.slice(2), 0)
+                discard: listCards(sentence.slice(2), 0)
             };
 
         // Some cards, i.e. Scepter, allow you to play another card
@@ -441,7 +484,11 @@ export function handleEffect(sentence: string[], phase: string) {
             };
 
         default:
-            return null; // some effects are not tracked, and null represents that
+            //If the effect isn't identified here just return unknown
+            return {
+                type: 'unknown',
+                player: ''
+            };
     }
 }
 
