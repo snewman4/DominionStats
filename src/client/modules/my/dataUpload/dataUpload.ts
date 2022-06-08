@@ -25,8 +25,8 @@ export default class DataUploader extends LightningElement {
             gameIds.push(game.gameId);
         }
         let errorMessages = validateInput(dataList);
-        // Get file values
-        let fileString = '';
+        //get file values
+        let fileString = "";
         let fileText = this.template.querySelector(
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
@@ -106,9 +106,12 @@ export default class DataUploader extends LightningElement {
         if (fileText !== null && fileText.files !== null) {
             fileText.files[0].text().then((result) => {
                 fileString = result;
-                //console.log('file: ', result);
+                
                 fileString = this.replaceGameIds(fileString);
-                this.validatePlayers(JSON.parse(fileString));
+                //fileString = this.validatePlayers(JSON.parse(fileString));
+                console.log('OBJECT: ', this.validatePlayers(JSON.parse(fileString)));
+                
+                /*
                 fetch('api/v1/logUpload', {
                     method: 'POST',
                     headers: {
@@ -116,6 +119,7 @@ export default class DataUploader extends LightningElement {
                     },
                     body: fileString
                 });
+                */
                 // TODO : Handle the response, potential error handling
             });
         }
@@ -217,10 +221,9 @@ export default class DataUploader extends LightningElement {
         return file;
     }
        
-    validatePlayers(file:Object): Object{
+    validatePlayers(file:Object): Object {
         let players: string[] = [];
         for(let key in file){
-            console.log('test', key)
             players = file[key]['players'];
             fetch('api/v1/usernameCheck', {
                 method: 'POST',
@@ -230,7 +233,9 @@ export default class DataUploader extends LightningElement {
                 body: JSON.stringify(players)}).then((response) => {
                     //check response from server
                     if (response.status == 200) {
-                        file[key]['players'] = response.body;
+                        response.json().then((json) => {
+                            file[key]['players'] = json;
+                        });
                     }
             });
         }
