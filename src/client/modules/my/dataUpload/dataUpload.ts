@@ -97,6 +97,30 @@ export default class DataUploader extends LightningElement {
         }
     }
 
+    uploadFile(): void {
+        //get file values
+        let fileString: string = "";
+        let fileText = this.template.querySelector(
+            'input[name="file-upload-input-107"]'
+        ) as HTMLInputElement;
+        if (fileText !== null && fileText.files !== null) {
+            fileText.files[0].text().then((result) => {
+                fileString = result;
+                console.log('file: ', result);
+                fileString = this.replaceGameIds(fileString);
+                fetch('api/v1/logUpload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: fileString
+                });
+                // TODO : Handle the response, potential error handling
+            });
+        }
+
+    }
+
     setErrorMessages(errorMessages: string[]): void {
         this.errorMessages = errorMessages;
         this.showErrors = errorMessages.length > 0;
@@ -140,16 +164,14 @@ export default class DataUploader extends LightningElement {
         let oldFile = file;
         while(file.indexOf("\"#") !== -1){
             replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
-            /*
-            let tester: string = file.substring(file.indexOf("\"date\"") + 2);
-            console.log(tester);
+            //Checks if log.json has a space after "date":
+            let tester: string = "";
+            tester += file.substring(file.indexOf("\"date\"") + 7, file.indexOf("\"date\"") + 8);
             if(tester === " "){
                 newGameID = file.substring(file.indexOf("\"date\"") + 15,file.indexOf("\"date\"") + 19 ) + file.substring(file.indexOf("\"date\"") + 12,file.indexOf("\"date\"") + 14) + file.substring(file.indexOf("\"date\"") + 9,file.indexOf("\"date\"") + 11 ) + letter;
             } else {
-                newGameID = "Test";
+                newGameID = file.substring(file.indexOf("\"date\"") + 14,file.indexOf("\"date\"") + 18 ) + file.substring(file.indexOf("\"date\"") + 11,file.indexOf("\"date\"") + 13) + file.substring(file.indexOf("\"date\"") + 8,file.indexOf("\"date\"") + 10 ) + letter;
             }
-            */
-            newGameID = file.substring(file.indexOf("\"date\"") + 15,file.indexOf("\"date\"") + 19 ) + file.substring(file.indexOf("\"date\"") + 12,file.indexOf("\"date\"") + 14) + file.substring(file.indexOf("\"date\"") + 9,file.indexOf("\"date\"") + 11 ) + letter;
             gameIDs.push(newGameID);
             letter = String.fromCharCode(letter.charCodeAt(0) + 1);
             dateString = file.substring(file.indexOf("\"date\""), file.indexOf("\"date\"") + 6);
@@ -173,8 +195,8 @@ export default class DataUploader extends LightningElement {
             gameIDsDisplay += ids + " ";
         }
         
-        let response = prompt("Do these Game ID's look correct? (Y/N) \n" , gameIDsDisplay);
-        console.log(response);
+        //let response = prompt("Do these Game ID's look correct? (Y/N) \n" , gameIDsDisplay);
+        //console.log(response);
         
 
         // (<HTMLInputElement>document.getElementById('gameArea')).value = JSON.stringify(gameIDs);
