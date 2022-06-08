@@ -11,6 +11,7 @@ export default class DataUploader extends LightningElement {
     defaultGameId = `${year}${month}${day}a`;
     errorMessages: string[] = [];
     showErrors = false;
+    showGameArea = false;
 
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
@@ -117,6 +118,16 @@ export default class DataUploader extends LightningElement {
         }
         return '';
     }
+
+    setValueFromInput(name: string, gameIDs: string[]): void {
+        const e: HTMLInputElement | null = this.template.querySelector(
+            'textarea[name="' + name + '"]'
+        );
+        if (e) {
+            e.value = JSON.stringify(gameIDs);
+        }
+    }
+
     //Replace each gameID in file with new format based on the date
     replaceGameIds(file:string):string{
         let replace: string = "";
@@ -144,13 +155,18 @@ export default class DataUploader extends LightningElement {
             file = file.replace(replace, newGameID);
         }
         //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
-        let response = prompt("Do these Game ID's look correct? (Y/N) \n" + gameIDs);
-        if(response === "Y" || response === "Yes" || response === "YES" || response === "y" || response === "yes"){
-            return file;
-        }
-        else{
-            return oldFile;
-        }
+        this.showGameArea = true;
+        this.setValueFromInput("gameInputArea", gameIDs);
+        debugger;
+        // (<HTMLInputElement>document.getElementById('gameArea')).value = JSON.stringify(gameIDs);
+       // let response = prompt("Do these Game ID's look correct? (Y/N) \n" + gameIDs);
+        // if(response === "Y" || response === "Yes" || response === "YES" || response === "y" || response === "yes"){
+        //     return file;
+        // }
+        // else{
+        //     return oldFile;
+        // }
+        return file;
     }
        
     
