@@ -136,7 +136,7 @@ export default class DataUploader extends LightningElement {
      */
     getValueFromInput(name: string): string {
         const e: HTMLInputElement | null = this.template.querySelector(
-            'textarea[name=' + name + ']'
+            'textarea[name="' + name + '"]'
         );
         if (e) {
             return e.value.trim();
@@ -177,6 +177,7 @@ export default class DataUploader extends LightningElement {
             } else {
                 newGameID = file.substring(file.indexOf("\"date\"") + 14,file.indexOf("\"date\"") + 18 ) + file.substring(file.indexOf("\"date\"") + 11,file.indexOf("\"date\"") + 13) + file.substring(file.indexOf("\"date\"") + 8,file.indexOf("\"date\"") + 10 ) + letter;
             }
+            
             gameIDs.push(newGameID);
             letter = String.fromCharCode(letter.charCodeAt(0) + 1);
             dateString = file.substring(file.indexOf("\"date\""), file.indexOf("\"date\"") + 6);
@@ -187,8 +188,10 @@ export default class DataUploader extends LightningElement {
                 currentDate = date;
             }
             //These lines will actually replace the gameIDs in the file
+            /*
             file = file.replace(dateString, "\"Date\"");
             file = file.replace(replace, newGameID);
+            */
         }
         //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
         this.showGameArea = true;
@@ -215,6 +218,28 @@ export default class DataUploader extends LightningElement {
         //     return oldFile;
         // }
         return file;
+    }
+
+    replaceGameIDs(): void{
+        //gets value from textarea
+        let newGameIDs: string[] = [];
+        let textBlob: string = this.getValueFromInput('gameInputArea');
+        textBlob.split(/[\r\n]+/).forEach((line: string) => {
+            newGameIDs.push(line);
+        });
+        for(let i = 0; i < newGameIDs.length; i++){
+            console.log(newGameIDs[i]);
+        }
+        this.showGameArea = false;
+        /*
+        let dataList: GameData[] = this.processLine(textBlob);
+        let gameIds: string[] = [];
+        console.log(textBlob);
+        console.log("hi");
+        for(let game of dataList){
+            gameIds.push(game.gameId);
+        }
+        */
     }
        
     validatePlayers(file:Object): Object{

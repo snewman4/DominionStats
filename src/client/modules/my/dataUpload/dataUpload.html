@@ -36,6 +36,7 @@
 
     <div class="slds-text-heading_small"><b>Upload game log file(s):</b></div>
 
+    <template if:false={showGameArea}></template>
     <div class="slds-form-element">
         <span
             class="slds-form-element__label"
@@ -84,8 +85,10 @@
         onclick={uploadFile}
         ></lightning-button>
     </template>
-    
-    <br />
+
+    <template if:true={showGameArea}>
+        <div class="slds-text-body_small">Please confirm that these gameIDs are correct.</div>
+    </template>
 
     <div class="slds-form-element__control">
         <template if:true={showGameArea}>
@@ -99,6 +102,14 @@
             </textarea>
         </template>
     </div>
+
+    <template if:true={showGameArea}>
+        <lightning-button
+        label="Confirm"
+        variant="brand-outline"
+        onclick={replaceGameIDs}
+        ></lightning-button>
+    </template>
 
     <br />
 
