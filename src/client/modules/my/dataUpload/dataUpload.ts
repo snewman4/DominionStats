@@ -192,10 +192,10 @@ export default class DataUploader extends LightningElement {
                 currentDate = date;
             }
             //These lines will actually replace the gameIDs in the file
-            /*
+            
             file = file.replace(dateString, "\"Date\"");
             file = file.replace(replace, newGameID);
-            */
+            
         }
         //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
         this.showGameArea = true;
