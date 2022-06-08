@@ -7,3 +7,8 @@ export interface PlayerData {
     playerPlace: number;
     victoryPoints: number;
 }
+export interface UsernameData {
+    username: string;
+    playerName: string;
+    playerSymbol: string;
+}

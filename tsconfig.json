@@ -87,6 +87,7 @@
             "my/userLink": ["src/client/modules/my/userLink/userLink.ts"]
         }
     },
+    "include": ["src/**/*", "src/server/cards.json"],
     "exclude": [
         "build",
         "node_modules/**",

@@ -1,3 +1,5 @@
+import type { PlayerTurn } from './log_values';
+
 export interface TestObject {
     id: number;
     name: string;
@@ -53,7 +55,30 @@ export type GameResultsFormResult =
     | DevErrorResult
     | SuccessResult;
 
+export interface NameSuccessResult {
+    status: 200;
+    results: UsernameMapping[];
+}
+
+export type UsernameFormResult =
+    | UserErrorResult
+    | DevErrorResult
+    | NameSuccessResult;
+
+export interface LogSuccessResult {
+    status: 200;
+    results: PlayerTurn[];
+}
+
+export type LogFormResult = UserErrorResult | DevErrorResult | LogSuccessResult;
+
 export interface DominionUser {
     email: string;
     name: string;
+}
+
+export interface UsernameMapping {
+    username: string;
+    playerName: string | undefined;
+    playerSymbol: string | undefined;
 }

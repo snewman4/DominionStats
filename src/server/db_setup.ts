@@ -2,14 +2,19 @@ import pg from 'pg';
 const Pool = pg.Pool;
 import { migrate } from 'postgres-migrations';
 import { validateGameData } from './validation';
+import { parseLog } from './log_parser';
 import type {
     TestObject,
     GameResultsDB,
     ErrorObject,
     GameResultsForm,
     PlayerResultForm,
-    GameResultsFormResult
+    GameResultsFormResult,
+    UsernameFormResult,
+    LogFormResult,
+    UsernameMapping
 } from './common';
+import type { PlayerTurn } from './log_values';
 
 /**
  * Single global pool to be used for all queries
@@ -258,24 +263,161 @@ export async function insertGameResults(
     }
 }
 
-//Function for adding a log to the log database
-export async function insertLog(log: string): Promise<GameResultsFormResult> {
-    //TODO: implement
+// Function to verify the existence of usernames in the DB
+export async function usernameCheck(
+    usernames: string[]
+): Promise<UsernameFormResult> {
+    let userList: UsernameMapping[] = [];
+    let allErrors: ErrorObject[] = [];
 
-    //Parse the data
-    log = trimLog(log);
-    console.log(log);
+    //Create an array of $#'s
+    let params: string[] = [];
+    for (let i = 1; i <= usernames.length; i++) {
+        params.push('$' + i);
+    }
 
-    //Placeholder return statement
-    return { status: 200, results: [] };
+    // TODO : Convert to simpler method : ... WHERE game_label = ANY($1::string[])
+    // https://stackoverflow.com/questions/10720420/node-postgres-how-to-execute-where-col-in-dynamic-value-list-query
+    let queryText: string =
+        'SELECT DISTINCT * FROM known_usernames WHERE username IN (' +
+        params.join(',') +
+        ')';
+    const res = await pool.query(queryText, usernames);
+
+    // Add elements that were defined in the database
+    for (let row of res.rows) {
+        userList.push({
+            username: row.username,
+            playerName: row.player_name,
+            playerSymbol: undefined
+        });
+    }
+
+    // Add elements that were not defined in the database
+    for (let username of usernames) {
+        if (
+            userList.filter((element) => element.username === username)
+                .length === 0
+        ) {
+            userList.push({
+                username: username,
+                playerName: undefined,
+                playerSymbol: undefined
+            });
+        }
+    }
+
+    // Attempt to generate unique symbols
+    try {
+        userList = userSymbolGenerator(userList);
+    } catch (e: any) {
+        console.log('Username symbol error: ' + e.message);
+        allErrors.push({ status: 'error', error: e.message });
+    }
+
+    if (allErrors.length != 0) {
+        return { status: 400, results: allErrors };
+    }
+    return { status: 200, results: userList };
 }
 
-//Helper function for trimming a log
-function trimLog(log: string): string {
-    //TODO: implement, may need more processing
+// Helper function to generate username symbols
+export function userSymbolGenerator(
+    names: UsernameMapping[]
+): UsernameMapping[] {
+    let dupSym: string | undefined;
+    for (let name of names) {
+        // If duplicate username, error
+        if (
+            names.filter((element) => element.username === name.username)
+                .length > 1
+        )
+            throw new Error(
+                'Duplicate usernames in player names: ' + name.username
+            );
+        // If symbols are undefined
+        if (name.playerSymbol === undefined)
+            name.playerSymbol = name.username[0];
+        // Check for duplicate symbols
+        if (
+            names.filter(
+                (element) => element.playerSymbol === name.playerSymbol
+            ).length > 1
+        ) {
+            dupSym = name.playerSymbol;
+            break;
+        }
+    }
 
-    //Removes < > and any characters between them, will not work with nested tags but should be fine with the HTML elements in the logs
-    log = log.replace(/<[\s\S]*?>/g, '');
+    // No duplicates
+    if (dupSym === undefined) return names;
 
-    return log;
+    let duplicateNames = names.filter(
+        (element) => element.playerSymbol === dupSym
+    );
+    let updated = false; // Makes sure that at least one element was updated
+    for (let name of duplicateNames) {
+        if (name.username.length > dupSym.length) {
+            // For each name, add an extra character to the symbol
+            name.playerSymbol = name.username.slice(0, dupSym.length + 1);
+            updated = true;
+        }
+        // If the symbol is as long as the username, then it cannot be extended further
+    }
+    if (!updated)
+        throw new Error(
+            'Unable to generate unique symbol. Closest form: ' + dupSym
+        );
+    return userSymbolGenerator(names);
+}
+
+//Function for adding a log to the log database
+export async function insertLog(log: object): Promise<LogFormResult> {
+    let allErrors: ErrorObject[] = [];
+    let allTurns: PlayerTurn[] = [];
+    // TODO: implement
+    let gameID: string;
+    let players: UsernameMapping[];
+    let gameLog: string;
+    for (let key in log) {
+        gameID = log[key]['gameID'];
+        // TODO : Check player usernames against DB
+        // TODO : May need to use JSON.parse() and some other things to get this to work
+        players = log[key]['players'];
+
+        // TODO : Remove, currently for testing usernames
+        console.log(players);
+
+        gameLog = log[key]['log'];
+        // Check that all of the above elements actually exist in log
+        if (
+            gameID === undefined ||
+            players === undefined ||
+            gameLog === undefined
+        ) {
+            allErrors.push({
+                status: 'error',
+                error: 'Log does not match expected format'
+            });
+            break;
+        } else {
+            // TODO : Verify that this error handling actually catches correctly,
+            // and returns the correct message
+            try {
+                allTurns = parseLog(gameID, players, gameLog);
+            } catch (e: any) {
+                console.log('Log error: ' + e.message);
+                allErrors.push({
+                    status: 'error',
+                    error: e.message
+                });
+            }
+        }
+    }
+
+    if (allErrors.length != 0) {
+        return { status: 400, results: allErrors };
+    } else {
+        return { status: 200, results: allTurns };
+    }
 }
