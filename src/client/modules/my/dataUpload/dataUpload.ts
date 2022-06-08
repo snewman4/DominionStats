@@ -11,6 +11,7 @@ export default class DataUploader extends LightningElement {
     defaultGameId = `${year}${month}${day}a`;
     errorMessages: string[] = [];
     showErrors = false;
+    showGameArea = false;
 
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
@@ -19,16 +20,21 @@ export default class DataUploader extends LightningElement {
         //gets value from textarea
         let textBlob: string = this.getValueFromInput('textArea');
         let dataList: GameData[] = this.processLine(textBlob);
+        let gameIds: string[] = [];
+        for(let game of dataList){
+            gameIds.push(game.gameId);
+        }
         let errorMessages = validateInput(dataList);
-        // Get file values
-        let fileString = '';
+        //get file values
+        let fileString = "";
         let fileText = this.template.querySelector(
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
         if (fileText !== null && fileText.files !== null) {
             fileText.files[0].text().then((result) => {
-                console.log('file: ', result);
                 fileString = result;
+               // console.log('file: ', result);
+                fileString = this.replaceGameIds(fileString);
                 fetch('api/v1/logUpload', {
                     method: 'POST',
                     headers: {
@@ -60,7 +66,7 @@ export default class DataUploader extends LightningElement {
                     location.reload();
                 }
                 //refresh page
-                else if (response.status >= 400) {
+                 else if (response.status >= 400) {
                     //If there has been a duplicate error
                     if (response.status == 409) {
                         response
@@ -91,6 +97,31 @@ export default class DataUploader extends LightningElement {
         }
     }
 
+    uploadFile(): void {
+        //get file values
+        let fileString = "";
+        let fileText = this.template.querySelector(
+            'input[name="file-upload-input-107"]'
+        ) as HTMLInputElement;
+        if (fileText !== null && fileText.files !== null) {
+            fileText.files[0].text().then((result) => {
+                fileString = result;
+                //console.log('file: ', result);
+                fileString = this.replaceGameIds(fileString);
+                this.validatePlayers(JSON.parse(fileString));
+                fetch('api/v1/logUpload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: fileString
+                });
+                // TODO : Handle the response, potential error handling
+            });
+        }
+        this.showGameArea = true;
+    }
+
     setErrorMessages(errorMessages: string[]): void {
         this.errorMessages = errorMessages;
         this.showErrors = errorMessages.length > 0;
@@ -105,12 +136,105 @@ export default class DataUploader extends LightningElement {
      */
     getValueFromInput(name: string): string {
         const e: HTMLInputElement | null = this.template.querySelector(
-            'textarea[name="' + name + '"]'
+            'textarea[name=' + name + ']'
         );
         if (e) {
             return e.value.trim();
         }
         return '';
+    }
+
+    setValueFromInput(name: string, gameIDs: string[]): void {
+        const e: HTMLInputElement | null = this.template.querySelector(
+            'textarea[name="' + name + '"]'
+        );
+        let gameIDsDisplay: string = "";
+        for(let i = 0; i < gameIDs.length; i++){
+            gameIDsDisplay += gameIDs[i] + "\n";
+        }
+        if(e){
+            e.value = gameIDsDisplay;
+        }
+    }
+
+    //Replace each gameID in file with new format based on the date
+    replaceGameIds(file:string):string{
+        let replace = "";
+        let date = "";
+        let dateString = "";
+        let currentDate = file.substring(file.indexOf("\"date\"") + 9, file.indexOf("\"date\"") + 19);
+        let newGameID = "";
+        let letter = "a";
+        let gameIDs: string[] = [];
+        let oldFile = file;
+        while(file.indexOf("\"#") !== -1){
+            replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
+            //Checks if log.json has a space after "date":
+            let tester = "";
+            tester += file.substring(file.indexOf("\"date\"") + 7, file.indexOf("\"date\"") + 8);
+            if(tester === " "){
+                newGameID = file.substring(file.indexOf("\"date\"") + 15,file.indexOf("\"date\"") + 19 ) + file.substring(file.indexOf("\"date\"") + 12,file.indexOf("\"date\"") + 14) + file.substring(file.indexOf("\"date\"") + 9,file.indexOf("\"date\"") + 11 ) + letter;
+            } else {
+                newGameID = file.substring(file.indexOf("\"date\"") + 14,file.indexOf("\"date\"") + 18 ) + file.substring(file.indexOf("\"date\"") + 11,file.indexOf("\"date\"") + 13) + file.substring(file.indexOf("\"date\"") + 8,file.indexOf("\"date\"") + 10 ) + letter;
+            }
+            gameIDs.push(newGameID);
+            letter = String.fromCharCode(letter.charCodeAt(0) + 1);
+            dateString = file.substring(file.indexOf("\"date\""), file.indexOf("\"date\"") + 6);
+            date = file.substring(file.indexOf("\"date\"") + 9, file.indexOf("\"date\"") + 19);
+            //if date changes, reset letter to 'a'
+            if(date !== currentDate){
+                letter = "a";
+                currentDate = date;
+            }
+            //These lines will actually replace the gameIDs in the file
+            file = file.replace(dateString, "\"Date\"");
+            file = file.replace(replace, newGameID);
+        }
+        //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
+        this.showGameArea = true;
+        this.setValueFromInput("gameInputArea", gameIDs);
+        
+        /*
+         //Prompt test stuff
+        let gameIDsDisplay = "";
+        for(let ids of gameIDs){
+            gameIDsDisplay += ids + " ";
+        }
+        */
+        
+        //let response = prompt("Do these Game ID's look correct? (Y/N) \n" , gameIDsDisplay);
+        //console.log(response);
+        
+
+        // (<HTMLInputElement>document.getElementById('gameArea')).value = JSON.stringify(gameIDs);
+       // let response = prompt("Do these Game ID's look correct? (Y/N) \n" + gameIDs);
+        // if(response === "Y" || response === "Yes" || response === "YES" || response === "y" || response === "yes"){
+        //     return file;
+        // }
+        // else{
+        //     return oldFile;
+        // }
+        return file;
+    }
+       
+    validatePlayers(file:Object): Object{
+        let players: string[] = [];
+        for(let key in file){
+            console.log('test', key)
+            players = file[key]['players'];
+            fetch('api/v1/usernameCheck', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(players)}).then((response) => {
+                    //check response from server
+                    if (response.status == 200) {
+                        file[key]['players'] = response.body;
+                    }
+            });
+        }
+        return file;
     }
 
     processLine(textBlob: string): GameData[] {

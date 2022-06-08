@@ -1,5 +1,5 @@
 <template>
-    <div class="slds-text-heading_small"><b>Enter game results below:</b></div>
+    <div class="slds-text-heading_small"><b>Insert game results:</b></div>
 
     <div class="slds-form-element">
         <label class="slds-form-element__label" for="textarea-id-01"
@@ -17,11 +17,24 @@
                 name="textArea"
                 rows="5"
                 class="slds-textarea"
-                placeholder="Ex. 20220525a Matthew 1 64"
+                placeholder="Ex. 20220525a 1 Matthew 64"
             >
             </textarea>
         </div>
     </div>
+
+    <div class="slds-text-body_small">This submit button refreshes the page.  Please upload game logs before submitting game results.</div>
+
+    <lightning-button
+    label="Submit"
+    variant="brand-outline"
+    onclick={gatherDataAndSend}
+    ></lightning-button>
+
+    <br />
+    <br />
+
+    <div class="slds-text-heading_small"><b>Upload game log file(s):</b></div>
 
     <div class="slds-form-element">
         <span
@@ -34,7 +47,7 @@
                     <input
                         type="file"
                         class="slds-file-selector__input slds-assistive-text"
-                        accept="image/json"
+                        accept=".json"
                         name="file-upload-input-107"
                         id="file-upload-input-107"
                         aria-labelledby="file-selector-primary-label-105 file-selector-secondary-label106"
@@ -54,10 +67,7 @@
                                 <use
                                     xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#upload"
                                 ></use></svg
-                            >Upload Game Logs</span
-                        >
-                        <span class="slds-file-selector__text slds-medium-show"
-                            >or Drop Files</span
+                            >Select Game Log File</span
                         >
                     </label>
                 </div>
@@ -67,11 +77,30 @@
 
     <br />
 
-    <lightning-button
-        label="Submit"
+    <template if:false={showGameArea}>
+        <lightning-button
+        label="Upload"
         variant="brand-outline"
-        onclick={gatherDataAndSend}
-    ></lightning-button>
+        onclick={uploadFile}
+        ></lightning-button>
+    </template>
+    
+    <br />
+
+    <div class="slds-form-element__control">
+        <template if:true={showGameArea}>
+            <textarea
+                id="gameInputArea"
+                name="gameInputArea"
+                rows="5"
+                class="slds-textarea"
+                placeholder="Testing input"
+            >
+            </textarea>
+        </template>
+    </div>
+
+    <br />
 
     <br />
 
