@@ -308,6 +308,64 @@ describe('Buy Keyword Handling', () => {
         ]);
     });
 
+    it('Valid input of a list of cards', () => {
+        const testCard: PlayedCard[] = handleBuyKeyword([
+            'an', 'Explorer,', 'a', 'Forager', 'and', 'a', 'Duke.'
+        ]);
+
+        expect(testCard.length).toEqual(3);
+        expect(testCard).toContainEqual({
+            card: 'Explorer',
+            effect: [],
+            phase: 'buy',
+            durationResolve: false,
+            usedVillagers: false
+        });
+        expect(testCard).toContainEqual({
+            card: 'Forager',
+            effect: [],
+            phase: 'buy',
+            durationResolve: false,
+            usedVillagers: false
+        });
+        expect(testCard).toContainEqual({
+            card: 'Duke',
+            effect: [],
+            phase: 'buy',
+            durationResolve: false,
+            usedVillagers: false
+        });
+    });
+
+    it('Valid input of a list of cards, Oxford comma', () => {
+        const testCard: PlayedCard[] = handleBuyKeyword([
+            'an', 'Explorer,', 'a', 'Forager,', 'and', 'a', 'Duke.'
+        ]);
+
+        expect(testCard.length).toEqual(3);
+        expect(testCard).toContainEqual({
+            card: 'Explorer',
+            effect: [],
+            phase: 'buy',
+            durationResolve: false,
+            usedVillagers: false
+        });
+        expect(testCard).toContainEqual({
+            card: 'Forager',
+            effect: [],
+            phase: 'buy',
+            durationResolve: false,
+            usedVillagers: false
+        });
+        expect(testCard).toContainEqual({
+            card: 'Duke',
+            effect: [],
+            phase: 'buy',
+            durationResolve: false,
+            usedVillagers: false
+        });
+    });
+
     it('Valid input of strange combination', () => {
         const testCard: PlayedCard[] = handleBuyKeyword([
             'a',

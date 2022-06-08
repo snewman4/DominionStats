@@ -460,8 +460,14 @@ function listCards(sentence: string[], phase) {
     if (sentence.join().indexOf(',') != -1) {
         for (let i = 0; i < sentence.length; i++) {
             if (sentence[i].slice(-1) === ',') {
+                let sliceIndex: number;
+                // The following is necessary in the event of an Oxford comma
+                if (sentence[i + 1] === 'and')
+                    sliceIndex = i + 2;
+                else
+                    sliceIndex = i + 1;
                 retList = retList.concat(
-                    listCards(sentence.slice(i + 1), phase)
+                    listCards(sentence.slice(sliceIndex), phase)
                 );
                 sentence = sentence.slice(0, i + 1);
                 break;
@@ -491,7 +497,7 @@ function listCards(sentence: string[], phase) {
         isNaN(Number(sentence[0]))
     ) {
         //If there isn't a leading a/an/number
-        cardName = sentence.slice(0).join(' ');
+        cardName = sentence.join(' ');
     } else {
         //Else there is a leading a/an/number
         cardName = sentence.slice(1).join(' ');
