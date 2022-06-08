@@ -23,8 +23,6 @@
         </div>
     </div>
 
-
-
     <div class="slds-form-element">
         <span
             class="slds-form-element__label"
@@ -68,16 +66,16 @@
     </div>
 
     <lightning-button
-    label="Upload"
-    variant="brand-outline"
-    onclick={uploadFile}
+        label="Upload"
+        variant="brand-outline"
+        onclick={uploadFile}
     ></lightning-button>
 
     <br />
 
     <div class="slds-form-element__control">
         <template if:true={showGameArea}>
-         <textarea
+            <textarea
                 id="gameInputArea"
                 name="gameInputArea"
                 rows="5"
@@ -91,156 +89,156 @@
     <br />
 
     <div class="slds-hide">
-    <table class="slds-size_small">
-        <thead class="slds-text-align_center">
-            <tr>
-                <th>Player Name</th>
-                <th>Place</th>
-                <th>Victory Points</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="text"
-                        name="playerName1"
-                    />
-                </td>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="number"
-                        name="playerPlace1"
-                    />
-                </td>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="number"
-                        name="victoryPoints1"
-                    />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="text"
-                        name="playerName2"
-                    />
-                </td>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="number"
-                        name="playerPlace2"
-                    />
-                </td>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="number"
-                        name="victoryPoints2"
-                    />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="text"
-                        name="playerName3"
-                    />
-                </td>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="number"
-                        name="playerPlace3"
-                    />
-                </td>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="number"
-                        name="victoryPoints3"
-                    />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="text"
-                        name="playerName4"
-                    />
-                </td>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="number"
-                        name="playerPlace4"
-                    />
-                </td>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="number"
-                        name="victoryPoints4"
-                    />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="text"
-                        name="playerName5"
-                    />
-                </td>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="number"
-                        name="playerPlace5"
-                    />
-                </td>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="number"
-                        name="victoryPoints5"
-                    />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="text"
-                        name="playerName6"
-                    />
-                </td>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="number"
-                        name="playerPlace6"
-                    />
-                </td>
-                <td>
-                    <input
-                        class="slds-input"
-                        type="number"
-                        name="victoryPoints6"
-                    />
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+        <table class="slds-size_small">
+            <thead class="slds-text-align_center">
+                <tr>
+                    <th>Player Name</th>
+                    <th>Place</th>
+                    <th>Victory Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="text"
+                            name="playerName1"
+                        />
+                    </td>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="number"
+                            name="playerPlace1"
+                        />
+                    </td>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="number"
+                            name="victoryPoints1"
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="text"
+                            name="playerName2"
+                        />
+                    </td>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="number"
+                            name="playerPlace2"
+                        />
+                    </td>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="number"
+                            name="victoryPoints2"
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="text"
+                            name="playerName3"
+                        />
+                    </td>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="number"
+                            name="playerPlace3"
+                        />
+                    </td>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="number"
+                            name="victoryPoints3"
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="text"
+                            name="playerName4"
+                        />
+                    </td>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="number"
+                            name="playerPlace4"
+                        />
+                    </td>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="number"
+                            name="victoryPoints4"
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="text"
+                            name="playerName5"
+                        />
+                    </td>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="number"
+                            name="playerPlace5"
+                        />
+                    </td>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="number"
+                            name="victoryPoints5"
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="text"
+                            name="playerName6"
+                        />
+                    </td>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="number"
+                            name="playerPlace6"
+                        />
+                    </td>
+                    <td>
+                        <input
+                            class="slds-input"
+                            type="number"
+                            name="victoryPoints6"
+                        />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <br />
 
@@ -261,4 +259,3 @@
         </template>
     </template>
 </template>
-    

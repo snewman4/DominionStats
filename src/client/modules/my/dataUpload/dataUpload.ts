@@ -26,14 +26,14 @@ export default class DataUploader extends LightningElement {
         }
         let errorMessages = validateInput(dataList);
         //get file values
-        let fileString: string = "";
+        let fileString = "";
         let fileText = this.template.querySelector(
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
         if (fileText !== null && fileText.files !== null) {
             fileText.files[0].text().then((result) => {
                 fileString = result;
-                console.log('file: ', result);
+               // console.log('file: ', result);
                 fileString = this.replaceGameIds(fileString);
                 fetch('api/v1/logUpload', {
                     method: 'POST',
@@ -99,15 +99,16 @@ export default class DataUploader extends LightningElement {
 
     uploadFile(): void {
         //get file values
-        let fileString: string = "";
+        let fileString = "";
         let fileText = this.template.querySelector(
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
         if (fileText !== null && fileText.files !== null) {
             fileText.files[0].text().then((result) => {
                 fileString = result;
-                console.log('file: ', result);
+                //console.log('file: ', result);
                 fileString = this.replaceGameIds(fileString);
+                this.validatePlayers(JSON.parse(fileString));
                 fetch('api/v1/logUpload', {
                     method: 'POST',
                     headers: {
@@ -154,18 +155,18 @@ export default class DataUploader extends LightningElement {
 
     //Replace each gameID in file with new format based on the date
     replaceGameIds(file:string):string{
-        let replace: string = "";
-        let date: string = "";
-        let dateString: string = "";
+        let replace = "";
+        let date = "";
+        let dateString = "";
         let currentDate = file.substring(file.indexOf("\"date\"") + 9, file.indexOf("\"date\"") + 19);
-        let newGameID: string = "";
+        let newGameID = "";
         let letter = "a";
         let gameIDs: string[] = [];
         let oldFile = file;
         while(file.indexOf("\"#") !== -1){
             replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
             //Checks if log.json has a space after "date":
-            let tester: string = "";
+            let tester = "";
             tester += file.substring(file.indexOf("\"date\"") + 7, file.indexOf("\"date\"") + 8);
             if(tester === " "){
                 newGameID = file.substring(file.indexOf("\"date\"") + 15,file.indexOf("\"date\"") + 19 ) + file.substring(file.indexOf("\"date\"") + 12,file.indexOf("\"date\"") + 14) + file.substring(file.indexOf("\"date\"") + 9,file.indexOf("\"date\"") + 11 ) + letter;
@@ -190,7 +191,7 @@ export default class DataUploader extends LightningElement {
         this.setValueFromInput("gameInputArea", gameIDs);
         
          //Prompt test stuff
-        let gameIDsDisplay: string = "";
+        let gameIDsDisplay = "";
         for(let ids of gameIDs){
             gameIDsDisplay += ids + " ";
         }
@@ -210,7 +211,25 @@ export default class DataUploader extends LightningElement {
         return file;
     }
        
-    
+    validatePlayers(file:Object): Object{
+        let players: string[] = [];
+        for(let key in file){
+            console.log('test', key)
+            players = file[key]['players'];
+            fetch('api/v1/usernameCheck', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(players)}).then((response) => {
+                    //check response from server
+                    if (response.status == 200) {
+                        file[key]['players'] = response.body;
+                    }
+            });
+        }
+        return file;
+    }
 
     processLine(textBlob: string): GameData[] {
         let playerData: PlayerData[] = []; //data for each player input
