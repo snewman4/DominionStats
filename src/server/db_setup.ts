@@ -311,6 +311,7 @@ export async function usernameCheck(
     try {
         userList = userSymbolGenerator(userList);
     } catch (e: any) {
+        console.log('Username symbol error: ' + e.message);
         allErrors.push({ status: 'error', error: e.message });
     }
 
@@ -383,6 +384,10 @@ export async function insertLog(log: object): Promise<LogFormResult> {
         // TODO : Check player usernames against DB
         // TODO : May need to use JSON.parse() and some other things to get this to work
         players = log[key]['players'];
+
+        // TODO : Remove, currently for testing usernames
+        console.log(players);
+
         gameLog = log[key]['log'];
         // Check that all of the above elements actually exist in log
         if (
@@ -401,7 +406,7 @@ export async function insertLog(log: object): Promise<LogFormResult> {
             try {
                 allTurns = parseLog(gameID, players, gameLog);
             } catch (e: any) {
-                console.log(e.message);
+                console.log('Log error: ' + e.message);
                 allErrors.push({
                     status: 'error',
                     error: e.message

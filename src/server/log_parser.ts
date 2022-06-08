@@ -17,8 +17,6 @@ export function parseLog(
     let iterator = 0; // Tracks the turn index
     console.log('Game length: ' + game.length);
     for (let turn of game) {
-        console.log('Turn: ');
-        console.log(turn);
         let turnResult: PlayerTurn | null = handleTurn(gameID, turn, iterator);
         if (turnResult !== null) {
             turnResult = updateNames(turnResult, players);
@@ -151,8 +149,9 @@ export function handleTurn(
             return element !== '';
         });
 
-    console.log('unprocessed turn:');
-    console.log(splitTurn); //TODO: remove when done testing
+    //TODO: remove when done testing
+    console.log('Unprocessed turn:');
+    console.log(splitTurn);
 
     // Check if this is a turn or the beginning of the game
     // TODO : Better handling of not-a-turn
@@ -199,6 +198,7 @@ export function handleTurn(
         purchasedCards: purchasedCards
     };
 
+    //TODO: remove when done testing
     console.log('Processed turn:');
     console.log(thisTurn);
 
