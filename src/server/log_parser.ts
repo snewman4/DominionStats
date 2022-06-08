@@ -20,6 +20,7 @@ export function parseLog(
         let turnResult: PlayerTurn | null = handleTurn(gameID, turn, iterator);
         if (turnResult !== null) {
             turnResult = updateNames(turnResult, players);
+            console.log('Processed turn: ', turnResult);
             fullGame.push(turnResult);
             iterator++;
         }
@@ -221,10 +222,6 @@ export function handleTurn(
         playedCards: playedCards,
         purchasedCards: purchasedCards
     };
-
-    //TODO: remove when done testing
-    console.log('Processed turn:');
-    console.log(thisTurn);
 
     return thisTurn;
 }

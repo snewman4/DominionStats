@@ -301,7 +301,7 @@ export async function usernameCheck(
         ) {
             userList.push({
                 username: username,
-                playerName: undefined,
+                playerName: '',
                 playerSymbol: undefined
             });
         }
