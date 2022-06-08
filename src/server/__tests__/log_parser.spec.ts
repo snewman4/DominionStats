@@ -1060,6 +1060,90 @@ describe('In-Depth Single Valid Turn Test', () => {
     });
 });
 
+describe('Second in-depth valid turn test', () => {
+    const testTurn: PlayerTurn = handleTurn('20220608a', '17 - DaveRambo   D starts their turn.   EFFECT D draws a card (Ghost Town).   EFFECT D gets +1 Action.   D plays a Black Market.   EFFECT D gets +$2.   EFFECT D reveals a Relic, a Coven and an Artisan.   EFFECT D puts an Artisan, a Relic, and a Coven on the bottom of the Black Market Deck.   D plays a Scepter.   EFFECT D plays a Black Market.   EFFECT EFFECT D gets +$2.   EFFECT EFFECT D reveals an Explorer, a Forager and a Duke.   EFFECT EFFECT D puts a Duke, an Explorer and a Forager on the bottom of the Black Market Deck.   D plays a Platinum and a Copper. (+$6)   D buys and gains a Province.   EFFECT s discards a Gold.   D draws 5 cards.', 23);
+
+    it('Basic turn information', () => {
+        expect(testTurn.gameId).toEqual('20220608a');
+        expect(testTurn.playerTurn).toEqual(17);
+        expect(testTurn.turnIndex).toEqual(23);
+        expect(testTurn.playerName).toEqual('DaveRambo');
+    });
+
+    const playedCards: PlayedCard[] = testTurn.playedCards;
+
+    it('Basic played card information', () => {
+        expect(playedCards.length).toEqual(4);
+        expect(playedCards.filter(element => element.card === 'Black Market').length).toEqual(1);
+        expect(playedCards.filter(element => element.card === 'Scepter').length).toEqual(1);
+        expect(playedCards).toContainEqual({
+            card: 'Platinum',
+            effect: [],
+            phase: 'buy',
+            durationResolve: false,
+            usedVillagers: false
+        });
+        expect(playedCards).toContainEqual({
+            card: 'Copper',
+            effect: [],
+            phase: 'buy',
+            durationResolve: false,
+            usedVillagers: false
+        });
+    });
+
+    const blackMarket: PlayedCard = playedCards.filter(element => element.card === 'Black Market')[0];
+
+    it('Black Market card information', () => {
+        expect(blackMarket).toEqual({
+            card: 'Black Market',
+            effect: [{
+                type: 'buying power',
+                player: 'D',
+                buyingPower: 2
+            }]
+        });
+    });
+
+    const scepter: PlayedCard = playedCards.filter(element => element.card === 'Scepter')[0];
+
+    it('Scepter card information', () => {
+        expect(scepter.effect.length).toEqual(1);
+        expect(scepter.effect[0].type).toEqual('reaction');
+        if(isReactionEffect(scepter.effect[0])) {
+            const reactCard: PlayedCard = scepter.effect[0].reaction;
+            expect(reactCard).toEqual({
+                card: 'Black Market',
+                effect: [{
+                    type: 'buying power',
+                    player: 'D',
+                    buyingPower: 2
+                }],
+                phase: 'buy',
+                durationResolve: false,
+                usedVillagers: false
+            });
+        }
+        expect(scepter.phase).toEqual('buy');
+    });
+
+    const purchasedCards: PlayedCard[] = testTurn.purchasedCards;
+
+    it('Purchased card information', () => {
+        expect(purchasedCards).toEqual([{
+            card: 'Province',
+            effect: [{
+                type: 'discard',
+                player: 's',
+                discard: 1
+            }],
+            phase: 'buy',
+            durationResolve: false,
+            usedVillagers: false
+        }]);
+    });
+});
+
 describe('Parse Log Tests', () => {
     it('Valid log with valid players', () => {
         const testParse: PlayerTurn[] = parseLog(

@@ -1,6 +1,7 @@
-import type { PlayerTurn, PlayedCard, PlayerEffect } from './log_values';
+import { PlayerTurn, PlayedCard, PlayerEffect, isGainEffect, isTrashEffect, isOtherPlayerEffect, isReactionEffect, isExileEffect } from './log_values';
 import cards from './cards.json';
 import { UsernameMapping } from './common';
+import { match } from 'sequelize/lib/operators';
 
 // Helper function to parse the actual log of the game
 export function parseLog(
@@ -87,35 +88,13 @@ export function updateNames(
     // Handle playerSymbols associated with effects
     for (let card of turn.playedCards) {
         for (let effect of card.effect) {
-            let matchSymbol = players.filter(
-                (element) =>
-                    element.username === effect.player ||
-                    element.playerName === effect.player ||
-                    element.playerSymbol === effect.player
-            );
-
-            if (matchSymbol.length === 1 && matchSymbol[0].playerName)
-                effect.player = matchSymbol[0].playerName;
-            else {
-                throw new Error('Unrecognized player: ' + effect.player);
-            }
+            effect = updateEffectName(effect, players);
         }
     }
 
     for (let card of turn.purchasedCards) {
         for (let effect of card.effect) {
-            let matchSymbol = players.filter(
-                (element) =>
-                    element.username === effect.player ||
-                    element.playerName === effect.player ||
-                    element.playerSymbol === effect.player
-            );
-
-            if (matchSymbol.length === 1 && matchSymbol[0].playerName)
-                effect.player = matchSymbol[0].playerName;
-            else {
-                throw new Error('Unrecognized player: ' + effect.player);
-            }
+            effect = updateEffectName(effect, players);
         }
     }
     return {
@@ -126,6 +105,52 @@ export function updateNames(
         playedCards: turn.playedCards,
         purchasedCards: turn.purchasedCards
     };
+}
+
+// Helper function to change the name in an individual effect, recursively
+function updateEffectName(effect: PlayerEffect, players: UsernameMapping[]): PlayerEffect {
+    // Find the matching player for this effect
+    let matchSymbol = players.filter((element) => element.username === effect.player || element.playerName === effect.player || element.playerSymbol === effect.player);
+    if (matchSymbol.length === 1 && matchSymbol[0].playerName)
+        effect.player = matchSymbol[0].playerName;
+    else if (matchSymbol.length > 1)
+        throw new Error('Too many players match this symbol: ' + effect.player);
+    else throw new Error('Unrecognized player: ' + effect.player);
+
+    // Depending on the type of effect this is, update nested effects
+    if(isGainEffect(effect)) {
+        for(let card of effect.gain) {
+            for(let gainEffect of card.effect) {
+                gainEffect = updateEffectName(gainEffect, players);
+            }
+        }
+    }
+    else if(isTrashEffect(effect)) {
+        for(let card of effect.trash) {
+            for(let trashEffect of card.effect) {
+                trashEffect = updateEffectName(trashEffect, players);
+            }
+        }
+    }
+    else if(isOtherPlayerEffect(effect)) {
+        for(let otherEffect of effect.otherPlayers) {
+            otherEffect = updateEffectName(otherEffect, players);
+        }
+    }
+    else if(isReactionEffect(effect)) {
+        for(let reactEffect of effect.reaction.effect) {
+            reactEffect = updateEffectName(reactEffect, players);
+        }
+    }
+    else if(isExileEffect(effect)) {
+        for(let card of effect.exile) {
+            for(let exileEffect of card.effect) {
+                exileEffect = updateEffectName(exileEffect, players);
+            }
+        }
+    }
+
+    return effect;
 }
 
 // TODO : Handle more keywords, like reacts
@@ -396,7 +421,10 @@ export function handleEffect(sentence: string[], phase: string) {
                 discard: numCards(sentence.slice(2), 0)
             };
 
+        // Some cards, i.e. Scepter, allow you to play another card
+        // It isn't necessarily a reaction, but it is identical to reaction
         case 'reacts':
+        case 'plays':
             return {
                 type: 'reaction',
                 player: player,
