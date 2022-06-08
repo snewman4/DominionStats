@@ -118,13 +118,14 @@ export default class DataUploader extends LightningElement {
                 //fileString = this.validatePlayers(JSON.parse(fileString));
                 console.log('OBJECT: ', this.validatePlayers(JSON.parse(globalThis.logFile)));
                 
+                /*
                 fetch('api/v1/logUpload', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: fileString
-                });
+                });*/
                 // TODO : Handle the response, potential error handling
             });
         }
