@@ -118,7 +118,7 @@ export default class DataUploader extends LightningElement {
                 // TODO : Handle the response, potential error handling
             });
         }
-
+        this.showGameArea = true;
     }
 
     setErrorMessages(errorMessages: string[]): void {
@@ -135,7 +135,7 @@ export default class DataUploader extends LightningElement {
      */
     getValueFromInput(name: string): string {
         const e: HTMLInputElement | null = this.template.querySelector(
-            'textarea[name="' + name + '"]'
+            'textarea[name=' + name + ']'
         );
         if (e) {
             return e.value.trim();
@@ -147,9 +147,11 @@ export default class DataUploader extends LightningElement {
         const e: HTMLInputElement | null = this.template.querySelector(
             'textarea[name="' + name + '"]'
         );
-        if (e) {
-            e.value = JSON.stringify(gameIDs);
+        let gameIDsDisplay: string = "";
+        for(let i = 0; i < gameIDs.length; i++){
+            gameIDsDisplay += gameIDs[i] + "\n";
         }
+        e.value = gameIDsDisplay;
     }
 
     //Replace each gameID in file with new format based on the date
@@ -189,11 +191,13 @@ export default class DataUploader extends LightningElement {
         this.showGameArea = true;
         this.setValueFromInput("gameInputArea", gameIDs);
         
+        /*
          //Prompt test stuff
         let gameIDsDisplay: string = "";
         for(let ids of gameIDs){
             gameIDsDisplay += ids + " ";
         }
+        */
         
         //let response = prompt("Do these Game ID's look correct? (Y/N) \n" , gameIDsDisplay);
         //console.log(response);
