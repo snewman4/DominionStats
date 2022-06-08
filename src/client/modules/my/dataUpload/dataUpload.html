@@ -23,8 +23,7 @@
         </div>
     </div>
 
-    <br />
-
+    <div class="slds-text-body_small">This submit button refreshes the page.  Please upload game logs before submitting game results.</div>
 
     <lightning-button
     label="Submit"
@@ -33,8 +32,9 @@
     ></lightning-button>
 
     <br />
+    <br />
 
-    <div class="slds-text-heading_small"><b>Upload game log file(s):</div>
+    <div class="slds-text-heading_small"><b>Upload game log file(s):</b></div>
 
     <div class="slds-form-element">
         <span
@@ -84,12 +84,6 @@
         onclick={uploadFile}
         ></lightning-button>
     </template>
-
-    <template if:true={showGameArea}>
-    <label class="slds-form-element__label" for="test"
-    >Input Format: GameID Player_Placement Player_Name Player_Points
-    etc.</label>
-    </template>
     
     <br />
 
@@ -109,8 +103,6 @@
     <br />
 
     <br />
-
-
 
     <template if:true={showErrors}>
         <template for:each={errorMessages} for:item="entry">
