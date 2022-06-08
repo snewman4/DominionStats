@@ -1,7 +1,6 @@
 import { PlayerTurn, PlayedCard, PlayerEffect, isGainEffect, isTrashEffect, isOtherPlayerEffect, isReactionEffect, isExileEffect } from './log_values';
 import cards from './cards.json';
 import { UsernameMapping } from './common';
-import { match } from 'sequelize/lib/operators';
 
 // Helper function to parse the actual log of the game
 export function parseLog(
