@@ -9,6 +9,7 @@ const month = (todaysDate.getMonth() + 1).toString().padStart(2, '0');
 const day = todaysDate.getDate().toString().padStart(2, '0');
 
 declare global {
+    // TODO : Change this so lint isn't mad
     var logFile: string;
 }
 
@@ -161,7 +162,7 @@ export default class DataUploader extends LightningElement {
         const e: HTMLInputElement | null = this.template.querySelector(
             'textarea[name="' + name + '"]'
         );
-        let gameIDsDisplay: string = '';
+        let gameIDsDisplay = '';
         for (let i = 0; i < gameIDs.length; i++) {
             gameIDsDisplay += gameIDs[i] + '\n';
         }
@@ -301,7 +302,7 @@ export default class DataUploader extends LightningElement {
         while (file.indexOf('"#') !== -1) {
             replace = file.substring(
                 file.indexOf('"#') + 1,
-                file.indexOf('"#') + 10
+                file.indexOf('"#') + 11
             );
             file = file.replace(replace, newGameIDs[gameIDsCount]);
             gameIDsCount++;
@@ -323,11 +324,13 @@ export default class DataUploader extends LightningElement {
                 //check response from server
                 if (response.status == 200) {
                     response.json().then((json) => {
+                        console.log('IN LOOP');
                         file[key]['players'] = json;
                     });
                 }
             });
         }
+        console.log('OUT OF LOOP');
         return file;
     }
 

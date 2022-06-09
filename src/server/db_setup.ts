@@ -336,8 +336,7 @@ export function userSymbolGenerator(
                 'Duplicate usernames in player names: ' + name.username
             );
         // If symbols are undefined
-        if (name.playerSymbol === '')
-            name.playerSymbol = name.username[0];
+        if (name.playerSymbol === '') name.playerSymbol = name.username[0];
         // Check for duplicate symbols
         if (
             names.filter(

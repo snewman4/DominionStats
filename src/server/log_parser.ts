@@ -46,11 +46,11 @@ export function parseLog(
             console.log('turnIndex: ', turnResult.turnIndex);
             console.log('playerName: ', turnResult.playerName);
             console.log('Played Cards: ');
-            for(let card of turnResult.playedCards) {
+            for (let card of turnResult.playedCards) {
                 console.log(card);
             }
             console.log('Purchased Cards: ');
-            for(let card of turnResult.purchasedCards) {
+            for (let card of turnResult.purchasedCards) {
                 console.log(card);
             }
             fullGame.push(turnResult);
@@ -557,6 +557,7 @@ export function handleEffect(sentence: string[], phase: string) {
             };
 
         default:
+            console.log('Unknown effect: ' + sentence.join(' '));
             //If the effect isn't identified here just return unknown
             return {
                 type: 'unknown',
