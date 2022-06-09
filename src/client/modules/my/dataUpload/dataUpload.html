@@ -23,12 +23,15 @@
         </div>
     </div>
 
-    <div class="slds-text-body_small">This submit button refreshes the page.  Please upload game logs before submitting game results.</div>
+    <div class="slds-text-body_small">
+        This submit button refreshes the page. Please upload game logs before
+        submitting game results.
+    </div>
 
     <lightning-button
-    label="Submit"
-    variant="brand-outline"
-    onclick={gatherDataAndSend}
+        label="Submit"
+        variant="brand-outline"
+        onclick={gatherDataAndSend}
     ></lightning-button>
 
     <br />
@@ -80,14 +83,16 @@
 
     <template if:false={showGameArea}>
         <lightning-button
-        label="Upload"
-        variant="brand-outline"
-        onclick={uploadFile}
+            label="Upload"
+            variant="brand-outline"
+            onclick={uploadFile}
         ></lightning-button>
     </template>
 
     <template if:true={showGameArea}>
-        <div class="slds-text-body_small">Please confirm that these gameIDs are correct.</div>
+        <div class="slds-text-body_small">
+            Please confirm that these gameIDs are correct.
+        </div>
     </template>
 
     <div class="slds-form-element__control">
@@ -105,9 +110,9 @@
 
     <template if:true={showGameArea}>
         <lightning-button
-        label="Confirm"
-        variant="brand-outline"
-        onclick={confirmGameIDs}
+            label="Confirm"
+            variant="brand-outline"
+            onclick={confirmGameIDs}
         ></lightning-button>
     </template>
 

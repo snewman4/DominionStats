@@ -10,7 +10,7 @@ const day = todaysDate.getDate().toString().padStart(2, '0');
 
 declare global {
     var logFile: string;
-  }
+}
 
 export default class DataUploader extends LightningElement {
     defaultGameId = `${year}${month}${day}a`;
@@ -26,12 +26,12 @@ export default class DataUploader extends LightningElement {
         let textBlob: string = this.getValueFromInput('textArea');
         let dataList: GameData[] = this.processLine(textBlob);
         let gameIds: string[] = [];
-        for(let game of dataList){
+        for (let game of dataList) {
             gameIds.push(game.gameId);
         }
         let errorMessages = validateInput(dataList);
         //get file values
-        let fileString = "";
+        let fileString = '';
         let fileText = this.template.querySelector(
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
@@ -73,7 +73,7 @@ export default class DataUploader extends LightningElement {
                     location.reload();
                 }
                 //refresh page
-                 else if (response.status >= 400) {
+                else if (response.status >= 400) {
                     //If there has been a duplicate error
                     if (response.status == 409) {
                         response
@@ -113,11 +113,14 @@ export default class DataUploader extends LightningElement {
         if (fileText !== null && fileText.files !== null) {
             fileText.files[0].text().then((result) => {
                 globalThis.logFile = result;
-                
+
                 this.displayNewGameIDs(globalThis.logFile);
                 //fileString = this.validatePlayers(JSON.parse(fileString));
-                console.log('OBJECT: ', this.validatePlayers(JSON.parse(globalThis.logFile)));
-                
+                console.log(
+                    'OBJECT: ',
+                    this.validatePlayers(JSON.parse(globalThis.logFile))
+                );
+
                 /*
                 fetch('api/v1/logUpload', {
                     method: 'POST',
@@ -158,54 +161,95 @@ export default class DataUploader extends LightningElement {
         const e: HTMLInputElement | null = this.template.querySelector(
             'textarea[name="' + name + '"]'
         );
-        let gameIDsDisplay: string = "";
-        for(let i = 0; i < gameIDs.length; i++){
-            gameIDsDisplay += gameIDs[i] + "\n";
+        let gameIDsDisplay: string = '';
+        for (let i = 0; i < gameIDs.length; i++) {
+            gameIDsDisplay += gameIDs[i] + '\n';
         }
-        if(e){
+        if (e) {
             e.value = gameIDsDisplay;
         }
     }
 
     //Replace each gameID in file with new format based on the date
-    displayNewGameIDs(file:string):void{
-        let replace = "";
-        let date = "";
-        let dateString = "";
-        let currentDate = file.substring(file.indexOf("\"date\"") + 9, file.indexOf("\"date\"") + 19);
-        let newGameID = "";
-        let letter = "a";
+    displayNewGameIDs(file: string): void {
+        let replace = '';
+        let date = '';
+        let dateString = '';
+        let currentDate = file.substring(
+            file.indexOf('"date"') + 9,
+            file.indexOf('"date"') + 19
+        );
+        let newGameID = '';
+        let letter = 'a';
         let gameIDs: string[] = [];
         let oldFile = file;
-        while(file.indexOf("\"#") !== -1){
-            replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
+        while (file.indexOf('"#') !== -1) {
+            replace = file.substring(
+                file.indexOf('"#') + 1,
+                file.indexOf('"#') + 10
+            );
             //Checks if log.json has a space after "date":
-            let tester = "";
-            tester += file.substring(file.indexOf("\"date\"") + 7, file.indexOf("\"date\"") + 8);
-            if(tester === " "){
-                newGameID = file.substring(file.indexOf("\"date\"") + 15,file.indexOf("\"date\"") + 19 ) + file.substring(file.indexOf("\"date\"") + 12,file.indexOf("\"date\"") + 14) + file.substring(file.indexOf("\"date\"") + 9,file.indexOf("\"date\"") + 11 ) + letter;
+            let tester = '';
+            tester += file.substring(
+                file.indexOf('"date"') + 7,
+                file.indexOf('"date"') + 8
+            );
+            if (tester === ' ') {
+                newGameID =
+                    file.substring(
+                        file.indexOf('"date"') + 15,
+                        file.indexOf('"date"') + 19
+                    ) +
+                    file.substring(
+                        file.indexOf('"date"') + 12,
+                        file.indexOf('"date"') + 14
+                    ) +
+                    file.substring(
+                        file.indexOf('"date"') + 9,
+                        file.indexOf('"date"') + 11
+                    ) +
+                    letter;
             } else {
-                newGameID = file.substring(file.indexOf("\"date\"") + 14,file.indexOf("\"date\"") + 18 ) + file.substring(file.indexOf("\"date\"") + 11,file.indexOf("\"date\"") + 13) + file.substring(file.indexOf("\"date\"") + 8,file.indexOf("\"date\"") + 10 ) + letter;
+                newGameID =
+                    file.substring(
+                        file.indexOf('"date"') + 14,
+                        file.indexOf('"date"') + 18
+                    ) +
+                    file.substring(
+                        file.indexOf('"date"') + 11,
+                        file.indexOf('"date"') + 13
+                    ) +
+                    file.substring(
+                        file.indexOf('"date"') + 8,
+                        file.indexOf('"date"') + 10
+                    ) +
+                    letter;
             }
-            
+
             gameIDs.push(newGameID);
             letter = String.fromCharCode(letter.charCodeAt(0) + 1);
-            dateString = file.substring(file.indexOf("\"date\""), file.indexOf("\"date\"") + 6);
-            date = file.substring(file.indexOf("\"date\"") + 9, file.indexOf("\"date\"") + 19);
+            dateString = file.substring(
+                file.indexOf('"date"'),
+                file.indexOf('"date"') + 6
+            );
+            date = file.substring(
+                file.indexOf('"date"') + 9,
+                file.indexOf('"date"') + 19
+            );
             //if date changes, reset letter to 'a'
-            if(date !== currentDate){
-                letter = "a";
+            if (date !== currentDate) {
+                letter = 'a';
                 currentDate = date;
             }
             //These lines will actually replace the gameIDs in the file
-            
-            file = file.replace(dateString, "\"Date\"");
+
+            file = file.replace(dateString, '"Date"');
             file = file.replace(replace, newGameID);
         }
         //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
         this.showGameArea = true;
-        this.setValueFromInput("gameInputArea", gameIDs);
-        
+        this.setValueFromInput('gameInputArea', gameIDs);
+
         /*
          //Prompt test stuff
         let gameIDsDisplay = "";
@@ -213,30 +257,32 @@ export default class DataUploader extends LightningElement {
             gameIDsDisplay += ids + " ";
         }
         */
-        
+
         //let response = prompt("Do these Game ID's look correct? (Y/N) \n" , gameIDsDisplay);
         //console.log(response);
-        
 
         // (<HTMLInputElement>document.getElementById('gameArea')).value = JSON.stringify(gameIDs);
-       // let response = prompt("Do these Game ID's look correct? (Y/N) \n" + gameIDs);
+        // let response = prompt("Do these Game ID's look correct? (Y/N) \n" + gameIDs);
         // if(response === "Y" || response === "Yes" || response === "YES" || response === "y" || response === "yes"){
         //     return file;
         // }
         // else{
         //     return oldFile;
         // }
-      //  return file;
+        //  return file;
     }
 
-    confirmGameIDs(): void{
+    confirmGameIDs(): void {
         //gets value from textarea
         let newGameIDs: string[] = [];
         let textBlob: string = this.getValueFromInput('gameInputArea');
         textBlob.split(/[\r\n]+/).forEach((line: string) => {
             newGameIDs.push(line);
         });
-        globalThis.logFile = this.replaceGameIDs(globalThis.logFile, newGameIDs);
+        globalThis.logFile = this.replaceGameIDs(
+            globalThis.logFile,
+            newGameIDs
+        );
 
         this.showGameArea = false;
 
@@ -249,33 +295,37 @@ export default class DataUploader extends LightningElement {
         });
     }
 
-    replaceGameIDs(file:string, newGameIDs:string[]): string{
-        let replace = "";
+    replaceGameIDs(file: string, newGameIDs: string[]): string {
+        let replace = '';
         let gameIDsCount = 0;
-        while(file.indexOf("\"#") !== -1){
-            replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
+        while (file.indexOf('"#') !== -1) {
+            replace = file.substring(
+                file.indexOf('"#') + 1,
+                file.indexOf('"#') + 10
+            );
             file = file.replace(replace, newGameIDs[gameIDsCount]);
             gameIDsCount++;
         }
         return file;
     }
-       
-    validatePlayers(file:Object): Object {
+
+    validatePlayers(file: Object): Object {
         let players: string[] = [];
-        for(let key in file){
+        for (let key in file) {
             players = file[key]['players'];
             fetch('api/v1/usernameCheck', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(players)}).then((response) => {
-                    //check response from server
-                    if (response.status == 200) {
-                        response.json().then((json) => {
-                            file[key]['players'] = json;
-                        });
-                    }
+                body: JSON.stringify(players)
+            }).then((response) => {
+                //check response from server
+                if (response.status == 200) {
+                    response.json().then((json) => {
+                        file[key]['players'] = json;
+                    });
+                }
             });
         }
         return file;

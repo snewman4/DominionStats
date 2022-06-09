@@ -89,7 +89,7 @@ export function isDeckEffect(pe: PlayerEffect): pe is DeckEffect {
 // cards discarded
 export interface DiscardEffect extends PlayerEffect {
     type: 'discard';
-    discard: PlayedCard[];
+    discard: number;
 }
 
 export function isDiscardEffect(pe: PlayerEffect): pe is DiscardEffect {
