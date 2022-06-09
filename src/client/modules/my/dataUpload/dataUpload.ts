@@ -8,16 +8,12 @@ const year = todaysDate.getFullYear();
 const month = (todaysDate.getMonth() + 1).toString().padStart(2, '0');
 const day = todaysDate.getDate().toString().padStart(2, '0');
 
-declare global {
-    var logFile: string;
-  }
-
 export default class DataUploader extends LightningElement {
     defaultGameId = `${year}${month}${day}a`;
     errorMessages: string[] = [];
     showErrors = false;
     showGameArea = false;
-
+    gameLog?:Object = undefined;
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
      */
@@ -104,7 +100,7 @@ export default class DataUploader extends LightningElement {
         }
     }
 
-    uploadFile(): void {
+    onLogFileAttached(): void {
         //get file values
         //let fileString = "";
         let fileText = this.template.querySelector(
@@ -112,21 +108,11 @@ export default class DataUploader extends LightningElement {
         ) as HTMLInputElement;
         if (fileText !== null && fileText.files !== null) {
             fileText.files[0].text().then((result) => {
-                globalThis.logFile = result;
+
+                this.displayNewGameIDs(result);
+                this.gameLog = this.validatePlayers(JSON.parse(result));
+                console.log('OBJECT: ', this.gameLog);
                 
-                this.displayNewGameIDs(globalThis.logFile);
-                //fileString = this.validatePlayers(JSON.parse(fileString));
-                console.log('OBJECT: ', this.validatePlayers(JSON.parse(globalThis.logFile)));
-                
-                /*
-                fetch('api/v1/logUpload', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: fileString
-                });
-                */
                 // TODO : Handle the response, potential error handling
             });
         }
@@ -230,14 +216,18 @@ export default class DataUploader extends LightningElement {
       //  return file;
     }
 
-    confirmGameIDs(): void{
+    onSaveGameLogToServer(): void{
         //gets value from textarea
         let newGameIDs: string[] = [];
         let textBlob: string = this.getValueFromInput('gameInputArea');
         textBlob.split(/[\r\n]+/).forEach((line: string) => {
             newGameIDs.push(line);
         });
-        globalThis.logFile = this.replaceGameIDs(globalThis.logFile, newGameIDs);
+        if(this.gameLog === undefined){
+            console.log('missing game log');
+            return;
+        }
+        this.gameLog = this.replaceGameIDs(this.gameLog, newGameIDs);
 
         this.showGameArea = false;
 
@@ -246,19 +236,24 @@ export default class DataUploader extends LightningElement {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: globalThis.logFile
+            body: JSON.stringify(this.gameLog)
         });
     }
-
-    replaceGameIDs(file:string, newGameIDs:string[]): string{
-        let replace = "";
-        let gameIDsCount = 0;
-        while(file.indexOf("\"#") !== -1){
-            replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
-            file = file.replace(replace, newGameIDs[gameIDsCount]);
-            gameIDsCount++;
-        }
+    //TODO: Change newGameIDs to Object, map from old game ids to new 
+    replaceGameIDs(file:Object, newGameIDs:string[]): Object{
+        Object.keys(file).forEach((UUID:string, index) => {
+            file[UUID].gameID = newGameIDs[index];
+        });
         return file;
+
+        // let replace = "";
+        // let gameIDsCount = 0;
+        // while(file.indexOf("\"#") !== -1){
+        //     replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
+        //     file = file.replace(replace, newGameIDs[gameIDsCount]);
+        //     gameIDsCount++;
+        // }
+        // return file;
     }
        
     validatePlayers(file:Object): Object {
