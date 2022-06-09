@@ -40,7 +40,19 @@ export function parseLog(
         );
         if (turnResult !== null) {
             turnResult = updateNames(turnResult, players);
-            console.log('Processed turn: ', turnResult);
+            console.log('Processed turn: ');
+            console.log('gameId: ', turnResult.gameId);
+            console.log('playerTurn: ', turnResult.playerTurn);
+            console.log('turnIndex: ', turnResult.turnIndex);
+            console.log('playerName: ', turnResult.playerName);
+            console.log('Played Cards: ');
+            for(let card of turnResult.playedCards) {
+                console.log(card);
+            }
+            console.log('Purchased Cards: ');
+            for(let card of turnResult.purchasedCards) {
+                console.log(card);
+            }
             fullGame.push(turnResult);
             iterator++;
         }
@@ -579,6 +591,7 @@ export function handleEffectList(
     let nextEffect: string[] = sentences[1].split(' ');
     let finalIndex = 0; // Tracks which effects have been handled
 
+    // TODO : OtherPlayerEffect generates weird sometimes, figure out why
     // If otherPlayerEffect
     if (
         currentEffect.player !== activePlayer.playerName &&

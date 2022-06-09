@@ -8,12 +8,12 @@ describe('User Symbol Generation', () => {
             {
                 username: 'snewman1',
                 playerName: 'Sam',
-                playerSymbol: undefined
+                playerSymbol: ''
             },
             {
                 username: 'matt.buland',
                 playerName: 'Matt',
-                playerSymbol: undefined
+                playerSymbol: ''
             }
         ]);
 
@@ -34,16 +34,16 @@ describe('User Symbol Generation', () => {
         const testNames: UsernameMapping[] = userSymbolGenerator([
             {
                 username: 'snewman1',
-                playerName: undefined,
-                playerSymbol: undefined
+                playerName: '',
+                playerSymbol: ''
             },
-            { username: 'snewman2', playerName: 'Sam', playerSymbol: undefined }
+            { username: 'snewman2', playerName: 'Sam', playerSymbol: '' }
         ]);
 
         expect(testNames.length).toEqual(2);
         expect(testNames).toContainEqual({
             username: 'snewman1',
-            playerName: undefined,
+            playerName: '',
             playerSymbol: 'snewman1'
         });
         expect(testNames).toContainEqual({
@@ -81,12 +81,12 @@ describe('User Symbol Generation', () => {
             {
                 username: 'snewman1',
                 playerName: 'Sam',
-                playerSymbol: undefined
+                playerSymbol: ''
             },
             {
                 username: 'snewman12',
                 playerName: 'Matt',
-                playerSymbol: undefined
+                playerSymbol: ''
             }
         ]);
 
@@ -108,27 +108,27 @@ describe('User Symbol Generation', () => {
             {
                 username: 'sam11',
                 playerName: 'Sam',
-                playerSymbol: undefined
+                playerSymbol: ''
             },
             {
                 username: 'sarah1',
                 playerName: 'Sarah',
-                playerSymbol: undefined
+                playerSymbol: ''
             },
             {
                 username: 'matt8',
                 playerName: 'Matt',
-                playerSymbol: undefined
+                playerSymbol: ''
             },
             {
                 username: 'matthew1',
                 playerName: 'Matthew',
-                playerSymbol: undefined
+                playerSymbol: ''
             },
             {
                 username: 'king',
                 playerName: 'King',
-                playerSymbol: undefined
+                playerSymbol: ''
             }
         ]);
 
@@ -166,12 +166,12 @@ describe('User Symbol Generation', () => {
                 {
                     username: 'snewman1',
                     playerName: 'Sam',
-                    playerSymbol: undefined
+                    playerSymbol: ''
                 },
                 {
                     username: 'snewman1',
                     playerName: 'Matt',
-                    playerSymbol: undefined
+                    playerSymbol: ''
                 }
             ]);
         }).toThrow('Duplicate usernames in player names: snewman1');
