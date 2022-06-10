@@ -9,6 +9,19 @@ export interface PlayerData {
 }
 export interface UsernameData {
     username: string;
-    playerName: string;
+    playerName: string | null;
     playerSymbol: string;
+}
+export interface VP {
+    player: string;
+    vp_value: string;
+}
+export interface GameLog {
+    VPs: VP[];
+    date: string;
+    gameID: string;
+    gameStatus: string;
+    log: string;
+    players: UsernameData[];
+    uuid: string;
 }

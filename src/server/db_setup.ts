@@ -404,10 +404,11 @@ export async function insertLog(log: object): Promise<LogFormResult> {
             // and returns the correct message
             try {
                 allTurns = parseLog(gameID, players, gameLog);
-                const query = 'INSERT INTO log_game_round (game_label, player_turn, turn_index, player_name, cards_played, cards_purchased) VALUES ($1, $2, $3, $4, $5, $6)';
-                
+                const query =
+                    'INSERT INTO log_game_round (game_label, player_turn, turn_index, player_name, cards_played, cards_purchased) VALUES ($1, $2, $3, $4, $5, $6)';
+
                 //Loop through each turn
-                for(let turn of allTurns){
+                for (let turn of allTurns) {
                     //Set values for the data
                     const values = [
                         turn.gameId,
@@ -420,11 +421,11 @@ export async function insertLog(log: object): Promise<LogFormResult> {
 
                     //Make query to the server
                     pool.query(query, values)
-                    .then(() => [])
-                    .catch((error) => {
-                        console.log('DB Error while adding log: ', error);
-                        return {status: 500, results: []};
-                    });
+                        .then(() => [])
+                        .catch((error) => {
+                            console.log('DB Error while adding log: ', error);
+                            return { status: 500, results: [] };
+                        });
                 }
             } catch (e: any) {
                 console.log('Log error: ' + e.message);
