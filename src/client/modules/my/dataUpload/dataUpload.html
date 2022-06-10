@@ -112,7 +112,7 @@
             <tbody>
                 <template for:each={tableData} for:item="entry">
                     <tr key={entry.customGameId} class="slds-hint-parent">
-                        <td><div id="tableInput" contenteditable>{entry.customGameId}</div></td>
+                        <td><div contenteditable>{entry.customGameId}</div></td>
                         <td>{entry.dominionGameId}</td>
                         <td>{entry.playerNames}</td>
                     </tr>

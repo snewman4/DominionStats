@@ -104,12 +104,20 @@ export default class DataUploader extends LightningElement {
                 console.log('OBJECT: ', JSON.stringify(this.gameLog));
 
                 let players: UsernameData[] = [];
+                let currentPlayerName;
+                let currentUserName;
+                let activeUsers:UsernameData[] = [];
                 for (let log of this.gameLog) {
                     players = log.players;
                     for (let player of players) {
+                        let currentUser = activeUsers.filter(element => element.username===player.username);
+                        if(currentUser.length > 0){
+                            player.playerName = currentUser[0].playerName;
+                            continue;
+                        }
                         if (
                             player.playerName === '' ||
-                            player.playerName === undefined
+                            player.playerName === undefined 
                         ) {
                             do {
                                 player.playerName = prompt(
@@ -117,10 +125,12 @@ export default class DataUploader extends LightningElement {
                                         player.username
                                 );
                             } while (player.playerName === null);
+                            activeUsers.push(player);
                         }
                     }
                     log.players = players;
                 }
+                
                 // TODO : Handle the response, potential error handling
             });
         }
