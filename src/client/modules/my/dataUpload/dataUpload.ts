@@ -299,6 +299,11 @@ export default class DataUploader extends LightningElement {
                 response.json().then((json) => console.error(json));
             }
         });
+        /*
+        let test: Element;
+        test = document.querySelector("tableInput");
+        console.log('tableInput', test);
+        */
     }
     //TODO: Change newGameIDs to Object, map from old game ids to new
     replaceGameIDs(file: GameLog[], newGameIDs: string[]): GameLog[] {
@@ -404,6 +409,7 @@ export default class DataUploader extends LightningElement {
         return dataList;
     }
 
+    /*
     handleUploadFinished(event) {
         // Get the list of uploaded files
         //const uploadedFiles = event.detail.files;
@@ -411,6 +417,7 @@ export default class DataUploader extends LightningElement {
         console.log("test");
         prompt("test");
     }
+    */
 
     /*
     test(): void {
