@@ -101,7 +101,9 @@ export default class DataUploader extends LightningElement {
                  players = this.gameLog[key]['players'];
                  for(let player of players){
                      if(player.playerName === "" || player.playerName === undefined){
-                          player.playerName = prompt("What is the player name for this username: " + player.username);
+                          do {
+                            player.playerName = prompt("What is the player name for this username: " + player.username);
+                        } while(player.playerName === null);
                      }               
             }
             this.gameLog[key]['players'] = players;

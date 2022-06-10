@@ -9,6 +9,6 @@ export interface PlayerData {
 }
 export interface UsernameData {
     username: string;
-    playerName: string;
+    playerName: string | null;
     playerSymbol: string;
 }
