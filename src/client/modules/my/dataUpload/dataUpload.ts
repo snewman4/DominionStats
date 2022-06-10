@@ -161,11 +161,13 @@ export default class DataUploader extends LightningElement {
          let dateString = "";
          let currentDate = file.substring(file.indexOf("\"date\"") + 9, file.indexOf("\"date\"") + 19);
          let newGameID = "";
+         let oldGameIds: string[] = [];
          let letter = "a";
          let gameIDs: string[] = [];
          let oldFile = file;
          while(file.indexOf("\"#") !== -1){
              replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
+             oldGameIds.push(replace);
              //Checks if log.json has a space after "date":
              let tester = "";
              tester += file.substring(file.indexOf("\"date\"") + 7, file.indexOf("\"date\"") + 8);
@@ -194,6 +196,10 @@ export default class DataUploader extends LightningElement {
         this.setValueFromInput("gameInputArea", gameIDs);
         //this.gameIDs = gameIDs;
         
+        for(let i in oldGameIds){
+            console.log(i);
+        }
+
         let dataRow: GameIDsAndPlayers = {
             customGameId: "",
             dominionGameId: "",
@@ -203,7 +209,7 @@ export default class DataUploader extends LightningElement {
             dataRow = {
                 customGameId: gameIDs[i],
                 //will change to index from array of dominion ids
-                dominionGameId: "test",
+                dominionGameId: oldGameIds[i],
                 //can be either an array or a string seprated by commas, will implement after parsing through names
                 playerNames: ["test1", "test2"]
             }
