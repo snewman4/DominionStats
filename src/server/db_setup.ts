@@ -385,6 +385,34 @@ export async function insertLog(log: GameLogServer[]): Promise<LogFormResult> {
         // TODO : May need to use JSON.parse() and some other things to get this to work
         players = item.players;
 
+        //Adding player names to the database if needed
+
+        //Add uknown users to the database
+
+        let usernames = players.map((player) => player.username);
+        let userQuery = 'SELECT * FROM known_usernames WHERE username IN (' +
+        usernames.join(',') +
+        ')';
+
+        //Get usernames and filter
+        let dominionNames = await pool.query(userQuery);
+        let dominionUsernames = dominionNames.rows.map((player) => player[0] as string); //may need to test this line
+        usernames = usernames.filter(name => !dominionUsernames.includes(name));
+
+        //Add users that aren't in the database
+        let userAddQuery = 'INSERT INTO game_results (username, player_name) VALUES ($1, $2)';
+        for(let user in usernames){
+            let currentPlayer = players.find((player) => {
+                return player.username === user;
+            });
+            if(currentPlayer == undefined){
+                throw new Error("There was an error while adding a user");
+            }
+            await pool.query(userAddQuery, [currentPlayer.username,currentPlayer.playerName]);
+        }
+        
+        
+
         // TODO : Remove, currently for testing usernames
         console.log(players);
 
