@@ -289,7 +289,7 @@ export async function usernameCheck(
         userList.push({
             username: row.username,
             playerName: row.player_name,
-            playerSymbol: undefined
+            playerSymbol: ''
         });
     }
 
@@ -301,8 +301,8 @@ export async function usernameCheck(
         ) {
             userList.push({
                 username: username,
-                playerName: undefined,
-                playerSymbol: undefined
+                playerName: '',
+                playerSymbol: ''
             });
         }
     }
@@ -336,8 +336,7 @@ export function userSymbolGenerator(
                 'Duplicate usernames in player names: ' + name.username
             );
         // If symbols are undefined
-        if (name.playerSymbol === undefined)
-            name.playerSymbol = name.username[0];
+        if (name.playerSymbol === '') name.playerSymbol = name.username[0];
         // Check for duplicate symbols
         if (
             names.filter(
@@ -375,13 +374,13 @@ export function userSymbolGenerator(
 export async function insertLog(log: object): Promise<LogFormResult> {
     let allErrors: ErrorObject[] = [];
     let allTurns: PlayerTurn[] = [];
-    // TODO: implement
+
     let gameID: string;
     let players: UsernameMapping[];
     let gameLog: string;
     for (let key in log) {
         gameID = log[key]['gameID'];
-        // TODO : Check player usernames against DB
+        // TODO : Add player names to database
         // TODO : May need to use JSON.parse() and some other things to get this to work
         players = log[key]['players'];
 
@@ -405,6 +404,29 @@ export async function insertLog(log: object): Promise<LogFormResult> {
             // and returns the correct message
             try {
                 allTurns = parseLog(gameID, players, gameLog);
+                const query =
+                    'INSERT INTO log_game_round (game_label, player_turn, turn_index, player_name, cards_played, cards_purchased) VALUES ($1, $2, $3, $4, $5, $6)';
+
+                //Loop through each turn
+                for (let turn of allTurns) {
+                    //Set values for the data
+                    const values = [
+                        turn.gameId,
+                        turn.playerTurn,
+                        turn.turnIndex,
+                        turn.playerName,
+                        JSON.stringify(turn.playedCards),
+                        JSON.stringify(turn.purchasedCards)
+                    ];
+
+                    //Make query to the server
+                    pool.query(query, values)
+                        .then(() => [])
+                        .catch((error) => {
+                            console.log('DB Error while adding log: ', error);
+                            return { status: 500, results: [] };
+                        });
+                }
             } catch (e: any) {
                 console.log('Log error: ' + e.message);
                 allErrors.push({
@@ -412,6 +434,8 @@ export async function insertLog(log: object): Promise<LogFormResult> {
                     error: e.message
                 });
             }
+
+            // TODO : Add data to database
         }
     }
 

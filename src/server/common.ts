@@ -79,6 +79,6 @@ export interface DominionUser {
 
 export interface UsernameMapping {
     username: string;
-    playerName: string | undefined;
-    playerSymbol: string | undefined;
+    playerName: string;
+    playerSymbol: string;
 }

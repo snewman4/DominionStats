@@ -1,4 +1,20 @@
-import { PlayerTurn, PlayedCard, PlayerEffect, isGainEffect, isTrashEffect, isOtherPlayerEffect, isReactionEffect, isExileEffect } from './log_values';
+import {
+    PlayerTurn,
+    PlayedCard,
+    PlayerEffect,
+    isGainEffect,
+    isTrashEffect,
+    isOtherPlayerEffect,
+    isReactionEffect,
+    isExileEffect,
+    GainEffect,
+    ExileEffect,
+    ReactionEffect,
+    TrashEffect,
+    DiscardEffect,
+    OtherPlayerEffect,
+    isDiscardEffect
+} from './log_values';
 import cards from './cards.json';
 import { UsernameMapping } from './common';
 
@@ -17,9 +33,41 @@ export function parseLog(
     let iterator = 0; // Tracks the turn index
     console.log('Game length: ' + game.length);
     for (let turn of game) {
-        let turnResult: PlayerTurn | null = handleTurn(gameID, turn, iterator);
+        let turnResult: PlayerTurn | null = handleTurn(
+            gameID,
+            turn,
+            iterator,
+            players
+        );
         if (turnResult !== null) {
             turnResult = updateNames(turnResult, players);
+
+            // TODO : Remove when done testing
+            console.log('\nProcessed turn: ');
+            console.log('gameId: ', turnResult.gameId);
+            console.log('playerTurn: ', turnResult.playerTurn);
+            console.log('turnIndex: ', turnResult.turnIndex);
+            console.log('playerName: ', turnResult.playerName);
+            console.log('\nPlayed Cards:');
+            for (let card of turnResult.playedCards) {
+                console.log('\nCard: ', card.card);
+                console.log('Effects:');
+                for (let effect of card.effect) {
+                    console.log(effect);
+                }
+                console.log('Phase: ', card.phase);
+            }
+            console.log('\nPurchased Cards:');
+            for (let card of turnResult.purchasedCards) {
+                console.log('\nCard: ', card.card);
+                console.log('Effects:');
+                for (let effect of card.effect) {
+                    console.log(effect);
+                }
+                console.log('Phase: ', card.phase);
+            }
+            // End of testing block
+
             fullGame.push(turnResult);
             iterator++;
         }
@@ -35,28 +83,28 @@ function trimLog(log: string): string[] {
     // This is not at all a good way to do this, but it does seem to work for every card we've tested so far
     log = log.replace(
         /<div style="display:inline; padding-left:2em; text-indent:-0.5em;">/g,
-        'EFFECT '
+        'spacing EFFECT 1 '
     );
     // Handles nested effects
     log = log.replace(
         /<div style="display:inline; padding-left:3.5em; text-indent:-0.5em;">/g,
-        'EFFECT EFFECT '
+        'spacing EFFECT 2 '
     );
     //Does the same but for the newer/other div method
     //Single effect
     log = log.replace(
         /<div style="padding-left: 4.[0-9]{0,20}%; width:93.[0-9]{0,20}%;" >/g,
-        'EFFECT'
+        'spacing EFFECT 1'
     );
     //Nested effect
     log = log.replace(
         /<div style="padding-left: 8.[0-9]{0,20}%; width:89.[0-9]{0,20}%;" >/g,
-        'EFFECT EFFECT'
+        'spacing EFFECT 2'
     );
     //Double nested effect
     log = log.replace(
         /<div style="padding-left: 11.[0-9]{0,20}%; width:86.[0-9]{0,20}%;" >/g,
-        'EFFECT EFFECT EFFECT'
+        'spacing EFFECT 3'
     );
 
     //Removes < > and any characters between them
@@ -107,9 +155,17 @@ export function updateNames(
 }
 
 // Helper function to change the name in an individual effect, recursively
-function updateEffectName(effect: PlayerEffect, players: UsernameMapping[]): PlayerEffect {
+function updateEffectName(
+    effect: PlayerEffect,
+    players: UsernameMapping[]
+): PlayerEffect {
     // Find the matching player for this effect
-    let matchSymbol = players.filter((element) => element.username === effect.player || element.playerName === effect.player || element.playerSymbol === effect.player);
+    let matchSymbol = players.filter(
+        (element) =>
+            element.username === effect.player ||
+            element.playerName === effect.player ||
+            element.playerSymbol === effect.player
+    );
     if (matchSymbol.length === 1 && matchSymbol[0].playerName)
         effect.player = matchSymbol[0].playerName;
     else if (matchSymbol.length > 1)
@@ -117,53 +173,54 @@ function updateEffectName(effect: PlayerEffect, players: UsernameMapping[]): Pla
     else throw new Error('Unrecognized player: ' + effect.player);
 
     // Depending on the type of effect this is, update nested effects
-    if(isGainEffect(effect)) {
-        for(let card of effect.gain) {
-            for(let gainEffect of card.effect) {
+    if (isGainEffect(effect)) {
+        for (let card of effect.gain) {
+            for (let gainEffect of card.effect) {
                 gainEffect = updateEffectName(gainEffect, players);
             }
         }
-    }
-    else if(isTrashEffect(effect)) {
-        for(let card of effect.trash) {
-            for(let trashEffect of card.effect) {
+    } else if (isTrashEffect(effect)) {
+        for (let card of effect.trash) {
+            for (let trashEffect of card.effect) {
                 trashEffect = updateEffectName(trashEffect, players);
             }
         }
-    }
-    else if(isOtherPlayerEffect(effect)) {
-        for(let otherEffect of effect.otherPlayers) {
+    } else if (isOtherPlayerEffect(effect)) {
+        for (let otherEffect of effect.otherPlayers) {
             otherEffect = updateEffectName(otherEffect, players);
         }
-    }
-    else if(isReactionEffect(effect)) {
-        for(let reactEffect of effect.reaction.effect) {
+    } else if (isReactionEffect(effect)) {
+        for (let reactEffect of effect.reaction.effect) {
             reactEffect = updateEffectName(reactEffect, players);
         }
-    }
-    else if(isExileEffect(effect)) {
-        for(let card of effect.exile) {
-            for(let exileEffect of card.effect) {
+    } else if (isExileEffect(effect)) {
+        for (let card of effect.exile) {
+            for (let exileEffect of card.effect) {
                 exileEffect = updateEffectName(exileEffect, players);
             }
+        }
+    } else if (isDiscardEffect(effect)) {
+        for (let discardEffect of effect.miscEffects) {
+            effect = updateEffectName(discardEffect, players);
         }
     }
 
     return effect;
 }
 
-// TODO : Handle more keywords, like reacts
+// TODO : Handle more keywords, like reveals
 // Helper function to handle the individual turn of a game
 export function handleTurn(
     gameID: string,
     turn: string,
-    turnIndex: number
+    turnIndex: number,
+    players: UsernameMapping[]
 ): PlayerTurn | null {
     // Split up the turn into sentences
     let splitTurn: string[] = turn.split('  ');
 
     // Remove unnecessary spaces
-    // TODO : Weird error where last turn would always have an empty string at the end. Double filter works, but is messy
+    // Weird error where last turn would always have an empty string at the end. Double filter works, but is messy
     splitTurn = splitTurn
         .filter((element) => {
             return element !== '';
@@ -174,66 +231,121 @@ export function handleTurn(
         });
 
     //TODO: remove when done testing
-    console.log('Unprocessed turn:');
+    console.log('\nUnprocessed turn:');
     console.log(splitTurn);
+    // End of testing block
 
     // Check if this is a turn or the beginning of the game
     // TODO : Better handling of not-a-turn
     if (splitTurn.length < 1 || isNaN(Number(splitTurn[0][0]))) return null;
 
     let activeTurn = 0;
-    let activePlayer = '';
+    let activePlayerName = ''; // Player who's turn it is
+    // Mapping for active player
+    let activePlayer: UsernameMapping = {
+        username: 'DEFAULT',
+        playerName: 'DEFAULT',
+        playerSymbol: 'DEFAULT'
+    };
+    let activeCard: PlayedCard;
     let playedCards: PlayedCard[] = [];
     let purchasedCards: PlayedCard[] = [];
 
-    for (let sentence of splitTurn) {
+    let effectList: PlayerEffect[];
+    let effectHandled = false; // Tracks whether the current effect has been handled
+    let previousPlay = false; // Tracks whether the previous card was played (true) or bought (false)
+
+    let j: number;
+
+    for (let i = 0; i < splitTurn.length; i++) {
+        let sentence = splitTurn[i];
         let splitSentence = sentence.split(' ');
         // Handles the first sentence of the turn, w/ turn number and name
         if (!isNaN(Number(splitSentence[0]))) {
             activeTurn = Number(splitSentence[0]);
-            activePlayer = sentence.substring(sentence.indexOf('-') + 2);
+            activePlayerName = sentence.substring(sentence.indexOf('-') + 2);
+            // Check that this is a valid player in the game
+            let filteredPlayer: UsernameMapping[] = players.filter(
+                (element) =>
+                    element.username === activePlayerName ||
+                    element.playerName === activePlayerName ||
+                    element.playerSymbol === activePlayerName
+            );
+            if (filteredPlayer.length < 1)
+                throw new Error('Unrecognized player: ' + activePlayerName);
+            else if (filteredPlayer.length > 1)
+                throw new Error('Duplicate players: ' + activePlayerName);
+            activePlayer = filteredPlayer[0];
             continue;
+            // Handles the rest of the turn
         } else if (splitSentence.length > 1) {
             let keyword: string = splitSentence[1];
-            //Handles a played card
+            if (keyword !== 'EFFECT') effectHandled = false; // Reset effect tracker
 
             switch (keyword) {
-                //Handles a played card
+                case 'EFFECT':
+                    if (effectHandled) break; // All effects in a row are handled at once
+
+                    // Determine which card caused the effect
+                    if (previousPlay)
+                        activeCard = playedCards[playedCards.length - 1];
+                    else if (purchasedCards.length < 1) {
+                        // TODO : Handle effects that result from previous turns
+                        // Some effects come from previous turns, before any card is used
+                        break;
+                    } else
+                        activeCard = purchasedCards[purchasedCards.length - 1];
+
+                    // Identify where consecutive effects end
+                    j = i;
+                    for (j; j < splitTurn.length; j++) {
+                        if (splitTurn[j].split(' ')[1] !== 'EFFECT') {
+                            j -= 1;
+                            break;
+                        }
+                    }
+
+                    effectList = handleEffectList(
+                        splitTurn.slice(i, j + 1),
+                        activeCard.phase,
+                        Number(splitSentence[2]),
+                        activePlayer
+                    );
+                    activeCard.effect = effectList;
+                    effectHandled = true; // Marks that all consecutive effects are handled
+                    break;
                 case 'plays':
+                    previousPlay = true;
                     playedCards = playedCards.concat(
                         handlePlayKeyword(splitSentence.slice(2))
                     );
                     break;
                 case 'buys':
+                    previousPlay = false;
                     purchasedCards = purchasedCards.concat(
                         handleBuyKeyword(splitSentence.slice(2))
                     );
                     break;
             }
-        }
+        } else throw new Error('Unhandlable Sentence: ' + sentence);
     }
 
     let thisTurn: PlayerTurn = {
         gameId: gameID,
         playerTurn: activeTurn,
         turnIndex: turnIndex,
-        playerName: activePlayer,
+        playerName: activePlayerName,
         playedCards: playedCards,
         purchasedCards: purchasedCards
     };
 
-    //TODO: remove when done testing
-    console.log('Processed turn:');
-    console.log(thisTurn);
-
     return thisTurn;
 }
 
-// TODO : Migrate handlePlayKeyword down to listCard
 // TODO : Add handling for using a secondary way
 // "W plays an Ironmonger using Way of the Monkey"
 // Function to handle the plays keyword, such as
-// "Matt plays a copper"
+// "Matt plays a Copper."
 export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     // Default values for tracking information
     let cardName = '';
@@ -331,18 +443,14 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
     return retList;
 }
 
-export function handleBuyKeyword(
-    sentence: string[],
-): PlayedCard[] {
+export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
     //If there is "and gains" in the sentence get rid of it
-    if (sentence[0] === 'and') {
-        sentence = sentence.slice(2);
-    }
+    if (sentence[0] === 'and') sentence = sentence.slice(2);
 
     return listCards(sentence, 'buy');
 }
 
-// Make sure to check for 'EFFECT' and 'EFFECT EFFECT' before passing into this
+// Function to generate a single effect, based on the keyword in the string
 export function handleEffect(sentence: string[], phase: string) {
     if (sentence.length < 3)
         throw new Error('Effect too short: ' + sentence.join(' '));
@@ -369,16 +477,25 @@ export function handleEffect(sentence: string[], phase: string) {
             type = sentence[3].slice(0, -1);
             switch (type) {
                 case 'Action':
+                case 'Actions':
                     return {
                         type: 'action',
                         player: player,
                         action: amount
                     };
+                case 'Coffer':
                 case 'Coffers':
                     return {
                         type: 'coffers',
                         player: player,
                         coffers: amount
+                    };
+                case 'Buy':
+                case 'Buys':
+                    return {
+                        type: 'buy',
+                        player: player,
+                        buy: amount
                     };
                 // TODO : Add more get keyword effects
                 default:
@@ -417,13 +534,26 @@ export function handleEffect(sentence: string[], phase: string) {
             return {
                 type: 'discard',
                 player: player,
-                discard: numCards(sentence.slice(2), 0)
+                discard: numCards(sentence.slice(2), 0),
+                miscEffects: []
             };
 
         // Some cards, i.e. Scepter, allow you to play another card
         // It isn't necessarily a reaction, but it is identical to reaction
-        case 'reacts':
         case 'plays':
+            return {
+                type: 'reaction',
+                player: player,
+                reaction: generateCard(
+                    sentence.slice(3).join(' ').slice(0, -1),
+                    'reaction',
+                    [],
+                    false,
+                    false
+                )
+            };
+
+        case 'reacts':
             return {
                 type: 'reaction',
                 player: player,
@@ -444,11 +574,152 @@ export function handleEffect(sentence: string[], phase: string) {
             };
 
         default:
-            return null; // some effects are not tracked, and null represents that
+            // It is important that this doesn't error out, as there are so many effects that we couldn't possibly
+            // list all cases here, and many of them don't matter enough to track.
+            // i.e. 'm shuffles their deck.'
+            console.log('Unknown effect: ' + sentence.join(' '));
+            //If the effect isn't identified here just return unknown
+            return {
+                type: 'unknown',
+                player: ''
+            };
     }
 }
 
-// TODO : Migrate handlePlayKeyword down here too
+// TODO : Make it so that reaction effects go into the reaction list, even though reaction effects aren't nested
+// Helper function to take in a list of nested effects and return a list of them
+export function handleEffectList(
+    sentences: string[],
+    phase: string,
+    activeNest = 1,
+    activePlayer: UsernameMapping,
+    otherPlayer = false
+): PlayerEffect[] {
+    if (sentences.length < 1) return [];
+    let currentEffect: PlayerEffect = handleEffect(
+        sentences[0].split(' ').slice(3),
+        phase
+    );
+    if (currentEffect.type === 'unknown')
+        return handleEffectList(
+            sentences.slice(1),
+            phase,
+            activeNest,
+            activePlayer,
+            otherPlayer
+        );
+
+    // Determine if this is an otherPlayer effect, and if so, handle it
+    let isOtherPlayer: boolean =
+        currentEffect.player !== activePlayer.playerName &&
+        currentEffect.player !== activePlayer.playerSymbol &&
+        currentEffect.player !== activePlayer.username &&
+        !otherPlayer;
+    if (sentences.length < 2 && isOtherPlayer) {
+        // Only one other player effect
+        let otherEffect: OtherPlayerEffect = {
+            type: 'other players',
+            player: activePlayer.playerSymbol,
+            otherPlayers: [currentEffect]
+        };
+        return [otherEffect];
+    } else if (sentences.length < 2) return [currentEffect]; // Not an other player effect
+    let nextEffect: string[] = sentences[1].split(' ');
+    let finalIndex = 0; // Tracks which effects have been handled
+
+    // Multiple other player effects
+    if (isOtherPlayer) {
+        let j = 0;
+        for (j; j < sentences.length; j++) {
+            if (
+                sentences[j].split(' ')[3] === activePlayer.playerName ||
+                sentences[j].split(' ')[3] === activePlayer.playerSymbol ||
+                sentences[j].split(' ')[3] === activePlayer.username
+            ) {
+                j -= 1;
+                break;
+            }
+        }
+
+        let otherEffect: OtherPlayerEffect = {
+            type: 'other players',
+            player: activePlayer.playerSymbol,
+            otherPlayers: handleEffectList(
+                sentences.slice(0, j + 1),
+                phase,
+                activeNest,
+                activePlayer,
+                true
+            )
+        };
+        // Generates the list of effects that come after all otherPlayerEffects
+        let continueEffect: PlayerEffect[] = handleEffectList(
+            sentences.slice(j + 1),
+            phase,
+            activeNest,
+            activePlayer,
+            false
+        );
+
+        continueEffect.push(otherEffect);
+
+        return continueEffect;
+    }
+
+    /*
+    TODO : Effects of a reaction card are, for whatever reason, not nested under
+    the card itself in the log. As such, we can't add the correct effects
+    to the reaction, so they just get added at the same level as the reaction.
+    For all intents and purposes, it should work, it's just kind of strange.
+    */
+    // If the next effect is nested under this one
+    if (Number(nextEffect[2]) > activeNest) {
+        finalIndex = 1;
+        for (finalIndex; finalIndex < sentences.length; finalIndex++) {
+            if (Number(sentences[finalIndex].split(' ')[2]) === activeNest) {
+                finalIndex -= 1;
+                break;
+            }
+        }
+
+        // Generate a list of nested effects
+        let nestedEffects: PlayerEffect[] = handleEffectList(
+            sentences.slice(1, finalIndex + 1),
+            phase,
+            Number(nextEffect[2]),
+            activePlayer,
+            otherPlayer
+        );
+
+        // Add nested effects to the current effect
+        if (isGainEffect(currentEffect)) {
+            currentEffect.gain[0].effect = nestedEffects;
+        } else if (isTrashEffect(currentEffect)) {
+            currentEffect.trash[0].effect = nestedEffects;
+        } else if (isReactionEffect(currentEffect)) {
+            currentEffect.reaction.effect = nestedEffects;
+        } else if (isExileEffect(currentEffect)) {
+            currentEffect.exile[0].effect = nestedEffects;
+        } else if (isDiscardEffect(currentEffect)) {
+            currentEffect.miscEffects = nestedEffects;
+        } else {
+            throw new Error(
+                'This effect should not have nested effects: ' + sentences[0]
+            );
+        }
+    }
+
+    return [currentEffect].concat(
+        handleEffectList(
+            sentences.slice(finalIndex + 1),
+            phase,
+            activeNest,
+            activePlayer,
+            otherPlayer
+        )
+    );
+}
+
 // Function to generate a list of cards interacted with in a sentence
 function listCards(sentence: string[], phase) {
     //Default values
@@ -461,10 +732,8 @@ function listCards(sentence: string[], phase) {
             if (sentence[i].slice(-1) === ',') {
                 let sliceIndex: number;
                 // The following is necessary in the event of an Oxford comma
-                if (sentence[i + 1] === 'and')
-                    sliceIndex = i + 2;
-                else
-                    sliceIndex = i + 1;
+                if (sentence[i + 1] === 'and') sliceIndex = i + 2;
+                else sliceIndex = i + 1;
                 retList = retList.concat(
                     listCards(sentence.slice(sliceIndex), phase)
                 );
@@ -528,7 +797,9 @@ function listCards(sentence: string[], phase) {
     return retList;
 }
 
-// Function to determine the number of cards interacted with in a sentence
+// Function to determine the number of cards interacted with in a sentence,
+// without having to verify that they are valid
+// Good for sentences like 'm plays a Gold and 2 cards.'
 function numCards(sentence: string[], initialAmount: number): number {
     let amount: number = initialAmount;
     if (sentence.length === 0) return amount; // Empty sentence
@@ -540,6 +811,7 @@ function numCards(sentence: string[], initialAmount: number): number {
     return numCards(sentence.slice(1), amount);
 }
 
+// Function to create a card using provided keywords
 export function generateCard(
     card: string,
     phase: string,
@@ -575,7 +847,6 @@ export function generateCard(
             retCard.phase = 'reaction';
             break;
         default:
-            // TODO : Use errors provided in common.ts?
             throw new Error(
                 'Not a valid card phase: ' + phase + ' for ' + card
             );

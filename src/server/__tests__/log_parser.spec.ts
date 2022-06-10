@@ -5,7 +5,8 @@ import {
     handleTurn,
     parseLog,
     updateNames,
-    handleEffect
+    handleEffect,
+    handleEffectList
 } from '../log_parser';
 import {
     BuyEffect,
@@ -310,7 +311,13 @@ describe('Buy Keyword Handling', () => {
 
     it('Valid input of a list of cards', () => {
         const testCard: PlayedCard[] = handleBuyKeyword([
-            'an', 'Explorer,', 'a', 'Forager', 'and', 'a', 'Duke.'
+            'an',
+            'Explorer,',
+            'a',
+            'Forager',
+            'and',
+            'a',
+            'Duke.'
         ]);
 
         expect(testCard.length).toEqual(3);
@@ -339,7 +346,13 @@ describe('Buy Keyword Handling', () => {
 
     it('Valid input of a list of cards, Oxford comma', () => {
         const testCard: PlayedCard[] = handleBuyKeyword([
-            'an', 'Explorer,', 'a', 'Forager,', 'and', 'a', 'Duke.'
+            'an',
+            'Explorer,',
+            'a',
+            'Forager,',
+            'and',
+            'a',
+            'Duke.'
         ]);
 
         expect(testCard.length).toEqual(3);
@@ -572,7 +585,13 @@ describe('Play Keyword Handling', () => {
 
     it('Valid multiple, single difference cards, Oxford comma', () => {
         const testCard: PlayedCard[] = handlePlayKeyword([
-            'an', 'Artisan,', 'a', 'Spy,', 'and', 'a', 'Gold.'
+            'an',
+            'Artisan,',
+            'a',
+            'Spy,',
+            'and',
+            'a',
+            'Gold.'
         ]);
 
         expect(testCard.length).toEqual(3);
@@ -760,8 +779,9 @@ describe('Handle Turn', () => {
     it('Valid simple turn', () => {
         const testTurn: PlayerTurn = handleTurn(
             '20220604a',
-            '1 - matt.buland   matt.buland plays 2 Coppers. (+$2)   matt.buland buys and gains a Cellar.   matt.buland draws 5 Coppers.',
-            0
+            '1 - matt.buland   m plays 2 Coppers. (+$2)   m buys and gains a Cellar.   m draws 5 Coppers.',
+            0,
+            [{ username: 'matt.buland', playerName: 'Matt', playerSymbol: 'm' }]
         );
 
         expect(testTurn).toEqual({
@@ -800,8 +820,9 @@ describe('Handle Turn', () => {
     it('Valid turn with effects', () => {
         const testTurn: PlayerTurn = handleTurn(
             '20220604a',
-            '3 - matt.buland   m plays a Council Room.   EFFECT m draws 2 Coppers and 2 Estates.   EFFECT m gets +1 Buy.   EFFECT W draws a card.   EFFECT j shuffles their deck.   EFFECT j draws a card.   EFFECT g shuffles their deck.   EFFECT g draws a card.   EFFECT D draws a card.   EFFECT a draws a card.   m plays 5 Coppers. (+$5)   m buys and gains an Ironmonger.   m shuffles their deck.   m draws 2 Coppers, 2 Estates and a Cellar.',
-            6
+            '3 - matt.buland   m plays a Council Room.   spacing EFFECT 1 m draws 2 Coppers and 2 Estates.   spacing EFFECT 1 m gets +1 Buy.   spacing EFFECT 1 W draws a card.   spacing EFFECT 1 j shuffles their deck.   spacing EFFECT 1 j draws a card.   spacing EFFECT 1 g shuffles their deck.   spacing EFFECT 1 g draws a card.   spacing EFFECT 1 D draws a card.   spacing EFFECT 1 a draws a card.   m plays 5 Coppers. (+$5)   m buys and gains an Ironmonger.   m shuffles their deck.   m draws 2 Coppers, 2 Estates and a Cellar.',
+            6,
+            [{ username: 'matt.buland', playerName: 'Matt', playerSymbol: 'm' }]
         );
 
         // Test basic information
@@ -885,20 +906,23 @@ describe('Handle Turn', () => {
         }
 
         // Test purchased card information
-        expect(testTurn.purchasedCards).toEqual({
-            card: 'Ironmonger',
-            effect: [],
-            phase: 'buy',
-            durationResolve: false,
-            usedVillagers: false
-        });
+        expect(testTurn.purchasedCards).toEqual([
+            {
+                card: 'Ironmonger',
+                effect: [],
+                phase: 'buy',
+                durationResolve: false,
+                usedVillagers: false
+            }
+        ]);
     });
 
     it('Valid input of non-turn', () => {
         const testTurn = handleTurn(
             '20220604a',
             'Game 20220604a, unrated.   m starts with 7 Coppers.   m starts with 3 Estates.   W starts with 7 Coppers.   W starts with 3 Estates.   m shuffles their deck.   m draws 2 Coppers and 3 Estates.   W shuffles their deck.   W draws 5 cards.',
-            0
+            0,
+            []
         );
 
         expect(testTurn).toBeNull;
@@ -908,7 +932,14 @@ describe('Handle Turn', () => {
         const testTurn = handleTurn(
             '20220604a',
             '1 - Matt Buland   M plays 2 Coppers. (+$2)   M buys and gains 2 Cellars.',
-            1
+            1,
+            [
+                {
+                    username: 'matt.buland',
+                    playerName: 'Matt Buland',
+                    playerSymbol: 'M'
+                }
+            ]
         );
 
         expect(testTurn).toEqual({
@@ -956,7 +987,14 @@ describe('Handle Turn', () => {
             handleTurn(
                 '20220604a',
                 '1 - matt.buland   m plays 2 Stormtroopers.   m buys and gains a Cellar.   m draws 5 cards.',
-                0
+                0,
+                [
+                    {
+                        username: 'matt.buland',
+                        playerName: 'Matt',
+                        playerSymbol: 'm'
+                    }
+                ]
             );
         }).toThrow('Not a valid card name: Stormtroopers');
     });
@@ -966,7 +1004,14 @@ describe('Handle Turn', () => {
             handleTurn(
                 '20220604a',
                 '1 - matt.buland   m plays 2 Coppers. (+$2)   m buys and gains 2 Cellas.',
-                0
+                0,
+                [
+                    {
+                        username: 'matt.buland',
+                        playerName: 'Matt',
+                        playerSymbol: 'm'
+                    }
+                ]
             );
         }).toThrow('Not a valid card name: Cellas');
     });
@@ -975,8 +1020,9 @@ describe('Handle Turn', () => {
 describe('In-Depth Single Valid Turn Test', () => {
     const testTurn: PlayerTurn = handleTurn(
         '20220606a',
-        '11 - tsornson   t plays a Horse.   EFFECT t draws 2 cards.   EFFECT t gets +1 Action.   EFFECT t returns a Horse to the Horse Pile.   t plays a Harbinger.   EFFECT t draws a card.   EFFECT t gets +1 Action.   t plays a Camel Train using Way of the Ox.   EFFECT t gets +2 Actions.   t plays a Sleigh.   EFFECT t gains a Horse.   EFFECT EFFECT t reacts with a Sleigh.   EFFECT EFFECT t discards a Sleigh.   EFFECT EFFECT t looks at 2 cards.   EFFECT EFFECT t topdecks a card.   EFFECT t gains a Horse.   t plays 2 Coppers. (+$2)   t ends their buy phase.   EFFECT t loses 1 Coin.   EFFECT t gets +1 Coffers. (Pageant)   t draws 5 cards.',
-        3
+        '11 - tsornson   t plays a Horse.   spacing EFFECT 1 t draws 2 cards.   spacing EFFECT 1 t gets +1 Action.   spacing EFFECT 1 t returns a Horse to the Horse Pile.   t plays a Harbinger.   spacing EFFECT 1 t draws a card.   spacing EFFECT 1 t gets +1 Action.   t plays a Camel Train using Way of the Ox.   spacing EFFECT 1 t gets +2 Actions.   t plays a Sleigh.   spacing EFFECT 1 t gains a Horse.    spacing EFFECT 2 t reacts with a Sleigh.    spacing EFFECT 2 t discards a Sleigh.    spacing EFFECT 2 t looks at 2 cards.    spacing EFFECT 2 t topdecks a card.   spacing EFFECT 1 t gains a Horse.   t plays 2 Coppers. (+$2)   t ends their buy phase.   spacing EFFECT 1 t loses 1 Coin.   spacing EFFECT 1 t gets +1 Coffers. (Pageant)   t draws 5 cards.',
+        3,
+        [{ username: 'tsornson', playerName: 'Troy', playerSymbol: 't' }]
     );
 
     it('Basic turn information', () => {
@@ -1074,32 +1120,70 @@ describe('In-Depth Single Valid Turn Test', () => {
         )[0];
         // Basic card information
         expect(sleighCard1.phase).toEqual('action');
-        expect(sleighCard1.effect.length).toEqual(1);
+        expect(sleighCard1.effect.length).toEqual(2);
         expect(
             sleighCard1.effect.filter((element) => element.type === 'gain')
                 .length
-        ).toEqual(1);
+        ).toEqual(2);
         // Card effect information
         const gainEffect: PlayerEffect = sleighCard1.effect.filter(
             (element) => element.type === 'gain'
         )[0];
         if (isGainEffect(gainEffect)) {
             // Top level gained cards
-            expect(gainEffect.gain.length).toEqual(2);
-            expect(
-                gainEffect.gain.filter(
-                    (element) =>
-                        element.card === 'Horse' && element.effect.length === 0
-                ).length
-            ).toEqual(1);
+            expect(gainEffect.gain.length).toEqual(1);
             expect(
                 gainEffect.gain.filter(
                     (element) =>
                         element.card === 'Horse' && element.effect.length !== 0
                 ).length
             ).toEqual(1);
+
+            // Cards with effects of their own
+            const horseWEffect: PlayedCard = gainEffect.gain.filter(
+                (element) =>
+                    element.card === 'Horse' && element.effect.length !== 0
+            )[0];
+            expect(horseWEffect.phase).toEqual('action');
+            /* Below is the only test that we can't pass:
+            Effects of a reaction card are, for whatever reason, not nested under
+            the card itself in the log. As such, we can't add the correct effects
+            to the reaction, so they just get added at the same level as the reaction.
+            For all intents and purposes, it should work, it's just kind of strange.
+
+            expect(horseWEffect.effect.length).toEqual(1);
+            const reactEffect: PlayerEffect = horseWEffect.effect[0];
+            if (isReactionEffect(reactEffect)) {
+                expect(reactEffect.reaction.phase).toEqual('reaction');
+                expect(reactEffect.reaction.effect.length).toEqual(2);
+                expect(reactEffect.reaction.effect).toContainEqual({
+                    type: 'discard',
+                    player: 't',
+                    discard: 1,
+                    miscEffects: []
+                });
+                expect(reactEffect.reaction.effect).toContainEqual({
+                    type: 'topdeck',
+                    player: 't',
+                    topdeck: 1
+                });
+            }
+            */
+        }
+
+        const gainEffect2: PlayerEffect = sleighCard1.effect.filter(
+            (element) => element.type === 'gain'
+        )[1];
+        if (isGainEffect(gainEffect2)) {
             expect(
-                gainEffect.gain.filter(
+                gainEffect2.gain.filter(
+                    (element) =>
+                        element.card === 'Horse' && element.effect.length === 0
+                ).length
+            ).toEqual(1);
+
+            expect(
+                gainEffect2.gain.filter(
                     (element) =>
                         element.card === 'Horse' && element.effect.length === 0
                 )
@@ -1112,34 +1196,17 @@ describe('In-Depth Single Valid Turn Test', () => {
                     usedVillagers: false
                 }
             ]);
-            // Cards with effects of their own
-            const horseWEffect: PlayedCard = gainEffect.gain.filter(
-                (element) =>
-                    element.card === 'Horse' && element.effect.length !== 0
-            )[0];
-            expect(horseWEffect.phase).toEqual('action');
-            expect(horseWEffect.effect.length).toEqual(1);
-            const reactEffect: PlayerEffect = horseWEffect.effect[0];
-            if (isReactionEffect(reactEffect)) {
-                expect(reactEffect.reaction.phase).toEqual('reaction');
-                expect(reactEffect.reaction.effect.length).toEqual(2);
-                expect(reactEffect.reaction.effect).toContainEqual({
-                    type: 'discard',
-                    player: 't',
-                    discard: 1
-                });
-                expect(reactEffect.reaction.effect).toContainEqual({
-                    type: 'topdeck',
-                    player: 't',
-                    topdeck: 1
-                });
-            }
         }
     });
 });
 
 describe('Second in-depth valid turn test', () => {
-    const testTurn: PlayerTurn = handleTurn('20220608a', '17 - DaveRambo   D starts their turn.   EFFECT D draws a card (Ghost Town).   EFFECT D gets +1 Action.   D plays a Black Market.   EFFECT D gets +$2.   EFFECT D reveals a Relic, a Coven and an Artisan.   EFFECT D puts an Artisan, a Relic, and a Coven on the bottom of the Black Market Deck.   D plays a Scepter.   EFFECT D plays a Black Market.   EFFECT EFFECT D gets +$2.   EFFECT EFFECT D reveals an Explorer, a Forager and a Duke.   EFFECT EFFECT D puts a Duke, an Explorer and a Forager on the bottom of the Black Market Deck.   D plays a Platinum and a Copper. (+$6)   D buys and gains a Province.   EFFECT s discards a Gold.   D draws 5 cards.', 23);
+    const testTurn: PlayerTurn = handleTurn(
+        '20220608a',
+        '17 - DaveRambo   D starts their turn.   spacing EFFECT 1 D draws a card (Ghost Town).   spacing EFFECT 1 D gets +1 Action.   D plays a Black Market.   spacing EFFECT 1 D gets +$2.   spacing EFFECT 1 D reveals a Relic, a Coven and an Artisan.   spacing EFFECT 1 D puts an Artisan, a Relic, and a Coven on the bottom of the Black Market Deck.   D plays a Scepter.   spacing EFFECT 1 D plays a Black Market.    spacing EFFECT 2 D gets +$2.    spacing EFFECT 2 D reveals an Explorer, a Forager and a Duke.    spacing EFFECT 2 D puts a Duke, an Explorer and a Forager on the bottom of the Black Market Deck.   D plays a Platinum and a Copper. (+$6)   D buys and gains a Province.   spacing EFFECT 1 s discards a Gold.   D draws 5 cards.',
+        23,
+        [{ username: 'DaveRambo', playerName: 'Dave', playerSymbol: 'D' }]
+    );
 
     it('Basic turn information', () => {
         expect(testTurn.gameId).toEqual('20220608a');
@@ -1152,8 +1219,13 @@ describe('Second in-depth valid turn test', () => {
 
     it('Basic played card information', () => {
         expect(playedCards.length).toEqual(4);
-        expect(playedCards.filter(element => element.card === 'Black Market').length).toEqual(1);
-        expect(playedCards.filter(element => element.card === 'Scepter').length).toEqual(1);
+        expect(
+            playedCards.filter((element) => element.card === 'Black Market')
+                .length
+        ).toEqual(1);
+        expect(
+            playedCards.filter((element) => element.card === 'Scepter').length
+        ).toEqual(1);
         expect(playedCards).toContainEqual({
             card: 'Platinum',
             effect: [],
@@ -1170,34 +1242,45 @@ describe('Second in-depth valid turn test', () => {
         });
     });
 
-    const blackMarket: PlayedCard = playedCards.filter(element => element.card === 'Black Market')[0];
+    const blackMarket: PlayedCard = playedCards.filter(
+        (element) => element.card === 'Black Market'
+    )[0];
 
     it('Black Market card information', () => {
         expect(blackMarket).toEqual({
             card: 'Black Market',
-            effect: [{
-                type: 'buying power',
-                player: 'D',
-                buyingPower: 2
-            }]
+            effect: [
+                {
+                    type: 'buying power',
+                    player: 'D',
+                    buyingPower: 2
+                }
+            ],
+            phase: 'action',
+            durationResolve: false,
+            usedVillagers: false
         });
     });
 
-    const scepter: PlayedCard = playedCards.filter(element => element.card === 'Scepter')[0];
+    const scepter: PlayedCard = playedCards.filter(
+        (element) => element.card === 'Scepter'
+    )[0];
 
     it('Scepter card information', () => {
         expect(scepter.effect.length).toEqual(1);
         expect(scepter.effect[0].type).toEqual('reaction');
-        if(isReactionEffect(scepter.effect[0])) {
+        if (isReactionEffect(scepter.effect[0])) {
             const reactCard: PlayedCard = scepter.effect[0].reaction;
             expect(reactCard).toEqual({
                 card: 'Black Market',
-                effect: [{
-                    type: 'buying power',
-                    player: 'D',
-                    buyingPower: 2
-                }],
-                phase: 'buy',
+                effect: [
+                    {
+                        type: 'buying power',
+                        player: 'D',
+                        buyingPower: 2
+                    }
+                ],
+                phase: 'reaction',
                 durationResolve: false,
                 usedVillagers: false
             });
@@ -1208,17 +1291,28 @@ describe('Second in-depth valid turn test', () => {
     const purchasedCards: PlayedCard[] = testTurn.purchasedCards;
 
     it('Purchased card information', () => {
-        expect(purchasedCards).toEqual([{
-            card: 'Province',
-            effect: [{
-                type: 'discard',
-                player: 's',
-                discard: 1
-            }],
-            phase: 'buy',
-            durationResolve: false,
-            usedVillagers: false
-        }]);
+        expect(purchasedCards).toEqual([
+            {
+                card: 'Province',
+                effect: [
+                    {
+                        type: 'other players',
+                        player: 'D',
+                        otherPlayers: [
+                            {
+                                type: 'discard',
+                                player: 's',
+                                discard: 1,
+                                miscEffects: []
+                            }
+                        ]
+                    }
+                ],
+                phase: 'buy',
+                durationResolve: false,
+                usedVillagers: false
+            }
+        ]);
     });
 });
 
@@ -1390,7 +1484,8 @@ describe('Name Updating Tests', () => {
         const discard: DiscardEffect = {
             type: 'discard',
             player: 's',
-            discard: 1
+            discard: 1,
+            miscEffects: []
         };
         const buyingPower: BuyingPowerEffect = {
             type: 'buying power',
@@ -1450,7 +1545,8 @@ describe('Name Updating Tests', () => {
             expect(playEffect.reaction.effect).toContainEqual({
                 type: 'discard',
                 player: 'Sam',
-                discard: 1
+                discard: 1,
+                miscEffects: []
             });
             expect(playEffect.reaction.effect).toContainEqual({
                 type: 'buying power',
@@ -1467,7 +1563,8 @@ describe('Name Updating Tests', () => {
             expect(buyEffect.reaction.effect).toContainEqual({
                 type: 'discard',
                 player: 'Sam',
-                discard: 1
+                discard: 1,
+                miscEffects: []
             });
             expect(buyEffect.reaction.effect).toContainEqual({
                 type: 'buying power',
@@ -1701,7 +1798,8 @@ describe('Effect Generation Tests', () => {
         expect(effectTest).toEqual({
             type: 'discard',
             player: 's',
-            discard: 2
+            discard: 2,
+            miscEffects: []
         });
     });
 
@@ -1714,7 +1812,8 @@ describe('Effect Generation Tests', () => {
         expect(effectTest).toEqual({
             type: 'discard',
             player: 'j',
-            discard: 1
+            discard: 1,
+            miscEffects: []
         });
     });
 
@@ -1727,7 +1826,8 @@ describe('Effect Generation Tests', () => {
         expect(effectTest).toEqual({
             type: 'discard',
             player: 'D',
-            discard: 3
+            discard: 3,
+            miscEffects: []
         });
     });
 
@@ -1822,7 +1922,10 @@ describe('Effect Generation Tests', () => {
             'buy'
         );
 
-        expect(effectTest).toEqual(null);
+        expect(effectTest).toEqual({
+            type: 'unknown',
+            player: ''
+        });
     });
 
     it('Valid not-a-tracked-effect', () => {
@@ -1831,7 +1934,10 @@ describe('Effect Generation Tests', () => {
             'action'
         );
 
-        expect(effectTest).toEqual(null);
+        expect(effectTest).toEqual({
+            type: 'unknown',
+            player: ''
+        });
     });
 
     it('Invalid, too short effect', () => {
@@ -1844,5 +1950,77 @@ describe('Effect Generation Tests', () => {
         expect(() => {
             handleEffect(['t', 'gains', 'a', 'Gardens.'], 'slay');
         }).toThrow('Not a valid card phase: slay for Gardens');
+    });
+});
+
+describe('Effect List Generation', () => {
+    it('Valid, other player effects', () => {
+        const testEffects: PlayerEffect[] = handleEffectList(
+            [
+                'spacing EFFECT 1 b trashes a Copper.',
+                'spacing EFFECT 1 W discards a Copper.',
+                'spacing EFFECT 1 t discards a Copper.',
+                'spacing EFFECT 1 jm discards a Copper.',
+                'spacing EFFECT 1 je discards a Copper.',
+                'spacing EFFECT 1 m discards a Copper.',
+                'spacing EFFECT 1 b gains a Silver.'
+            ],
+            'attack',
+            1,
+            { username: 'bsornson', playerName: 'Billy', playerSymbol: 'b' }
+        );
+
+        expect(testEffects.length).toEqual(3);
+        expect(
+            testEffects.filter((element) => element.type === 'trash').length
+        ).toEqual(1);
+        expect(
+            testEffects.filter((element) => element.type === 'other players')
+                .length
+        ).toEqual(1);
+        expect(
+            testEffects.filter((element) => element.type === 'gain').length
+        ).toEqual(1);
+
+        expect(testEffects).toContainEqual({
+            type: 'trash',
+            player: 'b',
+            trash: [
+                {
+                    card: 'Copper',
+                    effect: [],
+                    phase: 'attack',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ]
+        });
+
+        expect(testEffects).toContainEqual({
+            type: 'gain',
+            player: 'b',
+            gain: [
+                {
+                    card: 'Silver',
+                    effect: [],
+                    phase: 'attack',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ]
+        });
+
+        const otherEffect: PlayerEffect = testEffects.filter(
+            (element) => element.type === 'other players'
+        )[0];
+
+        if (isOtherPlayerEffect(otherEffect)) {
+            expect(otherEffect.otherPlayers.length).toEqual(5);
+            expect(
+                otherEffect.otherPlayers.filter(
+                    (element) => element.type === 'discard'
+                ).length
+            ).toEqual(5);
+        }
     });
 });

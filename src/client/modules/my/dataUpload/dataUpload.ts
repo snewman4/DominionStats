@@ -1,6 +1,12 @@
 import { LightningElement } from 'lwc';
 import { validateInput } from './helpers/validateInput';
-import type { GameData, GameIDsAndPlayers, PlayerData, UsernameData } from './helpers/types';
+import type {
+    GameData,
+    GameLog,
+    PlayerData,
+    UsernameData,
+    GameIDsAndPlayers
+} from './helpers/types';
 import { ConnectedScatterplot } from '../d3Charts/connectedScatter';
 
 const todaysDate = new Date();
@@ -13,7 +19,7 @@ export default class DataUploader extends LightningElement {
     errorMessages: string[] = [];
     showErrors = false;
     showGameArea = false;
-    gameLog?:Object = undefined;
+    gameLog?:GameLog[] = undefined;
     gameIDs: string[] = [];
     tableData: GameIDsAndPlayers[] = [];
     /**
@@ -24,12 +30,12 @@ export default class DataUploader extends LightningElement {
         let textBlob: string = this.getValueFromInput('textArea');
         let dataList: GameData[] = this.processLine(textBlob);
         let gameIds: string[] = [];
-        for(let game of dataList){
+        for (let game of dataList) {
             gameIds.push(game.gameId);
         }
         let errorMessages = validateInput(dataList);
         //get file values
-        let fileString = "";
+        let fileString = '';
         let fileText = this.template.querySelector(
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
@@ -54,7 +60,7 @@ export default class DataUploader extends LightningElement {
                     location.reload();
                 }
                 //refresh page
-                 else if (response.status >= 400) {
+                else if (response.status >= 400) {
                     //If there has been a duplicate error
                     if (response.status == 409) {
                         response
@@ -92,24 +98,29 @@ export default class DataUploader extends LightningElement {
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
         if (fileText !== null && fileText.files !== null) {
-            fileText.files[0].text().then((result) => {
+            fileText.files[0].text().then(async (result) => {
+                this.gameLog = await this.validatePlayers(JSON.parse(result));
+                this.displayNewGameIDs(result);
+                console.log('OBJECT: ', JSON.stringify(this.gameLog));
 
-            this.gameLog = this.validatePlayers(JSON.parse(result));
-            this.displayNewGameIDs(this.gameLog);
-            console.log('OBJECT: ', JSON.stringify(this.gameLog));
-            let players:UsernameData[] = [];
-            for(let key in this.gameLog){
-                 players = this.gameLog[key]['players'];
-                 for(let player of players){
-                     if(player.playerName === "" || player.playerName === undefined){
-                          do {
-                            player.playerName = prompt("What is the player name for this username: " + player.username);
-                            
-                        } while(player.playerName === null);
-                     }               
-            }
-            this.gameLog[key]['players'] = players;
-        }
+                let players: UsernameData[] = [];
+                for (let log of this.gameLog) {
+                    players = log.players;
+                    for (let player of players) {
+                        if (
+                            player.playerName === '' ||
+                            player.playerName === undefined
+                        ) {
+                            do {
+                                player.playerName = prompt(
+                                    'What is the player name for this username: ' +
+                                        player.username
+                                );
+                            } while (player.playerName === null);
+                        }
+                    }
+                    log.players = players;
+                }
                 // TODO : Handle the response, potential error handling
             });
         }
@@ -142,11 +153,11 @@ export default class DataUploader extends LightningElement {
         const e: HTMLInputElement | null = this.template.querySelector(
             'textarea[name="' + name + '"]'
         );
-        let gameIDsDisplay: string = "";
-        for(let i = 0; i < gameIDs.length; i++){
-            gameIDsDisplay += gameIDs[i] + "\n";
+        let gameIDsDisplay = '';
+        for (let i = 0; i < gameIDs.length; i++) {
+            gameIDsDisplay += gameIDs[i] + '\n';
         }
-        if(e){
+        if (e) {
             e.value = gameIDsDisplay;
         }
     }
@@ -243,17 +254,29 @@ export default class DataUploader extends LightningElement {
             gameIDsDisplay += ids + " ";
         }
         */
-        
+
+        //let response = prompt("Do these Game ID's look correct? (Y/N) \n" , gameIDsDisplay);
+        //console.log(response);
+
+        // (<HTMLInputElement>document.getElementById('gameArea')).value = JSON.stringify(gameIDs);
+        // let response = prompt("Do these Game ID's look correct? (Y/N) \n" + gameIDs);
+        // if(response === "Y" || response === "Yes" || response === "YES" || response === "y" || response === "yes"){
+        //     return file;
+        // }
+        // else{
+        //     return oldFile;
+        // }
+        //  return file;
     }
 
-    onSaveGameLogToServer(): void{
+    onSaveGameLogToServer(): void {
         //gets value from textarea
         let newGameIDs: string[] = [];
         let textBlob: string = this.getValueFromInput('gameInputArea');
         textBlob.split(/[\r\n]+/).forEach((line: string) => {
             newGameIDs.push(line);
         });
-        if(this.gameLog === undefined){
+        if (this.gameLog === undefined) {
             console.log('missing game log');
             return;
         }
@@ -267,35 +290,59 @@ export default class DataUploader extends LightningElement {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(this.gameLog)
+        }).then((response) => {
+            if (response.status === 200) {
+                console.log('Uploaded Successfully.');
+            } else {
+                response.json().then((json) => console.error(json));
+            }
         });
     }
-    //TODO: Change newGameIDs to Object, map from old game ids to new 
-    replaceGameIDs(file:Object, newGameIDs:string[]): Object{
-        Object.keys(file).forEach((UUID:string, index) => {
+    //TODO: Change newGameIDs to Object, map from old game ids to new
+    replaceGameIDs(file: GameLog[], newGameIDs: string[]): GameLog[] {
+        file.forEach((element, index) => {
+            element.gameID = newGameIDs[index];
+        });
+        /*
+        Object.keys(file).forEach((UUID: string, index) => {
             file[UUID].gameID = newGameIDs[index];
         });
+        */
         return file;
     }
-       
-    validatePlayers(file:Object): Object {
-        let players: string[] = [];
-        for(let key in file){
-            players = file[key]['players'];
-            fetch('api/v1/usernameCheck', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(players)}).then((response) => {
-                    //check response from server
-                    if (response.status == 200) {
-                        response.json().then((json) => {
-                            file[key]['players'] = json;
-                        });
-                    }
-            });
+
+    async validatePlayers(file: Object): Promise<GameLog[]> {
+        let allLogs: GameLog[] = [];
+        //let players: string[] = [];
+        for (let key in file) {
+            allLogs.push(await this.validateSingle(file[key]));
         }
-        return file;
+        return allLogs;
+    }
+
+    validateSingle(file: Object): Promise<GameLog> {
+        let players: string[] = file['players'];
+        return fetch('api/v1/usernameCheck', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(players)
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                return {
+                    VPs: file['VPs'],
+                    date: file['date'],
+                    gameID: file['gameID'],
+                    gameStatus: file['gameStatus'],
+                    log: file['log'],
+                    players: data,
+                    uuid: file['uuid']
+                };
+                return data;
+            })
+            .catch((error) => console.error(error));
     }
 
     processLine(textBlob: string): GameData[] {
