@@ -95,9 +95,8 @@ export default class DataUploader extends LightningElement {
             fileText.files[0].text().then((result) => {
 
             this.gameLog = this.validatePlayers(JSON.parse(result));
-            this.displayNewGameIDs(result);
+            this.displayNewGameIDs(this.gameLog);
             console.log('OBJECT: ', JSON.stringify(this.gameLog));
-
             let players:UsernameData[] = [];
             for(let key in this.gameLog){
                  players = this.gameLog[key]['players'];
@@ -105,6 +104,7 @@ export default class DataUploader extends LightningElement {
                      if(player.playerName === "" || player.playerName === undefined){
                           do {
                             player.playerName = prompt("What is the player name for this username: " + player.username);
+                            
                         } while(player.playerName === null);
                      }               
             }
@@ -152,48 +152,68 @@ export default class DataUploader extends LightningElement {
     }
 
     //Replace each gameID in file with new format based on the date
-    displayNewGameIDs(file:string):void{
-        // Object.keys(file).forEach((UUID:string, index) => {
-        //     console.log(file[UUID].gameID);
-        // });
-         let replace = "";
-         let date = "";
-         let dateString = "";
-         let currentDate = file.substring(file.indexOf("\"date\"") + 9, file.indexOf("\"date\"") + 19);
-         let newGameID = "";
-         let oldGameIds: string[] = [];
-         let letter = "a";
-         let gameIDs: string[] = [];
-         let oldFile = file;
-         while(file.indexOf("\"#") !== -1){
-             replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
-             oldGameIds.push(replace);
-             //Checks if log.json has a space after "date":
-             let tester = "";
-             tester += file.substring(file.indexOf("\"date\"") + 7, file.indexOf("\"date\"") + 8);
-             if(tester === " "){
-                 newGameID = file.substring(file.indexOf("\"date\"") + 15,file.indexOf("\"date\"") + 19 ) + file.substring(file.indexOf("\"date\"") + 12,file.indexOf("\"date\"") + 14) + file.substring(file.indexOf("\"date\"") + 9,file.indexOf("\"date\"") + 11 ) + letter;
-             } else {
-                 newGameID = file.substring(file.indexOf("\"date\"") + 14,file.indexOf("\"date\"") + 18 ) + file.substring(file.indexOf("\"date\"") + 11,file.indexOf("\"date\"") + 13) + file.substring(file.indexOf("\"date\"") + 8,file.indexOf("\"date\"") + 10 ) + letter;
-             }
+    displayNewGameIDs(file:Object):void{
+        let oldGameIds:string[] = [];
+        let newGameIDs:string[] = [];
+        let dates:string[] = [];
+        for(let key in file){
+            oldGameIds.push(file[key]['gameID']);
+            dates.push(file[key]['date']);
+        }
+        let currentDate = dates[0];
+        let letter = 'a';
+        for(let date of dates){
+            console.log('date?: ', date)
+            if(date !== undefined && date !== null){
+            let year = date.substring(6);
+            let month = date.substring(3, 5);
+            let day = date.substring(0, 2);
+            if(date !== currentDate){
+                letter = "a";
+                currentDate = date;
+            }
+            let newGameID = year + month + day + letter;
+            newGameIDs.push(newGameID);
+            letter = String.fromCharCode(letter.charCodeAt(0) + 1);
+        }
+        }
+
+        //  let replace = "";
+        //  let date = "";
+        //  let dateString = "";
+        //  let currentDate = file.substring(file.indexOf("\"date\"") + 9, file.indexOf("\"date\"") + 19);
+        //  let newGameID = "";
+        //  let letter = "a";
+        //  let gameIDs: string[] = [];
+        //  let oldFile = file;
+        //  while(file.indexOf("\"#") !== -1){
+        //      replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
+        //      //Checks if log.json has a space after "date":
+        //      let tester = "";
+        //      tester += file.substring(file.indexOf("\"date\"") + 7, file.indexOf("\"date\"") + 8);
+        //      if(tester === " "){
+        //          newGameID = file.substring(file.indexOf("\"date\"") + 15,file.indexOf("\"date\"") + 19 ) + file.substring(file.indexOf("\"date\"") + 12,file.indexOf("\"date\"") + 14) + file.substring(file.indexOf("\"date\"") + 9,file.indexOf("\"date\"") + 11 ) + letter;
+        //      } else {
+        //          newGameID = file.substring(file.indexOf("\"date\"") + 14,file.indexOf("\"date\"") + 18 ) + file.substring(file.indexOf("\"date\"") + 11,file.indexOf("\"date\"") + 13) + file.substring(file.indexOf("\"date\"") + 8,file.indexOf("\"date\"") + 10 ) + letter;
+        //      }
             
-             gameIDs.push(newGameID);
-             letter = String.fromCharCode(letter.charCodeAt(0) + 1);
-             dateString = file.substring(file.indexOf("\"date\""), file.indexOf("\"date\"") + 6);
-             date = file.substring(file.indexOf("\"date\"") + 9, file.indexOf("\"date\"") + 19);
-             //if date changes, reset letter to 'a'
-             if(date !== currentDate){
-                 letter = "a";
-                 currentDate = date;
-             }
-             //These lines will actually replace the gameIDs in the file
+        //      gameIDs.push(newGameID);
+        //      letter = String.fromCharCode(letter.charCodeAt(0) + 1);
+        //      dateString = file.substring(file.indexOf("\"date\""), file.indexOf("\"date\"") + 6);
+        //      date = file.substring(file.indexOf("\"date\"") + 9, file.indexOf("\"date\"") + 19);
+        //      //if date changes, reset letter to 'a'
+        //      if(date !== currentDate){
+        //          letter = "a";
+        //          currentDate = date;
+        //      }
+        //      //These lines will actually replace the gameIDs in the file
             
-             file = file.replace(dateString, "\"Date\"");
-             file = file.replace(replace, newGameID);
-         }
+        //      file = file.replace(dateString, "\"Date\"");
+        //      file = file.replace(replace, newGameID);
+        //  }
         //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
         this.showGameArea = true;
-        this.setValueFromInput("gameInputArea", gameIDs);
+        this.setValueFromInput("gameInputArea", newGameIDs);
         //this.gameIDs = gameIDs;
         
         for(let i in oldGameIds){
@@ -205,9 +225,9 @@ export default class DataUploader extends LightningElement {
             dominionGameId: "",
             playerNames: []
         }
-        for(let i = 0; i < gameIDs.length; i++){
+        for(let i = 0; i < newGameIDs.length; i++){
             dataRow = {
-                customGameId: gameIDs[i],
+                customGameId: newGameIDs[i],
                 //will change to index from array of dominion ids
                 dominionGameId: oldGameIds[i],
                 //can be either an array or a string seprated by commas, will implement after parsing through names
@@ -215,7 +235,6 @@ export default class DataUploader extends LightningElement {
             }
             this.tableData.push(dataRow);
         }
-
         
         /*
          //Prompt test stuff
@@ -225,19 +244,6 @@ export default class DataUploader extends LightningElement {
         }
         */
         
-        //let response = prompt("Do these Game ID's look correct? (Y/N) \n" , gameIDsDisplay);
-        //console.log(response);
-        
-
-        // (<HTMLInputElement>document.getElementById('gameArea')).value = JSON.stringify(gameIDs);
-       // let response = prompt("Do these Game ID's look correct? (Y/N) \n" + gameIDs);
-        // if(response === "Y" || response === "Yes" || response === "YES" || response === "y" || response === "yes"){
-        //     return file;
-        // }
-        // else{
-        //     return oldFile;
-        // }
-      //  return file;
     }
 
     onSaveGameLogToServer(): void{
