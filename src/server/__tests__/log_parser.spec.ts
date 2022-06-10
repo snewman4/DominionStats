@@ -5,7 +5,8 @@ import {
     handleTurn,
     parseLog,
     updateNames,
-    handleEffect
+    handleEffect,
+    handleEffectList
 } from '../log_parser';
 import {
     BuyEffect,
@@ -1153,7 +1154,8 @@ describe('In-Depth Single Valid Turn Test', () => {
                 expect(reactEffect.reaction.effect).toContainEqual({
                     type: 'discard',
                     player: 't',
-                    discard: 1
+                    discard: 1,
+                    miscEffects: []
                 });
                 expect(reactEffect.reaction.effect).toContainEqual({
                     type: 'topdeck',
@@ -1288,9 +1290,16 @@ describe('Second in-depth valid turn test', () => {
                 card: 'Province',
                 effect: [
                     {
-                        type: 'discard',
-                        player: 's',
-                        discard: 1
+                        type: 'other players',
+                        player: 'D',
+                        otherPlayers: [
+                            {
+                                type: 'discard',
+                                player: 's',
+                                discard: 1,
+                                miscEffects: []
+                            }
+                        ]
                     }
                 ],
                 phase: 'buy',
@@ -1469,7 +1478,8 @@ describe('Name Updating Tests', () => {
         const discard: DiscardEffect = {
             type: 'discard',
             player: 's',
-            discard: 1
+            discard: 1,
+            miscEffects: []
         };
         const buyingPower: BuyingPowerEffect = {
             type: 'buying power',
@@ -1529,7 +1539,8 @@ describe('Name Updating Tests', () => {
             expect(playEffect.reaction.effect).toContainEqual({
                 type: 'discard',
                 player: 'Sam',
-                discard: 1
+                discard: 1,
+                miscEffects: []
             });
             expect(playEffect.reaction.effect).toContainEqual({
                 type: 'buying power',
@@ -1546,7 +1557,8 @@ describe('Name Updating Tests', () => {
             expect(buyEffect.reaction.effect).toContainEqual({
                 type: 'discard',
                 player: 'Sam',
-                discard: 1
+                discard: 1,
+                miscEffects: []
             });
             expect(buyEffect.reaction.effect).toContainEqual({
                 type: 'buying power',
@@ -1780,7 +1792,8 @@ describe('Effect Generation Tests', () => {
         expect(effectTest).toEqual({
             type: 'discard',
             player: 's',
-            discard: 2
+            discard: 2,
+            miscEffects: []
         });
     });
 
@@ -1793,7 +1806,8 @@ describe('Effect Generation Tests', () => {
         expect(effectTest).toEqual({
             type: 'discard',
             player: 'j',
-            discard: 1
+            discard: 1,
+            miscEffects: []
         });
     });
 
@@ -1806,7 +1820,8 @@ describe('Effect Generation Tests', () => {
         expect(effectTest).toEqual({
             type: 'discard',
             player: 'D',
-            discard: 3
+            discard: 3,
+            miscEffects: []
         });
     });
 
@@ -1929,5 +1944,77 @@ describe('Effect Generation Tests', () => {
         expect(() => {
             handleEffect(['t', 'gains', 'a', 'Gardens.'], 'slay');
         }).toThrow('Not a valid card phase: slay for Gardens');
+    });
+});
+
+describe('Effect List Generation', () => {
+    it('Valid, other player effects', () => {
+        const testEffects: PlayerEffect[] = handleEffectList(
+            [
+                'spacing EFFECT 1 b trashes a Copper.',
+                'spacing EFFECT 1 W discards a Copper.',
+                'spacing EFFECT 1 t discards a Copper.',
+                'spacing EFFECT 1 jm discards a Copper.',
+                'spacing EFFECT 1 je discards a Copper.',
+                'spacing EFFECT 1 m discards a Copper.',
+                'spacing EFFECT 1 b gains a Silver.'
+            ],
+            'attack',
+            1,
+            { username: 'bsornson', playerName: 'Billy', playerSymbol: 'b' }
+        );
+
+        expect(testEffects.length).toEqual(3);
+        expect(
+            testEffects.filter((element) => element.type === 'trash').length
+        ).toEqual(1);
+        expect(
+            testEffects.filter((element) => element.type === 'other players')
+                .length
+        ).toEqual(1);
+        expect(
+            testEffects.filter((element) => element.type === 'gain').length
+        ).toEqual(1);
+
+        expect(testEffects).toContainEqual({
+            type: 'trash',
+            player: 'b',
+            trash: [
+                {
+                    card: 'Copper',
+                    effect: [],
+                    phase: 'attack',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ]
+        });
+
+        expect(testEffects).toContainEqual({
+            type: 'gain',
+            player: 'b',
+            gain: [
+                {
+                    card: 'Silver',
+                    effect: [],
+                    phase: 'attack',
+                    durationResolve: false,
+                    usedVillagers: false
+                }
+            ]
+        });
+
+        const otherEffect: PlayerEffect = testEffects.filter(
+            (element) => element.type === 'other players'
+        )[0];
+
+        if (isOtherPlayerEffect(otherEffect)) {
+            expect(otherEffect.otherPlayers.length).toEqual(5);
+            expect(
+                otherEffect.otherPlayers.filter(
+                    (element) => element.type === 'discard'
+                ).length
+            ).toEqual(5);
+        }
     });
 });

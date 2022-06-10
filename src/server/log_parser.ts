@@ -12,7 +12,8 @@ import {
     ReactionEffect,
     TrashEffect,
     DiscardEffect,
-    OtherPlayerEffect
+    OtherPlayerEffect,
+    isDiscardEffect
 } from './log_values';
 import cards from './cards.json';
 import { UsernameMapping } from './common';
@@ -40,19 +41,33 @@ export function parseLog(
         );
         if (turnResult !== null) {
             turnResult = updateNames(turnResult, players);
-            console.log('Processed turn: ');
+
+            // TODO : Remove when done testing
+            console.log('\nProcessed turn: ');
             console.log('gameId: ', turnResult.gameId);
             console.log('playerTurn: ', turnResult.playerTurn);
             console.log('turnIndex: ', turnResult.turnIndex);
             console.log('playerName: ', turnResult.playerName);
-            console.log('Played Cards: ');
+            console.log('\nPlayed Cards:');
             for (let card of turnResult.playedCards) {
-                console.log(card);
+                console.log('\nCard: ', card.card);
+                console.log('Effects:');
+                for (let effect of card.effect) {
+                    console.log(effect);
+                }
+                console.log('Phase: ', card.phase);
             }
-            console.log('Purchased Cards: ');
+            console.log('\nPurchased Cards:');
             for (let card of turnResult.purchasedCards) {
-                console.log(card);
+                console.log('\nCard: ', card.card);
+                console.log('Effects:');
+                for (let effect of card.effect) {
+                    console.log(effect);
+                }
+                console.log('Phase: ', card.phase);
             }
+            // End of testing block
+
             fullGame.push(turnResult);
             iterator++;
         }
@@ -184,12 +199,16 @@ function updateEffectName(
                 exileEffect = updateEffectName(exileEffect, players);
             }
         }
+    } else if (isDiscardEffect(effect)) {
+        for (let discardEffect of effect.miscEffects) {
+            effect = updateEffectName(discardEffect, players);
+        }
     }
 
     return effect;
 }
 
-// TODO : Handle more keywords, like reacts
+// TODO : Handle more keywords, like reveals
 // Helper function to handle the individual turn of a game
 export function handleTurn(
     gameID: string,
@@ -201,7 +220,7 @@ export function handleTurn(
     let splitTurn: string[] = turn.split('  ');
 
     // Remove unnecessary spaces
-    // TODO : Weird error where last turn would always have an empty string at the end. Double filter works, but is messy
+    // Weird error where last turn would always have an empty string at the end. Double filter works, but is messy
     splitTurn = splitTurn
         .filter((element) => {
             return element !== '';
@@ -212,15 +231,17 @@ export function handleTurn(
         });
 
     //TODO: remove when done testing
-    console.log('Unprocessed turn:');
+    console.log('\nUnprocessed turn:');
     console.log(splitTurn);
+    // End of testing block
 
     // Check if this is a turn or the beginning of the game
     // TODO : Better handling of not-a-turn
     if (splitTurn.length < 1 || isNaN(Number(splitTurn[0][0]))) return null;
 
     let activeTurn = 0;
-    let activePlayerName = '';
+    let activePlayerName = ''; // Player who's turn it is
+    // Mapping for active player
     let activePlayer: UsernameMapping = {
         username: 'DEFAULT',
         playerName: 'DEFAULT',
@@ -243,6 +264,8 @@ export function handleTurn(
         if (!isNaN(Number(splitSentence[0]))) {
             activeTurn = Number(splitSentence[0]);
             activePlayerName = sentence.substring(sentence.indexOf('-') + 2);
+            // Check that this is a valid player in the game
+            //let filteredPlayer: UsernameMapping[] = players.filter(element => element.username === activePlayerName || element.playerName === activePlayerName || element.playerSymbol === activePlayerName);
             if (
                 players.filter(
                     (element) =>
@@ -434,7 +457,7 @@ export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
     return listCards(sentence, 'buy');
 }
 
-// Make sure to check for 'EFFECT' and 'EFFECT EFFECT' before passing into this
+// Make sure to check for 'EFFECT' before passing into this
 export function handleEffect(sentence: string[], phase: string) {
     if (sentence.length < 3)
         throw new Error('Effect too short: ' + sentence.join(' '));
@@ -518,7 +541,8 @@ export function handleEffect(sentence: string[], phase: string) {
             return {
                 type: 'discard',
                 player: player,
-                discard: numCards(sentence.slice(2), 0)
+                discard: numCards(sentence.slice(2), 0),
+                miscEffects: []
             };
 
         // Some cards, i.e. Scepter, allow you to play another card
@@ -588,7 +612,20 @@ export function handleEffectList(
             activePlayer,
             otherPlayer
         );
-    if (sentences.length < 2) return [currentEffect];
+    if (
+        sentences.length < 2 &&
+        currentEffect.player !== activePlayer.playerName &&
+        currentEffect.player !== activePlayer.playerSymbol &&
+        currentEffect.player !== activePlayer.username &&
+        !otherPlayer
+    ) {
+        let otherEffect: OtherPlayerEffect = {
+            type: 'other players',
+            player: activePlayer.playerSymbol,
+            otherPlayers: [currentEffect]
+        };
+        return [otherEffect];
+    } else if (sentences.length < 2) return [currentEffect];
     let nextEffect: string[] = sentences[1].split(' ');
     let finalIndex = 0; // Tracks which effects have been handled
 
@@ -607,6 +644,7 @@ export function handleEffectList(
                 sentences[j].split(' ')[3] === activePlayer.playerSymbol ||
                 sentences[j].split(' ')[3] === activePlayer.username
             ) {
+                j -= 1;
                 break;
             }
         }
@@ -663,6 +701,8 @@ export function handleEffectList(
             currentEffect.reaction.effect = nestedEffects;
         } else if (isExileEffect(currentEffect)) {
             currentEffect.exile[0].effect = nestedEffects;
+        } else if (isDiscardEffect(currentEffect)) {
+            currentEffect.miscEffects = nestedEffects;
         } else {
             throw new Error(
                 'This effect should not have nested effects: ' + sentences[0]

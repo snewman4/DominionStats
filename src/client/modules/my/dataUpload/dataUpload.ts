@@ -13,7 +13,7 @@ export default class DataUploader extends LightningElement {
     errorMessages: string[] = [];
     showErrors = false;
     showGameArea = false;
-    gameLog?:Object = undefined;
+    gameLog?: Object = undefined;
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
      */
@@ -108,11 +108,10 @@ export default class DataUploader extends LightningElement {
         ) as HTMLInputElement;
         if (fileText !== null && fileText.files !== null) {
             fileText.files[0].text().then((result) => {
-
                 this.displayNewGameIDs(result);
                 this.gameLog = this.validatePlayers(JSON.parse(result));
                 console.log('OBJECT: ', this.gameLog);
-                
+
                 // TODO : Handle the response, potential error handling
             });
         }
@@ -256,14 +255,14 @@ export default class DataUploader extends LightningElement {
         //  return file;
     }
 
-    onSaveGameLogToServer(): void{
+    onSaveGameLogToServer(): void {
         //gets value from textarea
         let newGameIDs: string[] = [];
         let textBlob: string = this.getValueFromInput('gameInputArea');
         textBlob.split(/[\r\n]+/).forEach((line: string) => {
             newGameIDs.push(line);
         });
-        if(this.gameLog === undefined){
+        if (this.gameLog === undefined) {
             console.log('missing game log');
             return;
         }
@@ -279,9 +278,9 @@ export default class DataUploader extends LightningElement {
             body: JSON.stringify(this.gameLog)
         });
     }
-    //TODO: Change newGameIDs to Object, map from old game ids to new 
-    replaceGameIDs(file:Object, newGameIDs:string[]): Object{
-        Object.keys(file).forEach((UUID:string, index) => {
+    //TODO: Change newGameIDs to Object, map from old game ids to new
+    replaceGameIDs(file: Object, newGameIDs: string[]): Object {
+        Object.keys(file).forEach((UUID: string, index) => {
             file[UUID].gameID = newGameIDs[index];
         });
         return file;
