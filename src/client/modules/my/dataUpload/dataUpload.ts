@@ -1,6 +1,6 @@
 import { LightningElement } from 'lwc';
 import { validateInput } from './helpers/validateInput';
-import type { GameData, PlayerData, UsernameData } from './helpers/types';
+import type { GameData, GameIDsAndPlayers, GamePlayers, PlayerData, UsernameData } from './helpers/types';
 import { ConnectedScatterplot } from '../d3Charts/connectedScatter';
 
 const todaysDate = new Date();
@@ -14,6 +14,8 @@ export default class DataUploader extends LightningElement {
     showErrors = false;
     showGameArea = false;
     gameLog?:Object = undefined;
+    gameIDs: string[] = [];
+    tableData: GamePlayers[] = [];
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
      */
@@ -190,6 +192,24 @@ export default class DataUploader extends LightningElement {
         //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
         this.showGameArea = true;
         this.setValueFromInput("gameInputArea", gameIDs);
+        //this.gameIDs = gameIDs;
+        
+        let dataRow: GameIDsAndPlayers = {
+            customGameId: "",
+            dominionGameId: "",
+            playerNames: []
+        }
+        for(let i = 0; i < gameIDs.length; i++){
+            dataRow = {
+                customGameId: gameIDs[i],
+                //will change to index from array of dominion ids
+                dominionGameId: "test",
+                //can be either an array or a string seprated by commas, will implement after parsing through names
+                playerNames: ["test1", "test2"]
+            }
+            this.tableData.push(dataRow);
+        }
+
         
         /*
          //Prompt test stuff
@@ -322,4 +342,33 @@ export default class DataUploader extends LightningElement {
         dataList.push(currentData);
         return dataList;
     }
+
+    handleUploadFinished(event) {
+        // Get the list of uploaded files
+        //const uploadedFiles = event.detail.files;
+        //alert('No. of files uploaded : ' + uploadedFiles.length);
+        console.log("test");
+        prompt("test");
+    }
+
+    /*
+    test(): void {
+        let playernames: string[] = ["mike", "bob"];
+        let playernames2: string[] = ["mike", "bob"];
+        let e1: GamePlayers = {
+            dominionGameId: "test1",
+            customGameId: "2021",
+            playerNames: playernames
+        };
+
+        let e2: GamePlayers = {
+            dominionGameId: "test2",
+            customGameId: "20223",
+            playerNames: playernames2
+        };
+
+        this.tableData.push(e1);
+        this.tableData.push(e2);
+    }
+    */
 }

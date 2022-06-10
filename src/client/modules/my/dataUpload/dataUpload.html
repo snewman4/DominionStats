@@ -26,7 +26,7 @@
     <div class="slds-text-body_small">This submit button refreshes the page.  Please upload game logs before submitting game results.</div>
 
     <lightning-button
-    label="Submit"
+    label="Submita"
     variant="brand-outline"
     onclick={gatherDataAndSend}
     ></lightning-button>
@@ -46,12 +46,14 @@
             <div class="slds-file-selector slds-file-selector_files">
                 <div class="slds-file-selector__dropzone">
                     <input
+                        label="test"
                         type="file"
                         class="slds-file-selector__input slds-assistive-text"
                         accept=".json"
                         name="file-upload-input-107"
                         id="file-upload-input-107"
                         aria-labelledby="file-selector-primary-label-105 file-selector-secondary-label106"
+                        onuploadfinished={handleUploadFinished}
                     />
                     <label
                         class="slds-file-selector__body"
@@ -89,6 +91,31 @@
     <template if:true={showGameArea}>
         <div class="slds-text-body_small">Please confirm that these gameIDs are correct.</div>
     </template>
+
+    
+        <table
+            class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
+        >
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th>Custom GameID</th>
+                    <th>Dominion GameID</th>
+                    <th>Players</th>
+                </tr>
+            </thead>
+    
+            <tbody>
+                <template for:each={tableData} for:item="entry">
+                    <tr key={entry.customGameId} class="slds-hint-parent">
+                        <td>{entry.customGameId}</td>
+                        <td>{entry.dominionGameId}</td>
+                        <td>{entry.playerNames}</td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+
+
 
     <div class="slds-form-element__control">
         <template if:true={showGameArea}>
