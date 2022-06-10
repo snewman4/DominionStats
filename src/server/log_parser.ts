@@ -265,42 +265,38 @@ export function handleTurn(
             activeTurn = Number(splitSentence[0]);
             activePlayerName = sentence.substring(sentence.indexOf('-') + 2);
             // Check that this is a valid player in the game
-            //let filteredPlayer: UsernameMapping[] = players.filter(element => element.username === activePlayerName || element.playerName === activePlayerName || element.playerSymbol === activePlayerName);
-            if (
-                players.filter(
-                    (element) =>
-                        element.username === activePlayerName ||
-                        element.playerName === activePlayerName ||
-                        element.playerSymbol === activePlayerName
-                ).length < 1
-            )
-                throw new Error('Unrecognized player: ' + activePlayerName);
-            activePlayer = players.filter(
+            let filteredPlayer: UsernameMapping[] = players.filter(
                 (element) =>
                     element.username === activePlayerName ||
                     element.playerName === activePlayerName ||
                     element.playerSymbol === activePlayerName
-            )[0];
+            );
+            if (filteredPlayer.length < 1)
+                throw new Error('Unrecognized player: ' + activePlayerName);
+            else if (filteredPlayer.length > 1)
+                throw new Error('Duplicate players: ' + activePlayerName);
+            activePlayer = filteredPlayer[0];
             continue;
+            // Handles the rest of the turn
         } else if (splitSentence.length > 1) {
             let keyword: string = splitSentence[1];
             if (keyword !== 'EFFECT') effectHandled = false; // Reset effect tracker
 
             switch (keyword) {
                 case 'EFFECT':
-                    if (effectHandled) break;
+                    if (effectHandled) break; // All effects in a row are handled at once
 
                     // Determine which card caused the effect
-                    if (previousPlay) {
+                    if (previousPlay)
                         activeCard = playedCards[playedCards.length - 1];
-                    } else if (purchasedCards.length < 1) {
+                    else if (purchasedCards.length < 1) {
                         // TODO : Handle effects that result from previous turns
                         // Some effects come from previous turns, before any card is used
                         break;
-                    } else {
+                    } else
                         activeCard = purchasedCards[purchasedCards.length - 1];
-                    }
 
+                    // Identify where consecutive effects end
                     j = i;
                     for (j; j < splitTurn.length; j++) {
                         if (splitTurn[j].split(' ')[1] !== 'EFFECT') {
@@ -316,7 +312,7 @@ export function handleTurn(
                         activePlayer
                     );
                     activeCard.effect = effectList;
-                    effectHandled = true;
+                    effectHandled = true; // Marks that all consecutive effects are handled
                     break;
                 case 'plays':
                     previousPlay = true;
@@ -331,7 +327,7 @@ export function handleTurn(
                     );
                     break;
             }
-        }
+        } else throw new Error('Unhandlable Sentence: ' + sentence);
     }
 
     let thisTurn: PlayerTurn = {
@@ -346,7 +342,6 @@ export function handleTurn(
     return thisTurn;
 }
 
-// TODO : Migrate handlePlayKeyword down to listCard
 // TODO : Add handling for using a secondary way
 // "W plays an Ironmonger using Way of the Monkey"
 // Function to handle the plays keyword, such as
@@ -450,14 +445,12 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
 
 export function handleBuyKeyword(sentence: string[]): PlayedCard[] {
     //If there is "and gains" in the sentence get rid of it
-    if (sentence[0] === 'and') {
-        sentence = sentence.slice(2);
-    }
+    if (sentence[0] === 'and') sentence = sentence.slice(2);
 
     return listCards(sentence, 'buy');
 }
 
-// Make sure to check for 'EFFECT' before passing into this
+// Function to generate a single effect, based on the keyword in the string
 export function handleEffect(sentence: string[], phase: string) {
     if (sentence.length < 3)
         throw new Error('Effect too short: ' + sentence.join(' '));
@@ -581,6 +574,9 @@ export function handleEffect(sentence: string[], phase: string) {
             };
 
         default:
+            // It is important that this doesn't error out, as there are so many effects that we couldn't possibly
+            // list all cases here, and many of them don't matter enough to track.
+            // i.e. 'm shuffles their deck.'
             console.log('Unknown effect: ' + sentence.join(' '));
             //If the effect isn't identified here just return unknown
             return {
@@ -612,31 +608,27 @@ export function handleEffectList(
             activePlayer,
             otherPlayer
         );
-    if (
-        sentences.length < 2 &&
+
+    // Determine if this is an otherPlayer effect, and if so, handle it
+    let isOtherPlayer: boolean =
         currentEffect.player !== activePlayer.playerName &&
         currentEffect.player !== activePlayer.playerSymbol &&
         currentEffect.player !== activePlayer.username &&
-        !otherPlayer
-    ) {
+        !otherPlayer;
+    if (sentences.length < 2 && isOtherPlayer) {
+        // Only one other player effect
         let otherEffect: OtherPlayerEffect = {
             type: 'other players',
             player: activePlayer.playerSymbol,
             otherPlayers: [currentEffect]
         };
         return [otherEffect];
-    } else if (sentences.length < 2) return [currentEffect];
+    } else if (sentences.length < 2) return [currentEffect]; // Not an other player effect
     let nextEffect: string[] = sentences[1].split(' ');
     let finalIndex = 0; // Tracks which effects have been handled
 
-    // TODO : OtherPlayerEffect generates weird sometimes, figure out why
-    // If otherPlayerEffect
-    if (
-        currentEffect.player !== activePlayer.playerName &&
-        currentEffect.player !== activePlayer.playerSymbol &&
-        currentEffect.player !== activePlayer.username &&
-        !otherPlayer
-    ) {
+    // Multiple other player effects
+    if (isOtherPlayer) {
         let j = 0;
         for (j; j < sentences.length; j++) {
             if (
@@ -660,6 +652,7 @@ export function handleEffectList(
                 true
             )
         };
+        // Generates the list of effects that come after all otherPlayerEffects
         let continueEffect: PlayerEffect[] = handleEffectList(
             sentences.slice(j + 1),
             phase,
@@ -721,7 +714,6 @@ export function handleEffectList(
     );
 }
 
-// TODO : Migrate handlePlayKeyword down here too
 // Function to generate a list of cards interacted with in a sentence
 function listCards(sentence: string[], phase) {
     //Default values
@@ -799,7 +791,9 @@ function listCards(sentence: string[], phase) {
     return retList;
 }
 
-// Function to determine the number of cards interacted with in a sentence
+// Function to determine the number of cards interacted with in a sentence,
+// without having to verify that they are valid
+// Good for sentences like 'm plays a Gold and 2 cards.'
 function numCards(sentence: string[], initialAmount: number): number {
     let amount: number = initialAmount;
     if (sentence.length === 0) return amount; // Empty sentence
@@ -811,6 +805,7 @@ function numCards(sentence: string[], initialAmount: number): number {
     return numCards(sentence.slice(1), amount);
 }
 
+// Function to create a card using provided keywords
 export function generateCard(
     card: string,
     phase: string,
@@ -846,7 +841,6 @@ export function generateCard(
             retCard.phase = 'reaction';
             break;
         default:
-            // TODO : Use errors provided in common.ts?
             throw new Error(
                 'Not a valid card phase: ' + phase + ' for ' + card
             );

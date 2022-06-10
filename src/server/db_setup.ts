@@ -374,13 +374,13 @@ export function userSymbolGenerator(
 export async function insertLog(log: object): Promise<LogFormResult> {
     let allErrors: ErrorObject[] = [];
     let allTurns: PlayerTurn[] = [];
-    // TODO: implement
+
     let gameID: string;
     let players: UsernameMapping[];
     let gameLog: string;
     for (let key in log) {
         gameID = log[key]['gameID'];
-        // TODO : Check player usernames against DB
+        // TODO : Add player names to database
         // TODO : May need to use JSON.parse() and some other things to get this to work
         players = log[key]['players'];
 
@@ -411,6 +411,8 @@ export async function insertLog(log: object): Promise<LogFormResult> {
                     error: e.message
                 });
             }
+
+            // TODO : Add data to database
         }
     }
 
