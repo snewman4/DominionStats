@@ -666,6 +666,12 @@ export function handleEffectList(
         return continueEffect;
     }
 
+    /*
+    TODO : Effects of a reaction card are, for whatever reason, not nested under
+    the card itself in the log. As such, we can't add the correct effects
+    to the reaction, so they just get added at the same level as the reaction.
+    For all intents and purposes, it should work, it's just kind of strange.
+    */
     // If the next effect is nested under this one
     if (Number(nextEffect[2]) > activeNest) {
         finalIndex = 1;
