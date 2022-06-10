@@ -1,6 +1,6 @@
 import { LightningElement } from 'lwc';
 import { validateInput } from './helpers/validateInput';
-import type { GameData, GameIDsAndPlayers, GamePlayers, PlayerData, UsernameData } from './helpers/types';
+import type { GameData, GameIDsAndPlayers, PlayerData, UsernameData } from './helpers/types';
 import { ConnectedScatterplot } from '../d3Charts/connectedScatter';
 
 const todaysDate = new Date();
@@ -15,7 +15,7 @@ export default class DataUploader extends LightningElement {
     showGameArea = false;
     gameLog?:Object = undefined;
     gameIDs: string[] = [];
-    tableData: GamePlayers[] = [];
+    tableData: GameIDsAndPlayers[] = [];
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
      */
