@@ -100,7 +100,7 @@ export default class DataUploader extends LightningElement {
         if (fileText !== null && fileText.files !== null) {
             fileText.files[0].text().then(async (result) => {
                 this.gameLog = await this.validatePlayers(JSON.parse(result));
-                this.displayNewGameIDs(result);
+                this.displayNewGameIDs(this.gameLog);
                 console.log('OBJECT: ', JSON.stringify(this.gameLog));
 
                 let players: UsernameData[] = [];
@@ -163,18 +163,15 @@ export default class DataUploader extends LightningElement {
     }
 
     //Replace each gameID in file with new format based on the date
-    displayNewGameIDs(file:Object):void{
-        let oldGameIds:string[] = [];
+    displayNewGameIDs(file:GameLog[]):void{
         let newGameIDs:string[] = [];
         let dates:string[] = [];
-        for(let key in file){
-            oldGameIds.push(file[key]['gameID']);
-            dates.push(file[key]['date']);
+        for(let key of file){
+            dates.push(key.date);
         }
         let currentDate = dates[0];
         let letter = 'a';
         for(let date of dates){
-            console.log('date?: ', date)
             if(date !== undefined && date !== null){
             let year = date.substring(6);
             let month = date.substring(3, 5);
@@ -223,11 +220,16 @@ export default class DataUploader extends LightningElement {
         //      file = file.replace(replace, newGameID);
         //  }
         //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
+        
         this.showGameArea = true;
         this.setValueFromInput("gameInputArea", newGameIDs);
         //this.gameIDs = gameIDs;
-        
-        for(let i in oldGameIds){
+        let oldGameIDs: string[] = [];
+        for(let key of file){
+            oldGameIDs.push(key.gameID);
+        }
+
+        for(let i of oldGameIDs){
             console.log(i);
         }
 
@@ -240,7 +242,7 @@ export default class DataUploader extends LightningElement {
             dataRow = {
                 customGameId: newGameIDs[i],
                 //will change to index from array of dominion ids
-                dominionGameId: oldGameIds[i],
+                dominionGameId: oldGameIDs[i],
                 //can be either an array or a string seprated by commas, will implement after parsing through names
                 playerNames: ["test1", "test2"]
             }
