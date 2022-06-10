@@ -221,6 +221,9 @@ export default class DataUploader extends LightningElement {
         //  }
         //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
         
+        //this works, I'm not sure why but this refreshes the html element to populate the table
+        this.showGameArea = true;
+        this.showGameArea = false;
         this.showGameArea = true;
         this.setValueFromInput("gameInputArea", newGameIDs);
         //this.gameIDs = gameIDs;
