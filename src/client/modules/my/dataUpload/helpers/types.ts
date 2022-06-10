@@ -12,3 +12,8 @@ export interface UsernameData {
     playerName: string | null;
     playerSymbol: string;
 }
+export interface GameIDsAndPlayers {
+    customGameId: string;
+    dominionGameId: string;
+    playerNames: string[];
+}
