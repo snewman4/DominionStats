@@ -99,7 +99,8 @@
 
     <template if:true={showGameArea}>
         <table
-            class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped" name = "gameidtable" 
+            class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
+            name="gameidtable"
         >
             <thead>
                 <tr class="slds-line-height_reset">
@@ -108,7 +109,7 @@
                     <th>Players</th>
                 </tr>
             </thead>
-    
+
             <tbody>
                 <template for:each={tableData} for:item="entry">
                     <tr key={entry.customGameId} class="slds-hint-parent">
@@ -120,7 +121,6 @@
             </tbody>
         </table>
     </template>
-
 
     <!-- <div class="slds-form-element__control">
         <template if:true={showGameArea}>

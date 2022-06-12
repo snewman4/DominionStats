@@ -19,7 +19,7 @@ export default class DataUploader extends LightningElement {
     errorMessages: string[] = [];
     showErrors = false;
     showGameArea = false;
-    gameLog?:GameLog[] = undefined;
+    gameLog?: GameLog[] = undefined;
     gameIDs: string[] = [];
     tableData: GameIDsAndPlayers[] = [];
     /**
@@ -165,14 +165,16 @@ export default class DataUploader extends LightningElement {
                 for (let log of this.gameLog) {
                     players = log.players;
                     for (let player of players) {
-                        let currentUser = activeUsers.filter(element => element.username===player.username);
-                        if(currentUser.length > 0){
+                        let currentUser = activeUsers.filter(
+                            (element) => element.username === player.username
+                        );
+                        if (currentUser.length > 0) {
                             player.playerName = currentUser[0].playerName;
                             continue;
                         }
                         if (
                             player.playerName === '' ||
-                            player.playerName === undefined 
+                            player.playerName === undefined
                         ) {
                             do {
                                 player.playerName = prompt(
@@ -185,7 +187,7 @@ export default class DataUploader extends LightningElement {
                     }
                     log.players = players;
                 }
-                
+
                 // TODO : Handle the response, potential error handling
             });
         }
@@ -214,20 +216,20 @@ export default class DataUploader extends LightningElement {
         return '';
     }
 
-       /**
+    /**
      * Gets the value from the table with the given name.
      * Parameters:
      *  name: The name of the table in HTML.
      * Returns:
      *  All gameid values in the first row
      */
-      getValuesFromTable(name: string): string[] {
+    getValuesFromTable(name: string): string[] {
         const e: HTMLTableElement | null = this.template.querySelector(
             'table[name="' + name + '"]'
         );
         if (e) {
-            let table:string[] = [];
-            for(let r = 1; r < e.rows.length; r++){
+            let table: string[] = [];
+            for (let r = 1; r < e.rows.length; r++) {
                 table.push(e.rows[r].cells[0].textContent);
             }
             return table;
@@ -235,31 +237,30 @@ export default class DataUploader extends LightningElement {
         return [];
     }
 
-
     //Replace each gameID in file with new format based on date (YYYYMMDD[a-z])
-    displayNewGameIDs(file:GameLog[]):void{
-        let newGameIDs:string[] = [];
-        let dates:string[] = [];
-        for(let key of file){
+    displayNewGameIDs(file: GameLog[]): void {
+        let newGameIDs: string[] = [];
+        let dates: string[] = [];
+        for (let key of file) {
             dates.push(key.date);
         }
         let currentDate = dates[0];
         let letter = 'a';
-        for(let date of dates){
-            if(date !== undefined && date !== null){
-            let year = date.substring(6);
-            let month = date.substring(3, 5);
-            let day = date.substring(0, 2);
-            if(date !== currentDate){
-                letter = "a";
-                currentDate = date;
+        for (let date of dates) {
+            if (date !== undefined && date !== null) {
+                let year = date.substring(6);
+                let month = date.substring(3, 5);
+                let day = date.substring(0, 2);
+                if (date !== currentDate) {
+                    letter = 'a';
+                    currentDate = date;
+                }
+                let newGameID = year + month + day + letter;
+                newGameIDs.push(newGameID);
+                letter = String.fromCharCode(letter.charCodeAt(0) + 1);
             }
-            let newGameID = year + month + day + letter;
-            newGameIDs.push(newGameID);
-            letter = String.fromCharCode(letter.charCodeAt(0) + 1);
         }
-        }
-        
+
         //this works, I'm not sure why but this refreshes the html element to populate the table
         this.showGameArea = true;
         this.showGameArea = false;
@@ -267,28 +268,27 @@ export default class DataUploader extends LightningElement {
         let oldGameIDs: string[] = [];
         let allPlayers: string[][] = [];
 
-        for(let key of file){
+        for (let key of file) {
             oldGameIDs.push(key.gameID);
         }
         let index = 0;
 
         let dataRow: GameIDsAndPlayers = {
-            customGameId: "",
-            dominionGameId: "",
+            customGameId: '',
+            dominionGameId: '',
             playerNames: []
-        }
-        for(let i = 0; i < newGameIDs.length; i++){
-            
+        };
+        for (let i = 0; i < newGameIDs.length; i++) {
             dataRow = {
                 customGameId: newGameIDs[i],
                 //will change to index from array of dominion ids
                 dominionGameId: oldGameIDs[i],
                 //can be either an array or a string seprated by commas, will implement after parsing through names
-                playerNames: ["test1", "test2"]
-            }
+                playerNames: ['test1', 'test2']
+            };
             this.tableData.push(dataRow);
         }
-        
+
         /*
          //Prompt test stuff
         let gameIDsDisplay = "";
@@ -324,7 +324,7 @@ export default class DataUploader extends LightningElement {
         this.gameLog = this.replaceGameIDs(this.gameLog, newGameIDs);
         this.showGameArea = false;
         console.log('OBJECT: ', JSON.stringify(this.gameLog));
-        
+
         fetch('api/v1/logUpload', {
             method: 'POST',
             headers: {
