@@ -91,280 +91,7 @@ export default class DataUploader extends LightningElement {
         }
     }
 
-    onLogFileAttached(): void {
-        //get file values
-        //let fileString = "";
-        let fileText = this.template.querySelector(
-            'input[name="file-upload-input-107"]'
-        ) as HTMLInputElement;
-        if (fileText !== null && fileText.files !== null) {
-            fileText.files[0].text().then(async (result) => {
-                this.gameLog = await this.validatePlayers(JSON.parse(result));
-                this.displayNewGameIDs(this.gameLog);
-                console.log('OBJECT: ', JSON.stringify(this.gameLog));
-
-                let players: UsernameData[] = [];
-                let currentPlayerName;
-                let currentUserName;
-                let activeUsers:UsernameData[] = [];
-                for (let log of this.gameLog) {
-                    players = log.players;
-                    for (let player of players) {
-                        let currentUser = activeUsers.filter(element => element.username===player.username);
-                        if(currentUser.length > 0){
-                            player.playerName = currentUser[0].playerName;
-                            continue;
-                        }
-                        if (
-                            player.playerName === '' ||
-                            player.playerName === undefined 
-                        ) {
-                            do {
-                                player.playerName = prompt(
-                                    'What is the player name for this username: ' +
-                                        player.username
-                                );
-                            } while (player.playerName === null);
-                            activeUsers.push(player);
-                        }
-                    }
-                    log.players = players;
-                }
-                
-                // TODO : Handle the response, potential error handling
-            });
-        }
-        this.showGameArea = true;
-    }
-
-    setErrorMessages(errorMessages: string[]): void {
-        this.errorMessages = errorMessages;
-        this.showErrors = errorMessages.length > 0;
-    }
-
-    /**
-     * Gets the value from the input field with the given name.
-     * Parameters:
-     *  name: The name of the input field in HTML.
-     * Returns:
-     *  The value currently in the input field. Can be null.
-     */
-    getValueFromInput(name: string): string {
-        const e: HTMLInputElement | null = this.template.querySelector(
-            'textarea[name="' + name + '"]'
-        );
-        if (e) {
-            return e.value.trim();
-        }
-        return '';
-    }
-
-    setValueFromInput(name: string, gameIDs: string[]): void {
-        const e: HTMLInputElement | null = this.template.querySelector(
-            'textarea[name="' + name + '"]'
-        );
-        let gameIDsDisplay = '';
-        for (let i = 0; i < gameIDs.length; i++) {
-            gameIDsDisplay += gameIDs[i] + '\n';
-        }
-        if (e) {
-            e.value = gameIDsDisplay;
-        }
-    }
-
-    //Replace each gameID in file with new format based on the date
-    displayNewGameIDs(file:GameLog[]):void{
-        let newGameIDs:string[] = [];
-        let dates:string[] = [];
-        for(let key of file){
-            dates.push(key.date);
-        }
-        let currentDate = dates[0];
-        let letter = 'a';
-        for(let date of dates){
-            if(date !== undefined && date !== null){
-            let year = date.substring(6);
-            let month = date.substring(3, 5);
-            let day = date.substring(0, 2);
-            if(date !== currentDate){
-                letter = "a";
-                currentDate = date;
-            }
-            let newGameID = year + month + day + letter;
-            newGameIDs.push(newGameID);
-            letter = String.fromCharCode(letter.charCodeAt(0) + 1);
-        }
-        }
-
-        //  let replace = "";
-        //  let date = "";
-        //  let dateString = "";
-        //  let currentDate = file.substring(file.indexOf("\"date\"") + 9, file.indexOf("\"date\"") + 19);
-        //  let newGameID = "";
-        //  let letter = "a";
-        //  let gameIDs: string[] = [];
-        //  let oldFile = file;
-        //  while(file.indexOf("\"#") !== -1){
-        //      replace = file.substring(file.indexOf("\"#")+1, file.indexOf("\"#") + 10);
-        //      //Checks if log.json has a space after "date":
-        //      let tester = "";
-        //      tester += file.substring(file.indexOf("\"date\"") + 7, file.indexOf("\"date\"") + 8);
-        //      if(tester === " "){
-        //          newGameID = file.substring(file.indexOf("\"date\"") + 15,file.indexOf("\"date\"") + 19 ) + file.substring(file.indexOf("\"date\"") + 12,file.indexOf("\"date\"") + 14) + file.substring(file.indexOf("\"date\"") + 9,file.indexOf("\"date\"") + 11 ) + letter;
-        //      } else {
-        //          newGameID = file.substring(file.indexOf("\"date\"") + 14,file.indexOf("\"date\"") + 18 ) + file.substring(file.indexOf("\"date\"") + 11,file.indexOf("\"date\"") + 13) + file.substring(file.indexOf("\"date\"") + 8,file.indexOf("\"date\"") + 10 ) + letter;
-        //      }
-            
-        //      gameIDs.push(newGameID);
-        //      letter = String.fromCharCode(letter.charCodeAt(0) + 1);
-        //      dateString = file.substring(file.indexOf("\"date\""), file.indexOf("\"date\"") + 6);
-        //      date = file.substring(file.indexOf("\"date\"") + 9, file.indexOf("\"date\"") + 19);
-        //      //if date changes, reset letter to 'a'
-        //      if(date !== currentDate){
-        //          letter = "a";
-        //          currentDate = date;
-        //      }
-        //      //These lines will actually replace the gameIDs in the file
-            
-        //      file = file.replace(dateString, "\"Date\"");
-        //      file = file.replace(replace, newGameID);
-        //  }
-        //Prompt user to check gameIDS(TEMPORARY, CHANGE TO TEXT AREA THAT APPEARS AFTER FILE UPLOAD)
-        
-        //this works, I'm not sure why but this refreshes the html element to populate the table
-        this.showGameArea = true;
-        this.showGameArea = false;
-        this.showGameArea = true;
-        this.setValueFromInput("gameInputArea", newGameIDs);
-        //this.gameIDs = gameIDs;
-        let oldGameIDs: string[] = [];
-        for(let key of file){
-            oldGameIDs.push(key.gameID);
-        }
-
-        for(let i of oldGameIDs){
-            console.log(i);
-        }
-
-        let dataRow: GameIDsAndPlayers = {
-            customGameId: "",
-            dominionGameId: "",
-            playerNames: []
-        }
-        for(let i = 0; i < newGameIDs.length; i++){
-            dataRow = {
-                customGameId: newGameIDs[i],
-                //will change to index from array of dominion ids
-                dominionGameId: oldGameIDs[i],
-                //can be either an array or a string seprated by commas, will implement after parsing through names
-                playerNames: ["test1", "test2"]
-            }
-            this.tableData.push(dataRow);
-        }
-        
-        /*
-         //Prompt test stuff
-        let gameIDsDisplay = "";
-        for(let ids of gameIDs){
-            gameIDsDisplay += ids + " ";
-        }
-        */
-
-        //let response = prompt("Do these Game ID's look correct? (Y/N) \n" , gameIDsDisplay);
-        //console.log(response);
-
-        // (<HTMLInputElement>document.getElementById('gameArea')).value = JSON.stringify(gameIDs);
-        // let response = prompt("Do these Game ID's look correct? (Y/N) \n" + gameIDs);
-        // if(response === "Y" || response === "Yes" || response === "YES" || response === "y" || response === "yes"){
-        //     return file;
-        // }
-        // else{
-        //     return oldFile;
-        // }
-        //  return file;
-    }
-
-    onSaveGameLogToServer(): void {
-        //gets value from textarea
-        let newGameIDs: string[] = [];
-        let textBlob: string = this.getValueFromInput('gameInputArea');
-        textBlob.split(/[\r\n]+/).forEach((line: string) => {
-            newGameIDs.push(line);
-        });
-        if (this.gameLog === undefined) {
-            console.log('missing game log');
-            return;
-        }
-        this.gameLog = this.replaceGameIDs(this.gameLog, newGameIDs);
-
-        this.showGameArea = false;
-
-        fetch('api/v1/logUpload', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(this.gameLog)
-        }).then((response) => {
-            if (response.status === 200) {
-                console.log('Uploaded Successfully.');
-            } else {
-                response.json().then((json) => console.error(json));
-            }
-        });
-        /*
-        let test: Element;
-        test = document.querySelector("tableInput");
-        console.log('tableInput', test);
-        */
-    }
-    //TODO: Change newGameIDs to Object, map from old game ids to new
-    replaceGameIDs(file: GameLog[], newGameIDs: string[]): GameLog[] {
-        file.forEach((element, index) => {
-            element.gameID = newGameIDs[index];
-        });
-        /*
-        Object.keys(file).forEach((UUID: string, index) => {
-            file[UUID].gameID = newGameIDs[index];
-        });
-        */
-        return file;
-    }
-
-    async validatePlayers(file: Object): Promise<GameLog[]> {
-        let allLogs: GameLog[] = [];
-        //let players: string[] = [];
-        for (let key in file) {
-            allLogs.push(await this.validateSingle(file[key]));
-        }
-        return allLogs;
-    }
-
-    validateSingle(file: Object): Promise<GameLog> {
-        let players: string[] = file['players'];
-        return fetch('api/v1/usernameCheck', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(players)
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                return {
-                    VPs: file['VPs'],
-                    date: file['date'],
-                    gameID: file['gameID'],
-                    gameStatus: file['gameStatus'],
-                    log: file['log'],
-                    players: data,
-                    uuid: file['uuid']
-                };
-                return data;
-            })
-            .catch((error) => console.error(error));
-    }
-
+    //Proccess entire text area for bulk insert, returns list of GameData
     processLine(textBlob: string): GameData[] {
         let playerData: PlayerData[] = []; //data for each player input
         let dataList: GameData[] = []; //list of game data
@@ -420,6 +147,251 @@ export default class DataUploader extends LightningElement {
         };
         dataList.push(currentData);
         return dataList;
+    }
+
+    //Read in file, and prompt user to input playerNames if missing
+    onLogFileAttached(): void {
+        //Read in file from file select
+        let fileText = this.template.querySelector(
+            'input[name="file-upload-input-107"]'
+        ) as HTMLInputElement;
+        if (fileText !== null && fileText.files !== null) {
+            fileText.files[0].text().then(async (result) => {
+                this.gameLog = await this.validatePlayers(JSON.parse(result));
+                this.displayNewGameIDs(this.gameLog);
+
+                let players: UsernameData[] = [];
+                let activeUsers: UsernameData[] = [];
+                for (let log of this.gameLog) {
+                    players = log.players;
+                    for (let player of players) {
+                        let currentUser = activeUsers.filter(element => element.username===player.username);
+                        if(currentUser.length > 0){
+                            player.playerName = currentUser[0].playerName;
+                            continue;
+                        }
+                        if (
+                            player.playerName === '' ||
+                            player.playerName === undefined 
+                        ) {
+                            do {
+                                player.playerName = prompt(
+                                    'What is the player name for this username: ' +
+                                        player.username
+                                );
+                            } while (player.playerName === null);
+                            activeUsers.push(player);
+                        }
+                    }
+                    log.players = players;
+                }
+                
+                // TODO : Handle the response, potential error handling
+            });
+        }
+        this.showGameArea = true;
+    }
+
+    setErrorMessages(errorMessages: string[]): void {
+        this.errorMessages = errorMessages;
+        this.showErrors = errorMessages.length > 0;
+    }
+
+    /**
+     * Gets the value from the input field with the given name.
+     * Parameters:
+     *  name: The name of the input field in HTML.
+     * Returns:
+     *  The value currently in the input field. Can be null.
+     */
+    getValueFromInput(name: string): string {
+        const e: HTMLInputElement | null = this.template.querySelector(
+            'textarea[name="' + name + '"]'
+        );
+        if (e) {
+            return e.value.trim();
+        }
+        return '';
+    }
+
+       /**
+     * Gets the value from the table with the given name.
+     * Parameters:
+     *  name: The name of the table in HTML.
+     * Returns:
+     *  All gameid values in the first row
+     */
+      getValuesFromTable(name: string): string[] {
+        const e: HTMLTableElement | null = this.template.querySelector(
+            'table[name="' + name + '"]'
+        );
+        if (e) {
+            let table:string[] = [];
+            for(let r = 1; r < e.rows.length; r++){
+                table.push(e.rows[r].cells[0].textContent);
+            }
+            return table;
+        }
+        return [];
+    }
+
+
+    //Replace each gameID in file with new format based on date (YYYYMMDD[a-z])
+    displayNewGameIDs(file:GameLog[]):void{
+        let newGameIDs:string[] = [];
+        let dates:string[] = [];
+        for(let key of file){
+            dates.push(key.date);
+        }
+        let currentDate = dates[0];
+        let letter = 'a';
+        for(let date of dates){
+            if(date !== undefined && date !== null){
+            let year = date.substring(6);
+            let month = date.substring(3, 5);
+            let day = date.substring(0, 2);
+            if(date !== currentDate){
+                letter = "a";
+                currentDate = date;
+            }
+            let newGameID = year + month + day + letter;
+            newGameIDs.push(newGameID);
+            letter = String.fromCharCode(letter.charCodeAt(0) + 1);
+        }
+        }
+        
+        //this works, I'm not sure why but this refreshes the html element to populate the table
+        this.showGameArea = true;
+        this.showGameArea = false;
+        this.showGameArea = true;
+        let oldGameIDs: string[] = [];
+        let allPlayers: string[][] = [];
+
+        for(let key of file){
+            oldGameIDs.push(key.gameID);
+        }
+        let index = 0;
+
+        let dataRow: GameIDsAndPlayers = {
+            customGameId: "",
+            dominionGameId: "",
+            playerNames: []
+        }
+        for(let i = 0; i < newGameIDs.length; i++){
+            
+            dataRow = {
+                customGameId: newGameIDs[i],
+                //will change to index from array of dominion ids
+                dominionGameId: oldGameIDs[i],
+                //can be either an array or a string seprated by commas, will implement after parsing through names
+                playerNames: ["test1", "test2"]
+            }
+            this.tableData.push(dataRow);
+        }
+        
+        /*
+         //Prompt test stuff
+        let gameIDsDisplay = "";
+        for(let ids of gameIDs){
+            gameIDsDisplay += ids + " ";
+        }
+        */
+
+        //let response = prompt("Do these Game ID's look correct? (Y/N) \n" , gameIDsDisplay);
+        //console.log(response);
+
+        // (<HTMLInputElement>document.getElementById('gameArea')).value = JSON.stringify(gameIDs);
+        // let response = prompt("Do these Game ID's look correct? (Y/N) \n" + gameIDs);
+        // if(response === "Y" || response === "Yes" || response === "YES" || response === "y" || response === "yes"){
+        //     return file;
+        // }
+        // else{
+        //     return oldFile;
+        // }
+        //  return file;
+    }
+
+    //When all data has been validated, upload new log file to server
+    onSaveGameLogToServer(): void {
+        //gets values from table
+        let newGameIDs: string[] = [];
+        newGameIDs = this.getValuesFromTable('gameidtable');
+        if (this.gameLog === undefined) {
+            console.log('missing game log');
+            return;
+        }
+
+        this.gameLog = this.replaceGameIDs(this.gameLog, newGameIDs);
+        this.showGameArea = false;
+        console.log('OBJECT: ', JSON.stringify(this.gameLog));
+        
+        fetch('api/v1/logUpload', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(this.gameLog)
+        }).then((response) => {
+            if (response.status === 200) {
+                console.log('Uploaded Successfully.');
+            } else {
+                response.json().then((json) => console.error(json));
+            }
+        });
+        /*
+        let test: Element;
+        test = document.querySelector("tableInput");
+        console.log('tableInput', test);
+        */
+    }
+
+    //TODO: Change newGameIDs to Object, map from old game ids to new
+    replaceGameIDs(file: GameLog[], newGameIDs: string[]): GameLog[] {
+        file.forEach((element, index) => {
+            element.gameID = newGameIDs[index];
+        });
+        /*
+        Object.keys(file).forEach((UUID: string, index) => {
+            file[UUID].gameID = newGameIDs[index];
+        });
+        */
+        return file;
+    }
+
+    //Call validateSingle to validate each game in log
+    async validatePlayers(file: Object): Promise<GameLog[]> {
+        let allLogs: GameLog[] = [];
+        //let players: string[] = [];
+        for (let key in file) {
+            allLogs.push(await this.validateSingle(file[key]));
+        }
+        return allLogs;
+    }
+
+    //Validates a single game, specifically checking if usernames have an associated playername in the DB
+    validateSingle(file: Object): Promise<GameLog> {
+        let players: string[] = file['players'];
+        return fetch('api/v1/usernameCheck', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(players)
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                return {
+                    VPs: file['VPs'],
+                    date: file['date'],
+                    gameID: file['gameID'],
+                    gameStatus: file['gameStatus'],
+                    log: file['log'],
+                    players: data,
+                    uuid: file['uuid']
+                };
+                return data;
+            })
+            .catch((error) => console.error(error));
     }
 
     /*
