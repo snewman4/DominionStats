@@ -1,31 +1,31 @@
 <template>
-    <table
+    <table  
         class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
     >
         <thead>
             <tr class="slds-line-height_reset">
-                <th>TEst</th>
-                <th>Games Played</th>
-                <th>Percentage of Games Played</th>
-                <th>Average Points per Game</th>
-                <th>Total Points</th>
-                <th>First Place Finishes</th>
-                <th>First Place Percentage</th>
+                <th>ID</th>
+                <th>GameID</th>
+                <th>Player Turn</th>
+                <th>Turn Index</th>
+                <th>Player Name</th>
+                <th>Cards Played</th>
+                <th>Cards Purchased</th>
             </tr>
         </thead>
 
         <tbody>
             <template for:each={tableData} for:item="entry">
                 <tr key={entry.id} class="slds-hint-parent">
-                    <td>
-                        <my-user-link user={entry.id}></my-user-link>
-                    </td>
+                    <td>{entry.id}</td>
                     <td>{entry.game_label}</td>
                     <td>{entry.player_turn}</td>
                     <td>{entry.turn_index}</td>
-                    <td>{entry.player_name}</td>
-                    <td>{entry.cards_played}</td>
-                    <td>{entry.cards_purchased}</td>
+                    <td>
+                        <my-user-link user={entry.player_name}></my-user-link>
+                    </td>
+                    <td class="slds-cell-wrap">{entry.cards_played}</td>
+                    <td class="slds-cell-wrap">{entry.cards_purchased}</td>
                 </tr>
             </template>
         </tbody>

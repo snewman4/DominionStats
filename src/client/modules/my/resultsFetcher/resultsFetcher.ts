@@ -38,6 +38,13 @@ export function getRawData(): Promise<GameLogDB[]> {
             .then((response) => response.json())
             .then((data) => {
                 cachedDataLog = data as GameLogDB[];
+                for(let key of data){
+                    key.id = <number>key.id;
+                    console.log('id: ', key.id);
+                    //console.log('played cards:', JSON.stringify(key.cards_played));
+                    key.cards_played = JSON.stringify(key.cards_played).split('}').join('} ');
+                    key.cards_purchased = JSON.stringify(key.cards_purchased).split('}').join('} ');
+                }
                 return data;
             })
             .catch((error) => {
