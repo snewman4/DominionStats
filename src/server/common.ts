@@ -1,4 +1,4 @@
-import type { PlayerTurn } from './log_values';
+import type { PlayedCard, PlayerTurn } from './log_values';
 
 export interface TestObject {
     id: number;
@@ -95,4 +95,14 @@ export interface GameLogServer {
     log: string;
     players: UsernameMapping[];
     uuid: string;
+}
+
+export interface GameLogDB {
+    id: number;
+    game_label: string;
+    player_turn: number;
+    turn_index: number;
+    player_name: string;
+    cards_played: PlayedCard[];
+    cards_purchased: PlayedCard[];
 }
