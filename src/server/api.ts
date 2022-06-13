@@ -17,7 +17,8 @@ import {
     insertGameResult,
     insertGameResults,
     insertLog,
-    usernameCheck
+    usernameCheck,
+    getLogResultsFromDb
 } from './db_setup';
 
 function setupRoutes() {
@@ -289,6 +290,13 @@ function setupRoutes() {
         }
         return res.json(await getGameResultsFromDb());
     });
+
+    app.get('/api/v1/logData', async (req, res) => {
+        if (process.env.NODB) {
+            return res.status(501).send();
+        }
+        return res.json(await getLogResultsFromDb());
+    })
 
     /*
     // Serve LWC content

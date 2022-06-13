@@ -13,7 +13,8 @@ import type {
     UsernameFormResult,
     LogFormResult,
     UsernameMapping,
-    GameLogServer
+    GameLogServer,
+    GameLogDB
 } from './common';
 import type { PlayerTurn } from './log_values';
 
@@ -111,6 +112,11 @@ export async function getGameResultsFromDb(): Promise<GameResultsDB[]> {
         'SELECT id, game_label, player_num, player_name, victory_points FROM game_results'
     );
     return res.rows as GameResultsDB[];
+}
+
+export async function getLogResultsFromDb(): Promise<GameLogDB[]> {
+    const res = await pool.query('SELECT id, game_label, player_turn, turn_index, player_name, cards_played, cards_purchased FROM log_game_round');
+    return res.rows as GameLogDB[];
 }
 
 function flatArray<T>(arrarr: T[][]): T[] {
