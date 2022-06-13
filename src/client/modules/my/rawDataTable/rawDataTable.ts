@@ -1,10 +1,12 @@
 import { LightningElement } from 'lwc';
-import { getRawResults, extractaGameSizePlayerStats } from 'my/resultsFetcher';
+import { getRawData } from 'my/resultsFetcher';
+import type { GameLogDB } from '../resultsFetcher/types';
 import type { PlayerStatsAllGames } from 'my/resultsFetcher';
 
-export default class sixPlayerRankingTable extends LightningElement {
-    tableData: PlayerStatsAllGames[] = [];
+export default class RawDataValue extends LightningElement {
+    tableData: GameLogDB[] = [];
     async connectedCallback() {
-        this.tableData = extractaGameSizePlayerStats(await getRawResults(), 6);
+        this.tableData = await getRawData();
+        console.log(this.tableData);
     }
 }

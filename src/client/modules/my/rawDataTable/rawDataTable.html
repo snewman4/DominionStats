@@ -11,41 +11,21 @@
                 <th>Total Points</th>
                 <th>First Place Finishes</th>
                 <th>First Place Percentage</th>
-                <th>Second Place Finishes</th>
-                <th>Second Place Percentage</th>
-                <th>Third Place Finishes</th>
-                <th>Third Place Percentage</th>
-                <th>Fourth Place Finishes</th>
-                <th>Fourth Place Percentage</th>
-                <th>Fifth Place Finishes</th>
-                <th>Fifth Place Percentage</th>
-                <th>Sixth Place Finishes</th>
-                <th>Sixth Place Percentage</th>
             </tr>
         </thead>
 
         <tbody>
             <template for:each={tableData} for:item="entry">
-                <tr key={entry.player_name} class="slds-hint-parent">
+                <tr key={entry.id} class="slds-hint-parent">
                     <td>
-                        <my-user-link user={entry.player_name}></my-user-link>
+                        <my-user-link user={entry.id}></my-user-link>
                     </td>
-                    <td>{entry.num_games}</td>
-                    <td>{entry.percent_played}%</td>
-                    <td>{entry.avg_points}</td>
-                    <td>{entry.total_victory_points}</td>
-                    <td>{entry.first_place}</td>
-                    <td>{entry.percent_first}%</td>
-                    <td>{entry.second_place}</td>
-                    <td>{entry.percent_second}%</td>
-                    <td>{entry.third_place}</td>
-                    <td>{entry.percent_third}%</td>
-                    <td>{entry.fourth_place}</td>
-                    <td>{entry.percent_fourth}%</td>
-                    <td>{entry.fifth_place}</td>
-                    <td>{entry.percent_fifth}%</td>
-                    <td>{entry.sixth_place}</td>
-                    <td>{entry.percent_sixth}%</td>
+                    <td>{entry.game_label}</td>
+                    <td>{entry.player_turn}</td>
+                    <td>{entry.turn_index}</td>
+                    <td>{entry.player_name}</td>
+                    <td>{entry.cards_played}</td>
+                    <td>{entry.cards_purchased}</td>
                 </tr>
             </template>
         </tbody>

@@ -1,3 +1,5 @@
+import type { GameLogDB } from "./types";
+
 export interface GameResultsData {
     id: number;
     game_label: string;
@@ -27,7 +29,23 @@ export interface PlayerStatsAllGames {
 }
 
 let cachedData: GameResultsData[] = [];
+let cachedDataLog: GameLogDB[] = [];
 type PlayersPerGame = Pick<GameResultsData, 'game_label' | 'player_num'>;
+
+export function getRawData(): Promise<GameLogDB[]> {
+    if (cachedDataLog && !cachedDataLog.length) {
+        return fetch('/api/v1/logData')
+            .then((response) => response.json())
+            .then((data) => {
+                cachedDataLog = data as GameLogDB[];
+                return data;
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+    return new Promise((resolve) => resolve(cachedDataLog));
+}
 
 export function getRawResults(): Promise<GameResultsData[]> {
     if (cachedData && !cachedData.length) {
