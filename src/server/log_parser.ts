@@ -499,7 +499,7 @@ export function handleEffect(sentence: string[], phase: string) {
                     };
                 // TODO : Add more get keyword effects
                 default:
-                    console.log("Uknown action type: " + type);
+                    console.log('Uknown action type: ' + type);
                     return {
                         type: 'unknown',
                         player: ''

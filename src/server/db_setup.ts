@@ -394,32 +394,39 @@ export async function insertLog(log: GameLogServer[]): Promise<LogFormResult> {
         for (let i = 1; i <= usernames.length; i++) {
             params.push('$' + i);
         }
-        let userQuery = 'SELECT username FROM known_usernames WHERE username IN (' +
-        params.join(',') +
-        ')';
+        let userQuery =
+            'SELECT username FROM known_usernames WHERE username IN (' +
+            params.join(',') +
+            ')';
 
         //Get usernames and filter
         let dominionNames = await pool.query(userQuery, usernames);
-        let dominionUsernames = dominionNames.rows.map((player) => player.username); //may need to test this line
-        usernames = usernames.filter(name => !dominionUsernames.includes(name));
+        let dominionUsernames = dominionNames.rows.map(
+            (player) => player.username
+        ); //may need to test this line
+        usernames = usernames.filter(
+            (name) => !dominionUsernames.includes(name)
+        );
 
         //Add users that aren't in the database
-        let userAddQuery = 'INSERT INTO known_usernames (username, player_name) VALUES ($1, $2)';
-        for(let user of usernames){
+        let userAddQuery =
+            'INSERT INTO known_usernames (username, player_name) VALUES ($1, $2)';
+        for (let user of usernames) {
             let currentPlayer = players.find((player) => {
                 return player.username === user;
             });
-            if(currentPlayer == undefined){
+            if (currentPlayer == undefined) {
                 allErrors.push({
                     status: 'error',
                     error: 'There was an error while adding a user: ' + user
                 });
                 break;
             }
-            await pool.query(userAddQuery, [currentPlayer.username,currentPlayer.playerName]);
+            await pool.query(userAddQuery, [
+                currentPlayer.username,
+                currentPlayer.playerName
+            ]);
         }
-        
-        
 
         // TODO : Remove, currently for testing usernames
         console.log(players);
@@ -462,8 +469,10 @@ export async function insertLog(log: GameLogServer[]): Promise<LogFormResult> {
                         .catch((error) => {
                             allErrors.push({
                                 status: 'error',
-                                error: 'DB Error while adding log: ' + error.message
-                            })
+                                error:
+                                    'DB Error while adding log: ' +
+                                    error.message
+                            });
                             console.log('DB Error while adding log: ', error);
                         });
                 }

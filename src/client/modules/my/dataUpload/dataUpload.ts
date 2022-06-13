@@ -157,18 +157,22 @@ export default class DataUploader extends LightningElement {
         let fileText = this.template.querySelector(
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
-        if (fileText !== null && fileText.files !== null && fileText.files[0] !== null) {
+        if (
+            fileText !== null &&
+            fileText.files !== null &&
+            fileText.files[0] !== null
+        ) {
             // let fileName = fileText.files[0].name;
-               fileText.files[0].text().then(async (result) => {
-            //     const e: HTMLElement | null = this.template.querySelector(
-            //         'name="' + "fileNameText" + '"'
-            //     );
-            //     if (e) {
-            //         this.showFileName = true;
-            //         e.innerHTML = "File Selected: " + fileName;
-            //     }
-            //     else{
-            //     }
+            fileText.files[0].text().then(async (result) => {
+                //     const e: HTMLElement | null = this.template.querySelector(
+                //         'name="' + "fileNameText" + '"'
+                //     );
+                //     if (e) {
+                //         this.showFileName = true;
+                //         e.innerHTML = "File Selected: " + fileName;
+                //     }
+                //     else{
+                //     }
                 this.oldGameLog = JSON.parse(result);
                 this.gameLog = await this.validatePlayers(JSON.parse(result));
                 this.displayNewGameIDs(this.gameLog);
@@ -245,7 +249,7 @@ export default class DataUploader extends LightningElement {
             let tableValue;
             for (let r = 1; r < e.rows.length; r++) {
                 tableValue = e.rows[r].cells[0];
-                if(tableValue !== null && tableValue.textContent !== null){
+                if (tableValue !== null && tableValue.textContent !== null) {
                     table.push(tableValue.textContent);
                 }
             }
@@ -258,11 +262,11 @@ export default class DataUploader extends LightningElement {
     displayNewGameIDs(file: GameLog[]): void {
         let newGameIDs: string[] = [];
         let dates: string[] = [];
-        let allPlayers:string[][] = [];
+        let allPlayers: string[][] = [];
         for (let key of file) {
             dates.push(key.date);
         }
-        for (let key in this.oldGameLog){
+        for (let key in this.oldGameLog) {
             allPlayers.push(this.oldGameLog[key]['players']);
         }
 
@@ -415,15 +419,13 @@ export default class DataUploader extends LightningElement {
             .catch((error) => console.error(error));
     }
 
-    
     handleUploadFinished(event) {
         // Get the list of uploaded files
         //const uploadedFiles = event.detail.files;
         //alert('No. of files uploaded : ' + uploadedFiles.length);
-        console.log("FILE UPLOADED");
-        prompt("test");
+        console.log('FILE UPLOADED');
+        prompt('test');
     }
-    
 
     /*
     test(): void {
