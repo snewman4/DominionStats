@@ -19,6 +19,7 @@ export default class DataUploader extends LightningElement {
     errorMessages: string[] = [];
     showErrors = false;
     showGameArea = false;
+    oldGameLog: Object = undefined;
     gameLog?: GameLog[] = undefined;
     gameIDs: string[] = [];
     tableData: GameIDsAndPlayers[] = [];
@@ -157,6 +158,7 @@ export default class DataUploader extends LightningElement {
         ) as HTMLInputElement;
         if (fileText !== null && fileText.files !== null) {
             fileText.files[0].text().then(async (result) => {
+                this.oldGameLog = JSON.parse(result);
                 this.gameLog = await this.validatePlayers(JSON.parse(result));
                 this.displayNewGameIDs(this.gameLog);
 
@@ -245,9 +247,14 @@ export default class DataUploader extends LightningElement {
     displayNewGameIDs(file: GameLog[]): void {
         let newGameIDs: string[] = [];
         let dates: string[] = [];
+        let allPlayers = [];
         for (let key of file) {
             dates.push(key.date);
         }
+        for (let key in this.oldGameLog){
+            allPlayers.push(this.oldGameLog[key]['players']);
+        }
+
         let currentDate = dates[0];
         let letter = 'a';
         for (let date of dates) {
@@ -270,7 +277,6 @@ export default class DataUploader extends LightningElement {
         this.showGameArea = false;
         this.showGameArea = true;
         let oldGameIDs: string[] = [];
-        let allPlayers: string[][] = [];
 
         for (let key of file) {
             oldGameIDs.push(key.gameID);
@@ -288,7 +294,7 @@ export default class DataUploader extends LightningElement {
                 //will change to index from array of dominion ids
                 dominionGameId: oldGameIDs[i],
                 //can be either an array or a string seprated by commas, will implement after parsing through names
-                playerNames: ['test1', 'test2']
+                playerNames: allPlayers[i]
             };
             this.tableData.push(dataRow);
         }
