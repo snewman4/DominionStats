@@ -1,6 +1,7 @@
 export interface PlayerTurn {
     gameId: string;
     playerTurn: number;
+    turnIndex: number;
     playerName: string;
     playedCards: PlayedCard[];
     purchasedCards: PlayedCard[];
@@ -32,9 +33,7 @@ export interface ActionEffect extends PlayerEffect {
 }
 
 export function isActionEffect(pe: PlayerEffect): pe is ActionEffect {
-    return (
-        pe.type === 'action' && Number.isInteger((pe as ActionEffect).action)
-    );
+    return pe.type === 'action' && !isNaN(Number((pe as ActionEffect).action));
 }
 
 // # of buys added
@@ -44,7 +43,7 @@ export interface BuyEffect extends PlayerEffect {
 }
 
 export function isBuyEffect(pe: PlayerEffect): pe is BuyEffect {
-    return pe.type === 'buy' && Number.isInteger((pe as BuyEffect).buy);
+    return pe.type === 'buy' && !isNaN(Number((pe as BuyEffect).buy));
 }
 
 // list of cards gained
@@ -74,28 +73,31 @@ export interface DrawEffect extends PlayerEffect {
 }
 
 export function isDrawEffect(pe: PlayerEffect): pe is DrawEffect {
-    return pe.type === 'draw' && Number.isInteger((pe as DrawEffect).draw);
+    return pe.type === 'draw' && !isNaN(Number((pe as DrawEffect).draw));
 }
 
 // list of cards put back into deck
 export interface DeckEffect extends PlayerEffect {
     type: 'topdeck';
-    topdeck: PlayedCard[];
+    topdeck: number;
 }
 
 export function isDeckEffect(pe: PlayerEffect): pe is DeckEffect {
-    return pe.type === 'topdeck' && Array.isArray((pe as DeckEffect).topdeck);
+    return pe.type === 'topdeck' && !isNaN(Number((pe as DeckEffect).topdeck));
 }
 
-// # of cards discarded
+// cards discarded
 export interface DiscardEffect extends PlayerEffect {
     type: 'discard';
     discard: number;
+    miscEffects: PlayerEffect[];
 }
 
 export function isDiscardEffect(pe: PlayerEffect): pe is DiscardEffect {
     return (
-        pe.type === 'discard' && Number.isInteger((pe as DiscardEffect).discard)
+        pe.type === 'discard' &&
+        !isNaN(Number((pe as DiscardEffect).discard)) &&
+        Array.isArray((pe as DiscardEffect).miscEffects)
     );
 }
 
@@ -108,7 +110,7 @@ export interface VillagerEffect extends PlayerEffect {
 export function isVillagerEffect(pe: PlayerEffect): pe is VillagerEffect {
     return (
         pe.type === 'villagers' &&
-        Number.isInteger((pe as VillagerEffect).villagers)
+        !isNaN(Number((pe as VillagerEffect).villagers))
     );
 }
 
@@ -120,7 +122,7 @@ export interface CofferEffect extends PlayerEffect {
 
 export function isCofferEffect(pe: PlayerEffect): pe is CofferEffect {
     return (
-        pe.type === 'coffers' && Number.isInteger((pe as CofferEffect).coffers)
+        pe.type === 'coffers' && !isNaN(Number((pe as CofferEffect).coffers))
     );
 }
 
@@ -131,7 +133,7 @@ export interface VPEffect extends PlayerEffect {
 }
 
 export function isVPEffect(pe: PlayerEffect): pe is VPEffect {
-    return pe.type === 'VP' && Number.isInteger((pe as VPEffect).VP);
+    return pe.type === 'VP' && !isNaN(Number((pe as VPEffect).VP));
 }
 
 // # of buying power added
@@ -143,7 +145,7 @@ export interface BuyingPowerEffect extends PlayerEffect {
 export function isBuyingPowerEffect(pe: PlayerEffect): pe is BuyingPowerEffect {
     return (
         pe.type === 'buying power' &&
-        Number.isInteger((pe as BuyingPowerEffect).buyingPower)
+        !isNaN(Number((pe as BuyingPowerEffect).buyingPower))
     );
 }
 
@@ -158,4 +160,24 @@ export function isOtherPlayerEffect(pe: PlayerEffect): pe is OtherPlayerEffect {
         pe.type === 'other players' &&
         Array.isArray((pe as OtherPlayerEffect).otherPlayers)
     );
+}
+
+// reaction card, where player describes the player who reacted
+export interface ReactionEffect extends PlayerEffect {
+    type: 'reaction';
+    reaction: PlayedCard;
+}
+
+export function isReactionEffect(pe: PlayerEffect): pe is ReactionEffect {
+    return pe.type === 'reaction' && 'reaction' in pe;
+}
+
+// exiling a card or multiple cards
+export interface ExileEffect extends PlayerEffect {
+    type: 'exile';
+    exile: PlayedCard[];
+}
+
+export function isExileEffect(pe: PlayerEffect): pe is ExileEffect {
+    return pe.type === 'exile' && Array.isArray((pe as ExileEffect).exile);
 }

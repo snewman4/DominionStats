@@ -1,5 +1,5 @@
 <template>
-    <div class="slds-text-heading_small"><b>Enter game results below:</b></div>
+    <div class="slds-text-heading_small"><b>Insert game results:</b></div>
 
     <div class="slds-form-element">
         <label class="slds-form-element__label" for="textarea-id-01"
@@ -23,6 +23,23 @@
         </div>
     </div>
 
+    <div class="slds-text-body_small">
+        This submit button refreshes the page. Please upload game logs before
+        submitting game results.
+    </div>
+
+    <lightning-button
+        label="Submit"
+        variant="brand-outline"
+        onclick={gatherDataAndSend}
+    ></lightning-button>
+
+    <br />
+    <br />
+
+    <div class="slds-text-heading_small"><b>Upload game log file(s):</b></div>
+
+    <template if:false={showGameArea}></template>
     <div class="slds-form-element">
         <span
             class="slds-form-element__label"
@@ -32,12 +49,14 @@
             <div class="slds-file-selector slds-file-selector_files">
                 <div class="slds-file-selector__dropzone">
                     <input
+                        label="test"
                         type="file"
                         class="slds-file-selector__input slds-assistive-text"
                         accept=".json"
                         name="file-upload-input-107"
                         id="file-upload-input-107"
                         aria-labelledby="file-selector-primary-label-105 file-selector-secondary-label106"
+                        onuploadfinished={handleUploadFinished}
                     />
                     <label
                         class="slds-file-selector__body"
@@ -54,24 +73,80 @@
                                 <use
                                     xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#upload"
                                 ></use></svg
-                            >Upload Game Logs</span
-                        >
-                        <span class="slds-file-selector__text slds-medium-show"
-                            >or Drop Files</span
+                            >Select Game Log File</span
                         >
                     </label>
                 </div>
             </div>
         </div>
     </div>
+    <template if:true={showFileName}>
+        <div name = "fileNameText" class="slds-text-heading_small">File Selected:</div>
+    </template>
 
     <br />
 
-    <lightning-button
-        label="Submit"
-        variant="brand-outline"
-        onclick={gatherDataAndSend}
-    ></lightning-button>
+    <template if:false={showGameArea}>
+        <lightning-button
+            label="Upload"
+            variant="brand-outline"
+            onclick={onLogFileAttached}
+        ></lightning-button>
+    </template>
+
+    <template if:true={showGameArea}>
+        <div class="slds-text-body_small">
+            Please confirm that these gameIDs are correct.
+        </div>
+    </template>
+
+    <template if:true={showGameArea}>
+        <table
+            class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
+            name="gameidtable"
+        >
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th>Custom GameID (Editable)</th>
+                    <th>Dominion GameID</th>
+                    <th>Players</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <template for:each={tableData} for:item="entry">
+                    <tr key={entry.customGameId} class="slds-hint-parent">
+                        <td><div contenteditable>{entry.customGameId}</div></td>
+                        <td>{entry.dominionGameId}</td>
+                        <td>{entry.playerNames}</td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </template>
+
+    <!-- <div class="slds-form-element__control">
+        <template if:true={showGameArea}>
+            <textarea
+                id="gameInputArea"
+                name="gameInputArea"
+                rows="5"
+                class="slds-textarea"
+                placeholder="Testing input"
+            >
+            </textarea>
+        </template>
+    </div> -->
+
+    <template if:true={showGameArea}>
+        <lightning-button
+            label="Confirm"
+            variant="brand-outline"
+            onclick={onSaveGameLogToServer}
+        ></lightning-button>
+    </template>
+
+    <br />
 
     <br />
 

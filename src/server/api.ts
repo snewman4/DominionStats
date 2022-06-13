@@ -16,7 +16,8 @@ import {
     getGameResultsFromDb,
     insertGameResult,
     insertGameResults,
-    insertLog
+    insertLog,
+    usernameCheck
 } from './db_setup';
 
 function setupRoutes() {
@@ -247,6 +248,22 @@ function setupRoutes() {
             }
             const insertResult = await insertGameResults(req.body);
             return res.status(insertResult.status).json(insertResult.results);
+        }
+    );
+
+    // API access to endpoint for username workflow
+    app.post(
+        '/api/v1/usernameCheck',
+        ensureLoggedIn({ throw: true }),
+        async (req, res) => {
+            if (process.env.NODB) {
+                return res.status(501).send();
+            }
+
+            const usernameCheckResult = await usernameCheck(req.body);
+            return res
+                .status(usernameCheckResult.status)
+                .json(usernameCheckResult.results);
         }
     );
 
