@@ -229,8 +229,12 @@ export default class DataUploader extends LightningElement {
         );
         if (e) {
             let table: string[] = [];
+            let tableValue;
             for (let r = 1; r < e.rows.length; r++) {
-                table.push(e.rows[r].cells[0].textContent);
+                tableValue = e.rows[r].cells[0];
+                if(tableValue !== null && tableValue.textContent !== null){
+                    table.push(tableValue.textContent);
+                }
             }
             return table;
         }
