@@ -1,10 +1,9 @@
 <template>
-    <table  
+    <table
         class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
     >
         <thead>
             <tr class="slds-line-height_reset">
-                <th>ID</th>
                 <th>GameID</th>
                 <th>Player Turn</th>
                 <th>Turn Index</th>
@@ -17,7 +16,6 @@
         <tbody>
             <template for:each={tableData} for:item="entry">
                 <tr key={entry.id} class="slds-hint-parent">
-                    <td>{entry.id}</td>
                     <td>{entry.game_label}</td>
                     <td>{entry.player_turn}</td>
                     <td>{entry.turn_index}</td>

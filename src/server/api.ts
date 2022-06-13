@@ -296,7 +296,7 @@ function setupRoutes() {
             return res.status(501).send();
         }
         return res.json(await getLogResultsFromDb());
-    })
+    });
 
     /*
     // Serve LWC content

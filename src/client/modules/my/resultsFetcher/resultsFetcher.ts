@@ -1,4 +1,4 @@
-import type { GameLogDB } from "./types";
+import type { GameLogDB } from './types';
 
 export interface GameResultsData {
     id: number;
@@ -37,13 +37,23 @@ export function getRawData(): Promise<GameLogDB[]> {
         return fetch('/api/v1/logData')
             .then((response) => response.json())
             .then((data) => {
+                data = data.sort((a, b) =>
+                    a.game_label === b.game_label
+                        ? a.turn_index < b.turn_index
+                            ? -1
+                            : 1
+                        : a.game_label < b.game_label
+                        ? -1
+                        : 1
+                );
                 cachedDataLog = data as GameLogDB[];
-                for(let key of data){
-                    key.id = <number>key.id;
-                    console.log('id: ', key.id);
-                    //console.log('played cards:', JSON.stringify(key.cards_played));
-                    key.cards_played = JSON.stringify(key.cards_played).split('}').join('} ');
-                    key.cards_purchased = JSON.stringify(key.cards_purchased).split('}').join('} ');
+                for (let key of data) {
+                    key.cards_played = JSON.stringify(key.cards_played)
+                        .split('}')
+                        .join('} ');
+                    key.cards_purchased = JSON.stringify(key.cards_purchased)
+                        .split('}')
+                        .join('} ');
                 }
                 return data;
             })

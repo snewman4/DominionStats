@@ -115,7 +115,9 @@ export async function getGameResultsFromDb(): Promise<GameResultsDB[]> {
 }
 
 export async function getLogResultsFromDb(): Promise<GameLogDB[]> {
-    const res = await pool.query('SELECT id, game_label, player_turn, turn_index, player_name, cards_played, cards_purchased FROM log_game_round');
+    const res = await pool.query(
+        'SELECT id, game_label, player_turn, turn_index, player_name, cards_played, cards_purchased FROM log_game_round'
+    );
     return res.rows as GameLogDB[];
 }
 

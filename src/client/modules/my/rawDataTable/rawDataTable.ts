@@ -7,6 +7,5 @@ export default class RawDataValue extends LightningElement {
     tableData: GameLogDB[] = [];
     async connectedCallback() {
         this.tableData = await getRawData();
-        console.log(this.tableData);
     }
 }
