@@ -19,7 +19,8 @@ export default class DataUploader extends LightningElement {
     errorMessages: string[] = [];
     showErrors = false;
     showGameArea = false;
-    oldGameLog: Object = undefined;
+    showFileName = false;
+    oldGameLog?: Object;
     gameLog?: GameLog[] = undefined;
     gameIDs: string[] = [];
     tableData: GameIDsAndPlayers[] = [];
@@ -156,8 +157,18 @@ export default class DataUploader extends LightningElement {
         let fileText = this.template.querySelector(
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
-        if (fileText !== null && fileText.files !== null) {
+        if (fileText !== null && fileText.files !== null && fileText.files[0] !== null) {
+            let fileName = fileText.files[0].name;
             fileText.files[0].text().then(async (result) => {
+                const e: HTMLElement | null = this.template.querySelector(
+                    'name="' + "fileNameText" + '"'
+                );
+                if (e) {
+                    this.showFileName = true;
+                    e.innerHTML = "File Selected: " + fileName;
+                }
+                else{
+                }
                 this.oldGameLog = JSON.parse(result);
                 this.gameLog = await this.validatePlayers(JSON.parse(result));
                 this.displayNewGameIDs(this.gameLog);
@@ -210,7 +221,7 @@ export default class DataUploader extends LightningElement {
      */
     getValueFromInput(name: string): string {
         const e: HTMLInputElement | null = this.template.querySelector(
-            'textarea[name="' + name + '"]'
+            '[name="' + name + '"]'
         );
         if (e) {
             return e.value.trim();
@@ -247,7 +258,7 @@ export default class DataUploader extends LightningElement {
     displayNewGameIDs(file: GameLog[]): void {
         let newGameIDs: string[] = [];
         let dates: string[] = [];
-        let allPlayers = [];
+        let allPlayers:string[][] = [];
         for (let key of file) {
             dates.push(key.date);
         }
@@ -404,15 +415,15 @@ export default class DataUploader extends LightningElement {
             .catch((error) => console.error(error));
     }
 
-    /*
+    
     handleUploadFinished(event) {
         // Get the list of uploaded files
         //const uploadedFiles = event.detail.files;
         //alert('No. of files uploaded : ' + uploadedFiles.length);
-        console.log("test");
+        console.log("FILE UPLOADED");
         prompt("test");
     }
-    */
+    
 
     /*
     test(): void {
