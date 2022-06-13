@@ -158,17 +158,17 @@ export default class DataUploader extends LightningElement {
             'input[name="file-upload-input-107"]'
         ) as HTMLInputElement;
         if (fileText !== null && fileText.files !== null && fileText.files[0] !== null) {
-            let fileName = fileText.files[0].name;
-            fileText.files[0].text().then(async (result) => {
-                const e: HTMLElement | null = this.template.querySelector(
-                    'name="' + "fileNameText" + '"'
-                );
-                if (e) {
-                    this.showFileName = true;
-                    e.innerHTML = "File Selected: " + fileName;
-                }
-                else{
-                }
+            // let fileName = fileText.files[0].name;
+               fileText.files[0].text().then(async (result) => {
+            //     const e: HTMLElement | null = this.template.querySelector(
+            //         'name="' + "fileNameText" + '"'
+            //     );
+            //     if (e) {
+            //         this.showFileName = true;
+            //         e.innerHTML = "File Selected: " + fileName;
+            //     }
+            //     else{
+            //     }
                 this.oldGameLog = JSON.parse(result);
                 this.gameLog = await this.validatePlayers(JSON.parse(result));
                 this.displayNewGameIDs(this.gameLog);
