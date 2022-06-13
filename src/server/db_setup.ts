@@ -12,7 +12,8 @@ import type {
     GameResultsFormResult,
     UsernameFormResult,
     LogFormResult,
-    UsernameMapping
+    UsernameMapping,
+    GameLogServer
 } from './common';
 import type { PlayerTurn } from './log_values';
 
@@ -371,23 +372,59 @@ export function userSymbolGenerator(
 }
 
 //Function for adding a log to the log database
-export async function insertLog(log: object): Promise<LogFormResult> {
+export async function insertLog(log: GameLogServer[]): Promise<LogFormResult> {
     let allErrors: ErrorObject[] = [];
     let allTurns: PlayerTurn[] = [];
 
     let gameID: string;
     let players: UsernameMapping[];
     let gameLog: string;
-    for (let key in log) {
-        gameID = log[key]['gameID'];
+    for (let item of log) {
+        gameID = item.gameID;
         // TODO : Add player names to database
         // TODO : May need to use JSON.parse() and some other things to get this to work
-        players = log[key]['players'];
+        players = item.players;
+
+        //Add unknown users to the database
+
+        let usernames = players.map((player) => player.username);
+        // TODO : Convert to simpler method : ... WHERE game_label = ANY($1::string[])
+        // https://stackoverflow.com/questions/10720420/node-postgres-how-to-execute-where-col-in-dynamic-value-list-query
+        let params: string[] = [];
+        for (let i = 1; i <= usernames.length; i++) {
+            params.push('$' + i);
+        }
+        let userQuery = 'SELECT username FROM known_usernames WHERE username IN (' +
+        params.join(',') +
+        ')';
+
+        //Get usernames and filter
+        let dominionNames = await pool.query(userQuery, usernames);
+        let dominionUsernames = dominionNames.rows.map((player) => player.username); //may need to test this line
+        usernames = usernames.filter(name => !dominionUsernames.includes(name));
+
+        //Add users that aren't in the database
+        let userAddQuery = 'INSERT INTO known_usernames (username, player_name) VALUES ($1, $2)';
+        for(let user of usernames){
+            let currentPlayer = players.find((player) => {
+                return player.username === user;
+            });
+            if(currentPlayer == undefined){
+                allErrors.push({
+                    status: 'error',
+                    error: 'There was an error while adding a user: ' + user
+                });
+                break;
+            }
+            await pool.query(userAddQuery, [currentPlayer.username,currentPlayer.playerName]);
+        }
+        
+        
 
         // TODO : Remove, currently for testing usernames
         console.log(players);
 
-        gameLog = log[key]['log'];
+        gameLog = item.log;
         // Check that all of the above elements actually exist in log
         if (
             gameID === undefined ||
@@ -423,8 +460,11 @@ export async function insertLog(log: object): Promise<LogFormResult> {
                     pool.query(query, values)
                         .then(() => [])
                         .catch((error) => {
+                            allErrors.push({
+                                status: 'error',
+                                error: 'DB Error while adding log: ' + error.message
+                            })
                             console.log('DB Error while adding log: ', error);
-                            return { status: 500, results: [] };
                         });
                 }
             } catch (e: any) {

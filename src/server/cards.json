@@ -457,7 +457,12 @@
         "treasure map": "action",
         "treasury": "action",
         "warehouse": "action",
-        "wharf": "action"
+        "wharf": "action",
+        "abandoned mine": "action",
+        "ruined library": "action",
+        "ruined market": "action",
+        "ruined village": "action",
+        "survivors": "action"
     },
     "AllCards": [
         "alms",
@@ -1107,6 +1112,11 @@
         "treasure map",
         "treasury",
         "warehouse",
-        "wharf"
+        "wharf",
+        "abandoned mine",
+        "ruined library",
+        "ruined market",
+        "ruined village",
+        "survivors"
     ]
 }

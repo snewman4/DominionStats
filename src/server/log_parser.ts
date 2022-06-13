@@ -499,7 +499,11 @@ export function handleEffect(sentence: string[], phase: string) {
                     };
                 // TODO : Add more get keyword effects
                 default:
-                    throw new Error('Unknown effect: ' + sentence.join(' '));
+                    console.log("Uknown action type: " + type);
+                    return {
+                        type: 'unknown',
+                        player: ''
+                    };
             }
 
         case 'gains':

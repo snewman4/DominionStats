@@ -82,3 +82,17 @@ export interface UsernameMapping {
     playerName: string;
     playerSymbol: string;
 }
+
+export interface VP {
+    player: string;
+    vp_value: string;
+}
+export interface GameLogServer {
+    VPs: VP[];
+    date: string;
+    gameID: string;
+    gameStatus: string;
+    log: string;
+    players: UsernameMapping[];
+    uuid: string;
+}
