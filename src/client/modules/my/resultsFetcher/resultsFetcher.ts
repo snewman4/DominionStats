@@ -1,5 +1,3 @@
-import type { GameLogDB } from './types';
-
 export interface GameResultsData {
     id: number;
     game_label: string;
@@ -28,10 +26,22 @@ export interface PlayerStatsAllGames {
     percent_sixth: number;
 }
 
+export interface GameLogDB {
+    id: number;
+    game_label: string;
+    player_turn: number;
+    turn_index: number;
+    player_name: string;
+    //TODO: turn to played card list if you want it to be more than just a string display
+    cards_played: string;
+    cards_purchased: string;
+}
+
 let cachedData: GameResultsData[] = [];
 let cachedDataLog: GameLogDB[] = [];
 type PlayersPerGame = Pick<GameResultsData, 'game_label' | 'player_num'>;
 
+// Returns the log data
 export function getRawData(): Promise<GameLogDB[]> {
     if (cachedDataLog && !cachedDataLog.length) {
         return fetch('/api/v1/logData')

@@ -103,7 +103,6 @@ export interface GameLogDB {
     player_turn: number;
     turn_index: number;
     player_name: string;
-    //TODO: turn to played card list
-    cards_played: string;
-    cards_purchased: string;
+    cards_played: PlayedCard[];
+    cards_purchased: PlayedCard[];
 }

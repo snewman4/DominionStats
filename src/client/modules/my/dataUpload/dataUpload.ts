@@ -359,15 +359,21 @@ export default class DataUploader extends LightningElement {
         }).then((response) => {
             if (response.status === 200) {
                 console.log('Uploaded Successfully.');
-            } else {
-                response.json().then((json) => console.error(json));
+            } else if (response.status >= 400) {
+                response
+                    .json()
+                    .then((json) => {
+                        let errors: string[] = [];
+                        for (let res of json) errors.push(res.error);
+                        // Set the error messages to be the response
+                        this.setErrorMessages(errors);
+                        console.error(errors);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
             }
         });
-        /*
-        let test: Element;
-        test = document.querySelector("tableInput");
-        console.log('tableInput', test);
-        */
     }
 
     //TODO: Change newGameIDs to Object, map from old game ids to new

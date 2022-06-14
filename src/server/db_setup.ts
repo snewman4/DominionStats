@@ -125,7 +125,7 @@ function flatArray<T>(arrarr: T[][]): T[] {
     return arrarr.reduce((acc, val) => acc.concat(val), []);
 }
 
-//Submitting an individual game
+// Submitting an individual game
 // This is the original, tried and true function
 export async function insertGameResult(
     req: GameResultsForm
@@ -200,7 +200,8 @@ export async function insertGameResult(
 // Checks the existence of an ID in the database
 // Returns list of errors, one for each duplicate ID
 export async function checkGameIdExists(
-    gameId: string[]
+    gameId: string[],
+    database: 'game_results' | 'log_game_round'
 ): Promise<ErrorObject[]> {
     //Create an array of $#'s
     let params: string[] = [];
@@ -211,7 +212,9 @@ export async function checkGameIdExists(
     // TODO : Convert to simpler method : ... WHERE game_label = ANY($1::string[])
     // https://stackoverflow.com/questions/10720420/node-postgres-how-to-execute-where-col-in-dynamic-value-list-query
     let queryText: string =
-        'SELECT DISTINCT game_label FROM game_results WHERE game_label IN (' +
+        'SELECT DISTINCT game_label FROM ' +
+        database +
+        ' WHERE game_label IN (' +
         params.join(',') +
         ')';
     const res = await pool.query(queryText, gameId);
@@ -232,8 +235,8 @@ export async function checkGameIdExists(
     return allErrors;
 }
 
-//to test data upload
-//when page is refreshed, submitted data shows up in raw results table
+// To test data upload:
+// When page is refreshed, submitted data shows up in raw results table
 // This is the new function that can handle multiple insertions
 export async function insertGameResults(
     allReq: GameResultsForm[]
@@ -242,32 +245,28 @@ export async function insertGameResults(
     let allErrors: ErrorObject[] = [];
 
     // Check all game IDs being inserted
-    const allIds: string[] = [];
-    for (let req of allReq) {
-        allIds.push(req.gameId);
-    }
-
-    let gameIdExists = await checkGameIdExists(allIds);
+    const allIds: string[] = allReq.map((element) => element.gameId);
+    let gameIdExists = await checkGameIdExists(allIds, 'game_results');
 
     if (gameIdExists.length > 0) {
         return { status: 409, results: gameIdExists };
     }
 
-    //Loops for additional game data
+    // Loops for additional game data
     for (let req of allReq) {
         // If not a duplicate, insert it
         result = await insertGameResult(req);
-        //If the result is a user input error
+        // If the result is a user input error
         if (result.status == 500 || result.status == 400) {
             allErrors = allErrors.concat(result.results);
         }
     }
 
     if (allErrors.length != 0) {
-        //If there was an eror return a status of 500 and all errors
+        // If there was an eror return a status of 500 and all errors
         return { status: 500, results: allErrors };
     } else {
-        //Other wise return success
+        // Otherwise return success
         return { status: 200, results: [] };
     }
 }
@@ -379,7 +378,7 @@ export function userSymbolGenerator(
     return userSymbolGenerator(names);
 }
 
-//Function for adding a log to the log database
+// Function for adding a log to the log database
 export async function insertLog(log: GameLogServer[]): Promise<LogFormResult> {
     let allErrors: ErrorObject[] = [];
     let allTurns: PlayerTurn[] = [];
@@ -387,13 +386,20 @@ export async function insertLog(log: GameLogServer[]): Promise<LogFormResult> {
     let gameID: string;
     let players: UsernameMapping[];
     let gameLog: string;
+
+    // Check that no duplicate logs were uploaded
+    const allIds: string[] = log.map((element) => element.gameID);
+    let gameIdExists = await checkGameIdExists(allIds, 'log_game_round');
+    if (gameIdExists.length > 0) {
+        return { status: 409, results: gameIdExists };
+    }
+
     for (let item of log) {
         gameID = item.gameID;
-        // TODO : Add player names to database
-        // TODO : May need to use JSON.parse() and some other things to get this to work
+
         players = item.players;
 
-        //Add unknown users to the database
+        // Add unknown users to the database
 
         let usernames = players.map((player) => player.username);
         // TODO : Convert to simpler method : ... WHERE game_label = ANY($1::string[])
@@ -407,16 +413,16 @@ export async function insertLog(log: GameLogServer[]): Promise<LogFormResult> {
             params.join(',') +
             ')';
 
-        //Get usernames and filter
+        // Get usernames and filter
         let dominionNames = await pool.query(userQuery, usernames);
         let dominionUsernames = dominionNames.rows.map(
             (player) => player.username
-        ); //may need to test this line
+        );
         usernames = usernames.filter(
             (name) => !dominionUsernames.includes(name)
         );
 
-        //Add users that aren't in the database
+        // Add users that aren't in the database
         let userAddQuery =
             'INSERT INTO known_usernames (username, player_name) VALUES ($1, $2)';
         for (let user of usernames) {
@@ -436,9 +442,6 @@ export async function insertLog(log: GameLogServer[]): Promise<LogFormResult> {
             ]);
         }
 
-        // TODO : Remove, currently for testing usernames
-        console.log(players);
-
         gameLog = item.log;
         // Check that all of the above elements actually exist in log
         if (
@@ -452,16 +455,14 @@ export async function insertLog(log: GameLogServer[]): Promise<LogFormResult> {
             });
             break;
         } else {
-            // TODO : Verify that this error handling actually catches correctly,
-            // and returns the correct message
             try {
                 allTurns = parseLog(gameID, players, gameLog);
                 const query =
                     'INSERT INTO log_game_round (game_label, player_turn, turn_index, player_name, cards_played, cards_purchased) VALUES ($1, $2, $3, $4, $5, $6)';
 
-                //Loop through each turn
+                // Loop through each turn
                 for (let turn of allTurns) {
-                    //Set values for the data
+                    // Set values for the data
                     const values = [
                         turn.gameId,
                         turn.playerTurn,
@@ -471,7 +472,7 @@ export async function insertLog(log: GameLogServer[]): Promise<LogFormResult> {
                         JSON.stringify(turn.purchasedCards)
                     ];
 
-                    //Make query to the server
+                    // Make query to the server
                     pool.query(query, values)
                         .then(() => [])
                         .catch((error) => {
@@ -491,8 +492,6 @@ export async function insertLog(log: GameLogServer[]): Promise<LogFormResult> {
                     error: e.message
                 });
             }
-
-            // TODO : Add data to database
         }
     }
 

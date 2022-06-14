@@ -463,15 +463,17 @@
         "ruined market": "action",
         "ruined village": "action",
         "survivors": "action",
-        "anvil": "treasure",
+        "anvil": "buy",
         "clerk": "attack",
-        "investment": "treasure",
-        "tiara": "treasure",
+        "investment": "buy",
+        "tiara": "buy",
         "charlatan": "action",
-        "collection": "treasure",
-        "crystal ball": "treasure",
+        "collection": "buy",
+        "crystal ball": "buy",
         "magnate": "action",
-        "war chest": "treasure"
+        "war chest": "buy",
+        "curse": "buy",
+        "blockade": "attack"
     },
     "AllCards": [
         "alms",
@@ -1135,6 +1137,7 @@
         "collection",
         "crystal ball",
         "magnate",
-        "war chest"
+        "war chest",
+        "blockade"
     ]
 }
