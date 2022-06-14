@@ -24,6 +24,7 @@ export default class DataUploader extends LightningElement {
     gameLog?: GameLog[] = undefined;
     gameIDs: string[] = [];
     tableData: GameIDsAndPlayers[] = [];
+
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
      */
@@ -162,17 +163,7 @@ export default class DataUploader extends LightningElement {
             fileText.files !== null &&
             fileText.files[0] !== null
         ) {
-            // let fileName = fileText.files[0].name;
             fileText.files[0].text().then(async (result) => {
-                //     const e: HTMLElement | null = this.template.querySelector(
-                //         'name="' + "fileNameText" + '"'
-                //     );
-                //     if (e) {
-                //         this.showFileName = true;
-                //         e.innerHTML = "File Selected: " + fileName;
-                //     }
-                //     else{
-                //     }
                 this.oldGameLog = JSON.parse(result);
                 this.gameLog = await this.validatePlayers(JSON.parse(result));
                 this.displayNewGameIDs(this.gameLog);
@@ -287,10 +278,11 @@ export default class DataUploader extends LightningElement {
             }
         }
 
-        //this works, I'm not sure why but this refreshes the html element to populate the table
+        // updates table and button visibiliy
         this.showGameArea = true;
         this.showGameArea = false;
         this.showGameArea = true;
+
         let oldGameIDs: string[] = [];
 
         for (let key of file) {
@@ -303,40 +295,21 @@ export default class DataUploader extends LightningElement {
             dominionGameId: '',
             playerNames: []
         };
+        //displays all info in table
         for (let i = 0; i < newGameIDs.length; i++) {
             dataRow = {
+                //all new game ids
                 customGameId: newGameIDs[i],
-                //will change to index from array of dominion ids
+                //all old game ids
                 dominionGameId: oldGameIDs[i],
-                //can be either an array or a string seprated by commas, will implement after parsing through names
+                //array of all players, seperated by game
                 playerNames: allPlayers[i]
             };
             this.tableData.push(dataRow);
         }
-
-        /*
-         //Prompt test stuff
-        let gameIDsDisplay = "";
-        for(let ids of gameIDs){
-            gameIDsDisplay += ids + " ";
-        }
-        */
-
-        //let response = prompt("Do these Game ID's look correct? (Y/N) \n" , gameIDsDisplay);
-        //console.log(response);
-
-        // (<HTMLInputElement>document.getElementById('gameArea')).value = JSON.stringify(gameIDs);
-        // let response = prompt("Do these Game ID's look correct? (Y/N) \n" + gameIDs);
-        // if(response === "Y" || response === "Yes" || response === "YES" || response === "y" || response === "yes"){
-        //     return file;
-        // }
-        // else{
-        //     return oldFile;
-        // }
-        //  return file;
     }
 
-    //When all data has been validated, upload new log file to server
+    //When all data has been validated, upload new log file to server for processing
     onSaveGameLogToServer(): void {
         //gets values from table
         let newGameIDs: string[] = [];
@@ -348,7 +321,7 @@ export default class DataUploader extends LightningElement {
 
         this.gameLog = this.replaceGameIDs(this.gameLog, newGameIDs);
         this.showGameArea = false;
-        console.log('OBJECT: ', JSON.stringify(this.gameLog));
+        console.log('Uploading Log: ', JSON.stringify(this.gameLog));
 
         fetch('api/v1/logUpload', {
             method: 'POST',
@@ -377,15 +350,11 @@ export default class DataUploader extends LightningElement {
     }
 
     //TODO: Change newGameIDs to Object, map from old game ids to new
+    //Loops through game log, replacing old gameids with new format
     replaceGameIDs(file: GameLog[], newGameIDs: string[]): GameLog[] {
         file.forEach((element, index) => {
             element.gameID = newGameIDs[index];
         });
-        /*
-        Object.keys(file).forEach((UUID: string, index) => {
-            file[UUID].gameID = newGameIDs[index];
-        });
-        */
         return file;
     }
 
@@ -424,33 +393,4 @@ export default class DataUploader extends LightningElement {
             })
             .catch((error) => console.error(error));
     }
-
-    handleUploadFinished(event) {
-        // Get the list of uploaded files
-        //const uploadedFiles = event.detail.files;
-        //alert('No. of files uploaded : ' + uploadedFiles.length);
-        console.log('FILE UPLOADED');
-        prompt('test');
-    }
-
-    /*
-    test(): void {
-        let playernames: string[] = ["mike", "bob"];
-        let playernames2: string[] = ["mike", "bob"];
-        let e1: GamePlayers = {
-            dominionGameId: "test1",
-            customGameId: "2021",
-            playerNames: playernames
-        };
-
-        let e2: GamePlayers = {
-            dominionGameId: "test2",
-            customGameId: "20223",
-            playerNames: playernames2
-        };
-
-        this.tableData.push(e1);
-        this.tableData.push(e2);
-    }
-    */
 }
