@@ -75,7 +75,7 @@ export function parseLog(
 function trimLog(log: string): string[] {
     // This uses a very specific string to identify what is an effect of another card, and appends the EFFECT
     // prefix to the sentence.
-    // This is not at all a good way to do this, but it does seem to work for everything we've tested so far
+    // This is not at all a good way to do this, but it does seem to work for every card we've tested so far
     log = log.replace(
         /<div style="display:inline; padding-left:2em; text-indent:-0.5em;">/g,
         'spacing EFFECT 1 '
@@ -84,6 +84,14 @@ function trimLog(log: string): string[] {
     log = log.replace(
         /<div style="display:inline; padding-left:3.5em; text-indent:-0.5em;">/g,
         'spacing EFFECT 2 '
+    );
+    log = log.replace(
+        /<div style="display:inline; padding-left:5em; text-indent:-0.5em;">/g,
+        'spacing EFFECT 3 '
+    );
+    log = log.replace(
+        /<div style="display:inline; padding-left:6.5em; text-indent:-0.5em;">/g,
+        'spacing EFFECT 4 '
     );
     // Does the same but for the newer/other div method
     // Single effect
@@ -100,6 +108,11 @@ function trimLog(log: string): string[] {
     log = log.replace(
         /<div style="padding-left: 11.[0-9]{0,20}%; width:86.[0-9]{0,20}%;" >/g,
         'spacing EFFECT 3'
+    );
+    // Triple nested effect
+    log = log.replace(
+        /<div style="padding-left: 14.[0-9]{0,20}%; width:83.[0-9]{0,20}%;" >/g,
+        'spacing EFFECT 4'
     );
 
     // Removes < > and any characters between them
