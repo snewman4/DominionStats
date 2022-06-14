@@ -411,6 +411,10 @@ export function handlePlayKeyword(sentence: string[]): PlayedCard[] {
         way = cardName.slice(cardName.indexOf(' using ') + 6);
         cardName = cardName.slice(0, cardName.indexOf(' using '));
     }
+    // If a card is set aside, remove the 'setting it aside' part
+    if (cardName.includes(' setting ')) {
+        cardName = cardName.slice(0, cardName.indexOf(' setting '));
+    }
 
     // Singularizing card name and verifying the card exists
     cardName = singularize(cardName);
@@ -724,6 +728,10 @@ function listCards(sentence: string[], phase) {
     // Default values
     let amount = 1;
     let retList: PlayedCard[] = [];
+
+    // If a card is set aside, remove the 'setting it aside' part
+    if (sentence.includes('setting'))
+        return listCards(sentence.slice(0, sentence.indexOf('setting')), phase);
 
     // If there are multiple cards bought that are comma seperated
     if (sentence.join().indexOf(',') != -1) {
