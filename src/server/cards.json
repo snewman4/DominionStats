@@ -471,9 +471,17 @@
         "collection": "buy",
         "crystal ball": "buy",
         "magnate": "action",
-        "war chest": "buy",
-        "curse": "buy",
-        "blockade": "attack"
+        "war chest": "treasure",
+        "astrolabe": "treasure",
+        "monkey": "action",
+        "sea chart": "action",
+        "blockade": "attack",
+        "sailor": "action",
+        "tide pools": "action",
+        "corsair": "action",
+        "pirate": "action",
+        "sea witch": "attack",
+        "curse": "buy"
     },
     "AllCards": [
         "alms",
@@ -1138,6 +1146,14 @@
         "crystal ball",
         "magnate",
         "war chest",
-        "blockade"
+        "astrolabe",
+        "monkey",
+        "sea chart",
+        "blockade",
+        "sailor",
+        "tide pools",
+        "corsair",
+        "pirate",
+        "sea witch"
     ]
 }
