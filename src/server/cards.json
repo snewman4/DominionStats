@@ -462,7 +462,16 @@
         "ruined library": "action",
         "ruined market": "action",
         "ruined village": "action",
-        "survivors": "action"
+        "survivors": "action",
+        "anvil": "treasure",
+        "clerk": "attack",
+        "investment": "treasure",
+        "tiara": "treasure",
+        "charlatan": "action",
+        "collection": "treasure",
+        "crystal ball": "treasure",
+        "magnate": "action",
+        "war chest": "treasure"
     },
     "AllCards": [
         "alms",
@@ -1117,6 +1126,15 @@
         "ruined library",
         "ruined market",
         "ruined village",
-        "survivors"
+        "survivors",
+        "anvil",
+        "clerk",
+        "investment",
+        "tiara",
+        "charlatan",
+        "collection",
+        "crystal ball",
+        "magnate",
+        "war chest"
     ]
 }
